@@ -15,7 +15,7 @@ const routes = [
   },
   {
     path: '/instock',
-    name: 'InStock',
+    name: 'Inventory',
     icon: <PackageSearch />
   }
 ]
@@ -110,7 +110,7 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
               {/* Bottom: Fixed Icons */}
               <div className="bottom_section">
                 <div
-                  className="link"
+                  className="link cursor-pointer"
                   data-pr-tooltip={!isOpen ? 'Settings' : undefined}
                   data-pr-position="right"
                 >
@@ -119,7 +119,7 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
                 </div>
 
                 <div
-                  className="link"
+                  className="link cursor-pointer"
                   data-pr-tooltip={!isOpen ? 'Profile' : undefined}
                   data-pr-position="right"
                 >
