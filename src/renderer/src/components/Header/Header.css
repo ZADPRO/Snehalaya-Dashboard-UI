@@ -7,6 +7,9 @@
   top: 0;
   left: 0;
   bottom: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
   z-index: 11;
   background-color: #8f5fa8;
   /* position: sticky !important; */
@@ -105,4 +108,25 @@
   .p-icon-field.p-icon-field-right
   .p-input-icon {
   margin-top: -13px !important;
+}
+
+.logo_image {
+  width: 40px;
+  height: 40px;
+  margin: 20px auto;
+  display: block;
+  border-radius: 50%;
+}
+
+.bottom_section {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.bottom_icon_img {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
 }

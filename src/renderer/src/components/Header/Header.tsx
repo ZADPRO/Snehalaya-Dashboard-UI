@@ -3,11 +3,11 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { NavLink, useLocation } from 'react-router-dom'
 
 import './Header.css'
-import { LayoutGrid, PackageSearch } from 'lucide-react'
+import { CircleUserRound, LayoutGrid, Menu, PackageSearch, Settings } from 'lucide-react'
 
 const routes = [
   {
-    path: '/',
+    path: '/dashboard',
     name: 'DashBoard',
     icon: <LayoutGrid />
   },
@@ -62,6 +62,15 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
               }}
               className="sidebar"
             >
+              {/* Top: Logo */}
+              <div className="">
+                <div className="link">
+                  {/* <img src="/logo.png" alt="Logo" className="logo_image" /> */}
+                  <Menu />
+                </div>
+              </div>
+
+              {/* Middle: Routes */}
               <section className="routes">
                 {routes.map((route) => (
                   <NavLink
@@ -91,8 +100,22 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
                   </NavLink>
                 ))}
               </section>
+
+              {/* Bottom: Fixed Icons */}
+              <div className="bottom_section">
+                <div className="link">
+                  <Settings />
+                  {isOpen && <span className="link_text">Settings</span>}
+                </div>
+                <div className="link">
+                  <CircleUserRound />
+                  {/* <img src="/user.png" alt="User" className="bottom_icon_img" /> */}
+                  {isOpen && <span className="link_text">Profile</span>}
+                </div>
+              </div>
             </motion.div>
-            <main style={{ width: isOpen ? '85vw' : '95vw', marginLeft: '90px' }}>{children}</main>
+
+            <main style={{ width: isOpen ? '85vw' : '97vw', marginLeft: '75px' }}>{children}</main>
           </>
         )}
         {hideSidebarPaths.includes(location.pathname) && (
