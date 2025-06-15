@@ -130,3 +130,8 @@
   height: 25px;
   border-radius: 50%;
 }
+
+.p-tooltip {
+  font-size: 0.75rem;
+  padding: 6px 5px;
+}

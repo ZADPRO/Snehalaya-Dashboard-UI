@@ -5,6 +5,8 @@ import { NavLink, useLocation } from 'react-router-dom'
 import './Header.css'
 import { CircleUserRound, LayoutGrid, Menu, PackageSearch, Settings } from 'lucide-react'
 
+import { Tooltip } from 'primereact/tooltip'
+
 const routes = [
   {
     path: '/dashboard',
@@ -48,6 +50,8 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
 
   return (
     <div>
+      <Tooltip target=".link" />
+
       <div className="main_container">
         {!hideSidebarPaths.includes(location.pathname) && (
           <>
@@ -82,6 +86,8 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
                         localStorage.clear()
                       }
                     }}
+                    data-pr-tooltip={!isOpen ? route.name : undefined}
+                    data-pr-position="right"
                   >
                     <div className="icon">{route.icon}</div>
                     <AnimatePresence>
@@ -103,13 +109,21 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
 
               {/* Bottom: Fixed Icons */}
               <div className="bottom_section">
-                <div className="link">
+                <div
+                  className="link"
+                  data-pr-tooltip={!isOpen ? 'Settings' : undefined}
+                  data-pr-position="right"
+                >
                   <Settings />
                   {isOpen && <span className="link_text">Settings</span>}
                 </div>
-                <div className="link">
+
+                <div
+                  className="link"
+                  data-pr-tooltip={!isOpen ? 'Profile' : undefined}
+                  data-pr-position="right"
+                >
                   <CircleUserRound />
-                  {/* <img src="/user.png" alt="User" className="bottom_icon_img" /> */}
                   {isOpen && <span className="link_text">Profile</span>}
                 </div>
               </div>
