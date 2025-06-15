@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+.sidebar {
+  /* background-color: #0478df; */
+  color: white;
+  /* height: 100vh; */
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 11;
+  background-color: #8f5fa8;
+  /* position: sticky !important; */
+  /* border: 1px solid #9c9c9c; */
+  position: fixed;
+  /* margin: 10px; */
+}
+
+.main_container {
+  display: flex;
+  position: sticky !important;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  height: 100vh;
+  overflow: auto;
+  z-index: 10;
+}
+
+.routes {
+  color: white;
+}
+
+.top_section {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between;
+  padding: 2vh 1.7vw;
+  font-size: 1.2rem;
+}
+
+.logo {
+  font-size: 1.3rem;
+  line-height: 0;
+}
+
+.link {
+  text-decoration: none;
+  align-items: center;
+  display: flex;
+  color: white;
+  gap: 10px;
+  border-right: 4px solid white transparent;
+  padding: 1.2vh 15px;
+  transition: 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+  margin: 10px;
+  border-radius: 8px;
+}
+
+.bars {
+  /* padding: 10px; */
+  /* width: 3px; */
+  cursor: pointer;
+  margin-right: 10px;
+  /* background-color: red; */
+}
+
+.icon {
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+}
+
+/* .link:hover {
+  color: #0478df;
+  border-right: 4px solid white;
+  transition: 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+  background-color: #fff;
+} */
+
+.active {
+  color: #8e5ea7;
+  border-right: 4px solid white;
+  transition: 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+  background-color: white;
+  margin: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.link_text {
+  white-space: nowrap;
+  font-size: 1rem;
+}
+
+.logout_section {
+  margin-top: auto;
+  padding: 10px 20px;
+}
+
+.p-fieldset-legend.p-unselectable-text {
+  margin-left: 20px !important;
+}
+
+.p-password.p-component.p-inputwrapper.p-input-icon-right
+  .p-icon-field.p-icon-field-right
+  .p-input-icon {
+  margin-top: -13px !important;
+}
