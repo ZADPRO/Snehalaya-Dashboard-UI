@@ -3,11 +3,11 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { NavLink, useLocation } from 'react-router-dom'
 
 import './Header.css'
-import { CircleUserRound, LayoutGrid, Menu, PackageSearch, Settings } from 'lucide-react'
+import { CircleUserRound, LayoutGrid, LogOut, Menu, PackageSearch, Settings } from 'lucide-react'
 
 import { Tooltip } from 'primereact/tooltip'
 
-const routes = [
+const topRoutes = [
   {
     path: '/dashboard',
     name: 'DashBoard',
@@ -17,6 +17,24 @@ const routes = [
     path: '/instock',
     name: 'Inventory',
     icon: <PackageSearch />
+  }
+]
+
+const bottomRoutes = [
+  {
+    path: '/settings',
+    name: 'Settings',
+    icon: <Settings />
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    icon: <CircleUserRound />
+  },
+  {
+    path: '/logout',
+    name: 'Logout',
+    icon: <LogOut />
   }
 ]
 
@@ -76,15 +94,13 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
 
               {/* Middle: Routes */}
               <section className="routes">
-                {routes.map((route) => (
+                {topRoutes.map((route) => (
                   <NavLink
                     to={route.path}
                     key={route.name}
-                    className="link"
+                    className={({ isActive }) => `link ${isActive ? 'active' : ''}`}
                     onClick={() => {
-                      if (route.name === 'Logout') {
-                        localStorage.clear()
-                      }
+                      if (route.name === 'Logout') localStorage.clear()
                     }}
                     data-pr-tooltip={!isOpen ? route.name : undefined}
                     data-pr-position="right"
@@ -107,25 +123,20 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
                 ))}
               </section>
 
-              {/* Bottom: Fixed Icons */}
+              {/* Bottom: Settings & Profile */}
               <div className="bottom_section">
-                <div
-                  className="link cursor-pointer"
-                  data-pr-tooltip={!isOpen ? 'Settings' : undefined}
-                  data-pr-position="right"
-                >
-                  <Settings />
-                  {isOpen && <span className="link_text">Settings</span>}
-                </div>
-
-                <div
-                  className="link cursor-pointer"
-                  data-pr-tooltip={!isOpen ? 'Profile' : undefined}
-                  data-pr-position="right"
-                >
-                  <CircleUserRound />
-                  {isOpen && <span className="link_text">Profile</span>}
-                </div>
+                {bottomRoutes.map((route) => (
+                  <NavLink
+                    to={route.path}
+                    key={route.name}
+                    className={({ isActive }) => `link ${isActive ? 'active' : ''}`}
+                    data-pr-tooltip={!isOpen ? route.name : undefined}
+                    data-pr-position="right"
+                  >
+                    <div className="icon">{route.icon}</div>
+                    {isOpen && <span className="link_text">{route.name}</span>}
+                  </NavLink>
+                ))}
               </div>
             </motion.div>
 
