@@ -14,7 +14,7 @@ const topRoutes = [
     icon: <LayoutGrid />
   },
   {
-    path: '/instock',
+    path: '/inventory',
     name: 'Inventory',
     icon: <PackageSearch />
   }
