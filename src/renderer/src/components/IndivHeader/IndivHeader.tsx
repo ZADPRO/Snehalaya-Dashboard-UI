@@ -14,7 +14,7 @@ interface IndivHeaderProps {
 
 const IndivHeader: React.FC<IndivHeaderProps> = ({ title, subtitle }) => {
   return (
-    <div className="flex justify-content-between py-3 px-5 headerIndiv">
+    <div className="flex justify-content-between py-2 px-4 headerIndiv">
       <div className="flex flex-column">
         <p className="text-lg font-bold pb-1">{title}</p>
         <p>{subtitle}</p>
