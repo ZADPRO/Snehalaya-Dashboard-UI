@@ -24,7 +24,7 @@ import 'primereact/resources/primereact.css'
 // import 'primereact/resources/themes/mdc-dark-indigo/theme.css'
 // import 'primereact/resources/themes/mdc-dark-deeppurple/theme.css'
 // SELECTED UI - 1
-import 'primereact/resources/themes/tailwind-light/theme.css'
+// import 'primereact/resources/themes/tailwind-light/theme.css'
 // import 'primereact/resources/themes/fluent-light/theme.css'
 
 // SELECTED UI - 2
@@ -47,7 +47,7 @@ import 'primereact/resources/themes/tailwind-light/theme.css'
 // import 'primereact/resources/themes/saga-blue/theme.css'
 // import 'primereact/resources/themes/saga-green/theme.css'
 // import 'primereact/resources/themes/saga-orange/theme.css'
-// import 'primereact/resources/themes/saga-purple/theme.css'
+import 'primereact/resources/themes/saga-purple/theme.css'
 // import 'primereact/resources/themes/vela-blue/theme.css'
 // import 'primereact/resources/themes/vela-green/theme.css'
 // import 'primereact/resources/themes/vela-orange/theme.css'

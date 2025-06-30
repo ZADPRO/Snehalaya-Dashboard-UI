@@ -22,6 +22,8 @@ import SettingsBank from '@renderer/components/SettingsBank/SettingsBank'
 import SettingsOverview from '@renderer/components/SettingsOverview/SettingsOverview'
 import SettingsAttributes from '@renderer/components/SettingsAttributes/SettingsAttributes'
 
+import './Settings.css'
+
 // Sidebar items config
 const sidebarItems = [
   {
@@ -67,7 +69,7 @@ const Settings: React.FC = () => {
     <div className="h-full flex flex-column">
       <IndivHeader title="Settings" subtitle="Monday, Jun 15, 2025" />
       <div
-        className="flex flex-1 m-3 border-round-md shadow-2"
+        className="flex flex-1 m-3 border-round-md shadow-1"
         style={{ height: 'calc(100% - 80px)' }}
       >
         <div className="flex flex-column p-3 border-round-md" style={{ width: '20%' }}>
