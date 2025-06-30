@@ -7,7 +7,9 @@ import {
   PackageSearch,
   UsersRound,
   BadgeInfo,
-  Banknote
+  Banknote,
+  PanelsTopLeft,
+  SlidersVertical
 } from 'lucide-react'
 import { Divider } from 'primereact/divider'
 import SettingsCategories from '@renderer/components/SettingsCategories/SettingsCategories'
@@ -17,9 +19,17 @@ import SettingsSuppliers from '@renderer/components/SettingsSuppliers/SettingsSu
 import SettingsUsers from '@renderer/components/SettingsUsers/SettingsUsers'
 import SettingsEmployees from '@renderer/components/SettingsEmployees/SettingsEmployees'
 import SettingsBank from '@renderer/components/SettingsBank/SettingsBank'
+import SettingsOverview from '@renderer/components/SettingsOverview/SettingsOverview'
+import SettingsAttributes from '@renderer/components/SettingsAttributes/SettingsAttributes'
 
 // Sidebar items config
 const sidebarItems = [
+  {
+    key: 'overview',
+    label: 'Overview',
+    icon: <PanelsTopLeft />,
+    component: <SettingsOverview />
+  },
   {
     key: 'categories',
     label: 'Categories',
@@ -39,7 +49,13 @@ const sidebarItems = [
     icon: <PackageSearch />,
     component: <SettingsSuppliers />
   },
-  { key: 'users', label: 'Users', icon: <UsersRound />, component: <SettingsUsers /> },
+  {
+    key: 'attributes',
+    label: 'Attributes',
+    icon: <SlidersVertical />,
+    component: <SettingsAttributes />
+  },
+  { key: 'users', label: 'Users Roles', icon: <UsersRound />, component: <SettingsUsers /> },
   { key: 'employees', label: 'Employees', icon: <BadgeInfo />, component: <SettingsEmployees /> },
   { key: 'bank', label: 'Bank', icon: <Banknote />, component: <SettingsBank /> }
 ]
