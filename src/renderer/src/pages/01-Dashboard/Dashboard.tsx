@@ -5,6 +5,7 @@ import { Divider } from 'primereact/divider'
 import { Skeleton } from 'primereact/skeleton'
 
 const Dashboard: React.FC = () => {
+  // CARD ALIGNMENT DATA
   const metricsData = [
     {
       icon: <ChartNoAxesCombined />,
@@ -86,7 +87,13 @@ const Dashboard: React.FC = () => {
             </div>
             <p className="text-2xl font-bold">{metric.value}</p>
             <p className="text-xs">
-              <span className="font-semibold">{metric.growth}</span> from last month
+              <span
+                className="font-semibold"
+                style={{ color: metric.growth.startsWith('+') ? 'green' : 'red' }}
+              >
+                {metric.growth}
+              </span>{' '}
+              from last month
             </p>
           </>
         ) : (
@@ -122,7 +129,13 @@ const Dashboard: React.FC = () => {
             </div>
             <p className="text-2xl font-bold">{metric.value}</p>
             <p className="text-xs">
-              <span className="font-semibold">{metric.growth}</span> from last month
+              <span
+                className="font-semibold"
+                style={{ color: metric.growth.startsWith('+') ? 'green' : 'red' }}
+              >
+                {metric.growth}
+              </span>{' '}
+              from last month
             </p>
           </>
         ) : (
@@ -149,8 +162,8 @@ const Dashboard: React.FC = () => {
     <div>
       <IndivHeader title="Dashboard" subtitle="Monday, Jun 15, 2025" />
 
-      <div className="flex m-3">
-        <div className="dashboardItems flex gap-3" style={{ width: '100%' }}>
+      <div className="flex flex-column m-3">
+        <div className="dashboardItems flex flex-row gap-3" style={{ width: '100%' }}>
           {/* Column 1 - 30% */}
           <div className="flex flex-column gap-3" style={{ width: '30%' }}>
             {col1Rows}

@@ -17,7 +17,7 @@ const IndivHeader: React.FC<IndivHeaderProps> = ({ title, subtitle }) => {
     <div className="flex justify-content-between py-2 px-4 headerIndiv">
       <div className="flex flex-column">
         <p className="text-lg font-bold pb-1">{title}</p>
-        <p>{subtitle}</p>
+        <p className="text-xs">{subtitle}</p>
       </div>
       <div className="flex align-items-center gap-3">
         <IconField iconPosition="left">
