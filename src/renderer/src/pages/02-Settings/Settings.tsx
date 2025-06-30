@@ -10,29 +10,38 @@ import {
   Banknote
 } from 'lucide-react'
 import { Divider } from 'primereact/divider'
+import SettingsCategories from '@renderer/components/SettingsCategories/SettingsCategories'
+import SettingsSubCategories from '@renderer/components/SettingsSubCategories/SettingsSubCategories'
+import SettingsBranches from '@renderer/components/SettingsBranches/SettingsBranches'
+import SettingsSuppliers from '@renderer/components/SettingsSuppliers/SettingsSuppliers'
+import SettingsUsers from '@renderer/components/SettingsUsers/SettingsUsers'
+import SettingsEmployees from '@renderer/components/SettingsEmployees/SettingsEmployees'
+import SettingsBank from '@renderer/components/SettingsBank/SettingsBank'
 
-// Dummy components for demonstration
-const Categories = () => <div>Categories Component</div>
-const SubCategories = () => <div>Sub Categories Component</div>
-const Branches = () => <div>Branches Component</div>
-const Suppliers = () => <div>Suppliers Component</div>
-const Users = () => <div>Users Component</div>
-const Employees = () => <div>Employees Component</div>
-const Bank = () => <div>Bank Component</div>
-
+// Sidebar items config
 const sidebarItems = [
-  { key: 'categories', label: 'Categories', icon: <FolderKanban />, component: <Categories /> },
+  {
+    key: 'categories',
+    label: 'Categories',
+    icon: <FolderKanban />,
+    component: <SettingsCategories />
+  },
   {
     key: 'subcategories',
     label: 'Sub Categories',
     icon: <Layers3 />,
-    component: <SubCategories />
+    component: <SettingsSubCategories />
   },
-  { key: 'branches', label: 'Branches', icon: <Landmark />, component: <Branches /> },
-  { key: 'suppliers', label: 'Suppliers', icon: <PackageSearch />, component: <Suppliers /> },
-  { key: 'users', label: 'Users', icon: <UsersRound />, component: <Users /> },
-  { key: 'employees', label: 'Employees', icon: <BadgeInfo />, component: <Employees /> },
-  { key: 'bank', label: 'Bank', icon: <Banknote />, component: <Bank /> }
+  { key: 'branches', label: 'Branches', icon: <Landmark />, component: <SettingsBranches /> },
+  {
+    key: 'suppliers',
+    label: 'Suppliers',
+    icon: <PackageSearch />,
+    component: <SettingsSuppliers />
+  },
+  { key: 'users', label: 'Users', icon: <UsersRound />, component: <SettingsUsers /> },
+  { key: 'employees', label: 'Employees', icon: <BadgeInfo />, component: <SettingsEmployees /> },
+  { key: 'bank', label: 'Bank', icon: <Banknote />, component: <SettingsBank /> }
 ]
 
 const Settings: React.FC = () => {
@@ -42,22 +51,28 @@ const Settings: React.FC = () => {
     <div className="h-full flex flex-column">
       <IndivHeader title="Settings" subtitle="Monday, Jun 15, 2025" />
       <div
-        className="flex flex-1 m-3 shadow-2 border-round-md"
+        className="flex flex-1 m-3 border-round-md shadow-2"
         style={{ height: 'calc(100% - 80px)' }}
       >
-        <div className="flex flex-column p-2 border-round-md" style={{ width: '20%' }}>
+        <div className="flex flex-column p-3 border-round-md" style={{ width: '20%' }}>
           <div className="sidebarContainer flex flex-column gap-2">
-            {sidebarItems.map((item) => (
-              <div
-                key={item.key}
-                onClick={() => setActiveKey(item.key)}
-                className={`iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2 ${activeKey === item.key ? 'bg-blue-100' : ''}`}
-                style={{ border: '1px solid #8e5ea8' }}
-              >
-                {item.icon}
-                <p>{item.label}</p>
-              </div>
-            ))}
+            {sidebarItems.map((item) => {
+              const isActive = item.key === activeKey
+              return (
+                <div
+                  key={item.key}
+                  onClick={() => setActiveKey(item.key)}
+                  className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
+                  style={{
+                    border: '1px solid #8e5ea8',
+                    backgroundColor: isActive ? '#f3e9f8' : 'transparent'
+                  }}
+                >
+                  {item.icon}
+                  <p className="m-0">{item.label}</p>
+                </div>
+              )
+            })}
           </div>
         </div>
 
