@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { JSX } from 'react'
 import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
 import { ChartNoAxesCombined, ShoppingBasket, Sparkles, Users, IndianRupee } from 'lucide-react'
 import { Divider } from 'primereact/divider'
@@ -54,13 +54,19 @@ const Dashboard: React.FC = () => {
 
   // Step 1: Fill up to 8 cards (data + skeletons)
   const totalCards = 8
-  const filledMetrics = [...metricsData]
+
+  const filledMetrics: ({
+    icon: JSX.Element
+    title: string
+    value: string
+    growth: string
+  } | null)[] = [...metricsData]
+
   const skeletonCount = totalCards - filledMetrics.length
 
   for (let i = 0; i < skeletonCount; i++) {
-    filledMetrics.push(null) // null means render skeleton
+    filledMetrics.push(null)
   }
-
   // Step 2: Create rows with 2 cards per row for each column
   const col1Rows: React.ReactNode[] = []
   const col2Rows: React.ReactNode[] = []
@@ -121,12 +127,12 @@ const Dashboard: React.FC = () => {
           </>
         ) : (
           <>
-            <div className="flex align-items-center justify-content-between">
-              <Skeleton width="2rem" height="2rem" shape="circle" />
-              <Skeleton width="6rem" height="1rem" />
+            <div className="flex align-items-center gap-3">
+              <Skeleton width="1.3rem" height="1.3rem" shape="circle" />
+              <Skeleton width="7rem" height="1.3rem" />
             </div>
-            <Skeleton width="8rem" height="1.5rem" />
-            <Skeleton width="6rem" height="1rem" />
+            <Skeleton width="10rem" height="1.5rem" />
+            <Skeleton width="9rem" height="1.5rem" />
           </>
         )}
       </div>
