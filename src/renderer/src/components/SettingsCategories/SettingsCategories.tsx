@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { Button } from 'primereact/button'
@@ -9,6 +9,7 @@ import { IconField } from 'primereact/iconfield'
 import { InputIcon } from 'primereact/inputicon'
 import { Sidebar } from 'primereact/sidebar'
 import SettingsAddNewCategories from './SettingsAddNewCategories'
+import { Toast } from 'primereact/toast'
 
 interface Category {
   refCategoryId: number
@@ -27,6 +28,10 @@ const SettingsCategories: React.FC = () => {
   const [visibleRight, setVisibleRight] = useState(false)
 
   const dtRef = React.useRef<DataTable<Category[]>>(null)
+
+  const [editData, setEditData] = useState<Category | null>(null)
+  const [mode, setMode] = useState<'add' | 'edit'>('add')
+  const toast = useRef<Toast>(null)
 
   useEffect(() => {
     fetchData()
@@ -95,8 +100,53 @@ const SettingsCategories: React.FC = () => {
     </IconField>
   )
 
+  const actionBody = (rowData: Category) => (
+    <div className="flex gap-2">
+      <Button
+        icon="pi pi-pencil"
+        rounded
+        text
+        severity="info"
+        onClick={() => {
+          setEditData(rowData)
+          setMode('edit')
+          setVisibleRight(true)
+        }}
+      />
+      <Button
+        icon="pi pi-trash"
+        rounded
+        text
+        severity="danger"
+        onClick={() => handleDelete(rowData.refCategoryId)}
+      />
+    </div>
+  )
+
+  const handleDelete = (id: number) => {
+    setCategories((prev) => prev.filter((c) => c.refCategoryId !== id))
+    toast.current?.show({
+      severity: 'success',
+      summary: 'Deleted',
+      detail: 'Category deleted successfully',
+      life: 2000
+    })
+  }
+
+  const handleSave = (newCategory: Category) => {
+    setCategories((prev) => [...prev, newCategory])
+  }
+
+  const handleUpdate = (updatedCategory: Category) => {
+    setCategories((prev) =>
+      prev.map((c) => (c.refCategoryId === updatedCategory.refCategoryId ? updatedCategory : c))
+    )
+  }
+
   return (
     <div className="card">
+      <Toast ref={toast} />
+
       <Toolbar className="mb-4" left={rightHeader} right={leftHeader} />
 
       <DataTable
@@ -120,15 +170,26 @@ const SettingsCategories: React.FC = () => {
         <Column header="Status" body={activeStatusBody} />
         <Column field="createdAt" header="Created At" sortable />
         <Column field="createdBy" header="Created By" sortable />
+        <Column header="Actions" body={actionBody} />
       </DataTable>
 
       <Sidebar
         visible={visibleRight}
         position="right"
-        onHide={() => setVisibleRight(false)}
+        onHide={() => {
+          setVisibleRight(false)
+          setEditData(null)
+          setMode('add')
+        }}
         style={{ width: '50vw' }}
       >
-        <SettingsAddNewCategories />
+        <SettingsAddNewCategories
+          mode={mode}
+          editData={editData}
+          onClose={() => setVisibleRight(false)}
+          onSave={handleSave}
+          onUpdate={handleUpdate}
+        />
       </Sidebar>
     </div>
   )
