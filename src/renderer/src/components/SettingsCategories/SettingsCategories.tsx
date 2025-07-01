@@ -10,6 +10,7 @@ import { InputIcon } from 'primereact/inputicon'
 import { Sidebar } from 'primereact/sidebar'
 import SettingsAddNewCategories from './SettingsAddNewCategories'
 import { Toast } from 'primereact/toast'
+import axios from 'axios'
 
 interface Category {
   refCategoryId: number
@@ -37,35 +38,23 @@ const SettingsCategories: React.FC = () => {
     fetchData()
   }, [])
 
-  const fetchData = () => {
-    const response = {
-      data: [
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/admin/settings/categories`,
         {
-          refCategoryId: 0,
-          categoryName: 'Category 001',
-          categoryCode: 'C001',
-          isActive: true,
-          createdAt: '2025-06-23 15:50:56',
-          createdBy: 'Admin',
-          updatedAt: '',
-          updatedBy: ''
-        },
-        {
-          refCategoryId: 1,
-          categoryName: 'Category 002',
-          categoryCode: 'C002',
-          isActive: false,
-          createdAt: '2025-06-23 15:53:12',
-          createdBy: 'Admin',
-          updatedAt: '',
-          updatedBy: ''
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token')
+          }
         }
-      ],
-      status: true
-    }
-
-    if (response.status) {
-      setCategories(response.data)
+      )
+      console.log('response', response)
+      if (response.status) {
+        setCategories(response.data.data)
+      }
+    } catch (error) {
+      console.log(error)
     }
   }
 
