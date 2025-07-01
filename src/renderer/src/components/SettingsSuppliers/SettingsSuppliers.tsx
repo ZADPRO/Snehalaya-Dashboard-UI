@@ -59,7 +59,7 @@ const SettingsSuppliers: React.FC = () => {
     const dummyData: Supplier[] = [
       {
         supplierId: 12,
-        supplierName: 'Thiru Kumar Updated',
+        supplierName: 'Thiru Kumara Updated',
         supplierCompanyName: 'IT Solutions',
         supplierCode: 'SUP001',
         supplierEmail: 'thiru.updated@example.com',

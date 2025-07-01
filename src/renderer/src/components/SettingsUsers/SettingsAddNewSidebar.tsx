@@ -38,18 +38,45 @@ const SettingsAddNewSidebar: React.FC = () => {
     { id: 1, moduleName: 'Dashboard', visible: true, canView: true, canEdit: false },
     { id: 2, moduleName: 'Inventory', visible: true, canView: false, canEdit: false },
     { id: 3, moduleName: 'Products (PO)', visible: false, canView: false, canEdit: false },
-    { id: 4, moduleName: 'Sales Order', visible: true, canView: true, canEdit: true }
+    { id: 4, moduleName: 'Sales Order', visible: true, canView: true, canEdit: true },
+    { id: 5, moduleName: 'Settings', visible: true, canView: true, canEdit: true },
+    { id: 6, moduleName: 'Profile', visible: true, canView: true, canEdit: true }
   ])
 
   const handleCheckboxChange = (id: number, field: keyof ModulePermission, checked: boolean) => {
     setPermissions((prev) =>
-      prev.map((module) => (module.id === id ? { ...module, [field]: checked } : module))
+      prev.map((module) => {
+        if (module.id === id) {
+          const updatedModule = { ...module, [field]: checked }
+          // If "Edit" is being checked, force "View" to true
+          if (field === 'canEdit' && checked) {
+            updatedModule.canView = true
+          }
+          // If "View" is being unchecked and "Edit" is true, disable "Edit"
+          if (field === 'canView' && !checked && module.canEdit) {
+            updatedModule.canEdit = false
+          }
+
+          return updatedModule
+        }
+        return module
+      })
     )
   }
 
   const handleVisibilityToggle = (id: number, checked: boolean) => {
     setPermissions((prev) =>
-      prev.map((module) => (module.id === id ? { ...module, visible: checked } : module))
+      prev.map((module) =>
+        module.id === id
+          ? {
+              ...module,
+              visible: checked,
+              // Reset view/edit to false if turning off visibility
+              canView: checked ? module.canView : false,
+              canEdit: checked ? module.canEdit : false
+            }
+          : module
+      )
     )
   }
 
@@ -65,13 +92,13 @@ const SettingsAddNewSidebar: React.FC = () => {
       inputId={`${field}-${rowData.id}`}
       checked={rowData[field] as boolean}
       onChange={(e) => handleCheckboxChange(rowData.id, field, e.checked!)}
+      disabled={!rowData.visible}
     />
   )
 
   const handleSave = () => {
     console.log('Selected Role:', selectedRole)
     console.log('Permissions:', permissions)
-
     // Save logic here...
   }
 

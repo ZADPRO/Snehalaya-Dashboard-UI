@@ -26,12 +26,12 @@ import './Settings.css'
 
 // Sidebar items config
 const sidebarItems = [
-  {
-    key: 'overview',
-    label: 'Overview',
-    icon: <PanelsTopLeft />,
-    component: <SettingsOverview />
-  },
+  // {
+  //   key: 'overview',
+  //   label: 'Overview',
+  //   icon: <PanelsTopLeft />,
+  //   component: <SettingsOverview />
+  // },
   {
     key: 'categories',
     label: 'Categories',
@@ -63,7 +63,7 @@ const sidebarItems = [
 ]
 
 const Settings: React.FC = () => {
-  const [activeKey, setActiveKey] = useState('overview')
+  const [activeKey, setActiveKey] = useState('categories')
 
   return (
     <div className="h-full flex flex-column">

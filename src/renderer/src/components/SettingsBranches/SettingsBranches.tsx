@@ -281,13 +281,13 @@ const SettingsBranches: React.FC = () => {
         />
         <Column
           field="refBranchName"
-          header="Category Name"
+          header="Branch Name"
           sortable
           style={{ minWidth: '5rem' }}
         />
         <Column
           field="refBranchCode"
-          header="Category Code"
+          header="Branch Code"
           sortable
           style={{ minWidth: '5rem' }}
         />
