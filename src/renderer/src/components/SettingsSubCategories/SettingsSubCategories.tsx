@@ -11,6 +11,7 @@ import { Sidebar } from 'primereact/sidebar'
 import { Toast } from 'primereact/toast'
 
 import SettingsAddNewSubCategories from './SettingsAddNewSubCategories'
+import axios from 'axios'
 
 interface Category {
   refCategoryId: number
@@ -45,44 +46,43 @@ const SettingsSubCategories: React.FC = () => {
     fetchSubCategories()
   }, [])
 
-  const fetchCategories = () => {
-    setCategories([
-      { refCategoryId: 1, categoryName: 'Category 001' },
-      { refCategoryId: 2, categoryName: 'Category 002' }
-    ])
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/admin/settings/categories`,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token')
+          }
+        }
+      )
+      console.log('response', response)
+      if (response.status) {
+        setCategories(response.data.data)
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
-  const fetchSubCategories = () => {
-    const response = {
-      data: [
+  const fetchSubCategories = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/admin/settings/subcategories`,
         {
-          refSubCategoryId: 100,
-          parentCategoryId: 1,
-          subCategoryName: 'Sub Cat A',
-          subCategoryCode: 'SCA',
-          isActive: true,
-          createdAt: '2025-07-01',
-          createdBy: 'Admin',
-          updatedAt: '',
-          updatedBy: ''
-        },
-        {
-          refSubCategoryId: 101,
-          parentCategoryId: 2,
-          subCategoryName: 'Sub Cat B',
-          subCategoryCode: 'SCB',
-          isActive: false,
-          createdAt: '2025-07-01',
-          createdBy: 'Admin',
-          updatedAt: '',
-          updatedBy: ''
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token')
+          }
         }
-      ],
-      status: true
-    }
-
-    if (response.status) {
-      setSubCategories(response.data)
+      )
+      console.log('response', response)
+      if (response.status) {
+        setSubCategories(response.data.data)
+      }
+    } catch (error) {
+      console.log(error)
     }
   }
 
@@ -98,6 +98,7 @@ const SettingsSubCategories: React.FC = () => {
   )
 
   const categoryNameBody = (rowData: SubCategory) => {
+    console.log('rowData', rowData)
     const category = categories.find((c) => c.refCategoryId === rowData.parentCategoryId)
     return category ? category.categoryName : '-'
   }
@@ -123,26 +124,119 @@ const SettingsSubCategories: React.FC = () => {
     </div>
   )
 
-  const handleDelete = (id: number) => {
-    setSubCategories((prev) => prev.filter((s) => s.refSubCategoryId !== id))
-    toast.current?.show({
-      severity: 'success',
-      summary: 'Deleted',
-      detail: 'Sub-category deleted successfully',
-      life: 2000
-    })
-  }
-
-  const handleSave = (newSubCategory: SubCategory) => {
-    setSubCategories((prev) => [...prev, newSubCategory])
-  }
-
-  const handleUpdate = (updatedSubCategory: SubCategory) => {
-    setSubCategories((prev) =>
-      prev.map((s) =>
-        s.refSubCategoryId === updatedSubCategory.refSubCategoryId ? updatedSubCategory : s
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/admin/settings/subcategories/${id}`,
+        {
+          headers: {
+            Authorization: sessionStorage.getItem('token')
+          }
+        }
       )
-    )
+
+      if (response.data?.status) {
+        fetchSubCategories()
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Deleted',
+          detail: 'Sub-category deleted successfully',
+          life: 2000
+        })
+      } else {
+        toast.current?.show({
+          severity: 'warn',
+          summary: 'Warning',
+          detail: response.data?.message || 'Unable to delete sub-category',
+          life: 3000
+        })
+      }
+    } catch (error) {
+      console.error(error)
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to delete sub-category',
+        life: 2000
+      })
+    }
+  }
+
+  const handleSave = async (newSubCategory: SubCategory) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/admin/settings/subcategories`,
+        {
+          subCategoryName: newSubCategory.subCategoryName,
+          subCategoryCode: newSubCategory.subCategoryCode,
+          refCategoryId: newSubCategory.parentCategoryId,
+          isActive: newSubCategory.isActive
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token')
+          }
+        }
+      )
+
+      if (response.data?.status) {
+        fetchSubCategories()
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Sub-category created successfully',
+          life: 2000
+        })
+      }
+    } catch (error) {
+      console.error(error)
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to create sub-category',
+        life: 2000
+      })
+    }
+  }
+
+  const handleUpdate = async (updatedSubCategory: SubCategory) => {
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/admin/settings/subcategories`,
+        {
+          refSubCategoryId: updatedSubCategory.refSubCategoryId,
+          subCategoryName: updatedSubCategory.subCategoryName,
+          subCategoryCode: updatedSubCategory.subCategoryCode,
+          refCategoryId: updatedSubCategory.parentCategoryId,
+          isActive: updatedSubCategory.isActive
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token')
+          }
+        }
+      )
+
+      if (response.data?.status) {
+        fetchSubCategories()
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Updated',
+          detail: 'Sub-category updated successfully',
+          life: 2000
+        })
+      }
+    } catch (error) {
+      console.error(error)
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to update sub-category',
+        life: 2000
+      })
+    }
   }
 
   const leftHeader = (
