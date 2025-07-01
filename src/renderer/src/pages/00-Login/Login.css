@@ -1,0 +1,181 @@
+.login-box {
+  font-family: 'Noto Sans', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 780;
+  font-style: normal;
+  font-variation-settings: 'wdth' 100;
+}
+.login-wrapper {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(-135deg, #b073de 0%, #41195a 50%, #80599e 100%);
+  font-family: 'Noto Sans', sans-serif;
+}
+
+.carousel-box {
+  width: 50%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px 10px 10px 10px;
+  height: 90%;
+  margin-left: 1px;
+}
+
+.slide-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(179, 37, 211, 0.3), rgba(0, 0, 0, 0.7));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  color: white;
+  text-align: center;
+}
+
+.logo {
+  width: 10%;
+  top: 0;
+}
+
+.login-form {
+  width: 45%;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.slide-text {
+  font-size: 1.5rem;
+  margin: 10px 0;
+  font-weight: 500;
+}
+
+.indicator {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+  /* justify-content: center; */
+}
+
+.dot {
+  width: 50px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  /* transition: all 0.1s ease; */
+  transition: background-color 0.3s;
+}
+
+.dot.active {
+  /* width: 14px; */
+  background: rgb(230, 225, 225);
+}
+
+.brand {
+  font-size: 3rem;
+  font-weight: 100;
+  margin-bottom: 40px;
+  margin-right: 140px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-group .icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: white;
+}
+
+.input-group input,
+.input-group .p-inputtext {
+  height: 60px;
+  padding: 10px 12px 10px 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  color: white;
+  outline: none;
+  width: 350px;
+}
+
+.input-group input::placeholder,
+.input-group .p-inputtext::placeholder {
+  color: white;
+  opacity: 0.8;
+}
+
+.input-group .p-password {
+  width: 100%;
+}
+
+.input-group .p-password input {
+  padding-left: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  color: white;
+}
+
+.input-group .p-password input::placeholder {
+  color: white;
+  opacity: 0.8;
+}
+
+.options {
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  margin-left: -210px;
+}
+
+.login-button {
+  width: 350px;
+  padding: 12px;
+  background: linear-gradient(-135deg, #6d319b 0%, #38174c 50%, #9a5ec7 100%);
+  border: 1px solid white;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.forgot-text {
+  font-size: 0.89rem;
+  text-align: center;
+  font-family: 'cursive';
+}
+
+.forgot-text a {
+  color: fff;
+  text-decoration: underline;
+  font-family: 'cursive';
+}
+
+.p-password.p-component.p-inputwrapper.p-input-icon-right
+  .p-icon-field.p-icon-field-right
+  .p-input-icon {
+  color: white !important;
+}

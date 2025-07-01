@@ -1,4 +1,5 @@
-.p-icon-field.p-icon-field-left .pi.pi-search.p-input-icon {
+.p-icon-field.p-icon-field-left .pi.pi-search.p-input-icon,
+.p-icon-field.p-icon-field-left .pi.pi-user.p-input-icon {
   margin-top: -8px;
 }
 
