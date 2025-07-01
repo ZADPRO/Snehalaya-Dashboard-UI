@@ -20,7 +20,7 @@ interface Category {
 
 interface SubCategory {
   refSubCategoryId: number
-  parentCategoryId: number
+  refCategoryId: number // <- use this name to match API
   subCategoryName: string
   subCategoryCode: string
   isActive: boolean
@@ -98,8 +98,7 @@ const SettingsSubCategories: React.FC = () => {
   )
 
   const categoryNameBody = (rowData: SubCategory) => {
-    console.log('rowData', rowData)
-    const category = categories.find((c) => c.refCategoryId === rowData.parentCategoryId)
+    const category = categories.find((c) => c.refCategoryId === rowData.refCategoryId)
     return category ? category.categoryName : '-'
   }
 

@@ -12,7 +12,7 @@ interface SubCategoryStatusOptions {
 
 export interface SubCategory {
   refSubCategoryId: number
-  parentCategoryId: number
+  refCategoryId: number // <- use this name to match API
   subCategoryName: string
   subCategoryCode: string
   isActive: boolean
@@ -67,7 +67,7 @@ const SettingsAddNewSubCategories: React.FC<Props> = ({
 
   useEffect(() => {
     if (mode === 'edit' && editData) {
-      const categoryMatch = categories.find((c) => c.refCategoryId === editData.parentCategoryId)
+      const categoryMatch = categories.find((c) => c.refCategoryId === editData.refCategoryId)
       setFormData({
         parentCategory: categoryMatch || null,
         subCategoryName: editData.subCategoryName,
