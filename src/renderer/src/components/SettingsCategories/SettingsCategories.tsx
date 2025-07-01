@@ -7,6 +7,8 @@ import { InputText } from 'primereact/inputtext'
 import { Toolbar } from 'primereact/toolbar'
 import { IconField } from 'primereact/iconfield'
 import { InputIcon } from 'primereact/inputicon'
+import { Sidebar } from 'primereact/sidebar'
+import SettingsAddNewCategories from './SettingsAddNewCategories'
 
 interface Category {
   refCategoryId: number
@@ -22,6 +24,7 @@ interface Category {
 const SettingsCategories: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([])
   const [globalFilter, setGlobalFilter] = useState<string>('')
+  const [visibleRight, setVisibleRight] = useState(false)
 
   const dtRef = React.useRef<DataTable<Category[]>>(null)
 
@@ -75,7 +78,7 @@ const SettingsCategories: React.FC = () => {
   const leftHeader = (
     <div className="flex gap-2 items-center">
       <Button icon="pi pi-file-excel" severity="success" onClick={exportExcel} />
-      <Button label="" icon="pi pi-plus" />
+      <Button label="" icon="pi pi-plus" onClick={() => setVisibleRight(true)} />
       <Button label="" icon="pi pi-refresh" severity="secondary" onClick={fetchData} />
     </div>
   )
@@ -118,6 +121,15 @@ const SettingsCategories: React.FC = () => {
         <Column field="createdAt" header="Created At" sortable />
         <Column field="createdBy" header="Created By" sortable />
       </DataTable>
+
+      <Sidebar
+        visible={visibleRight}
+        position="right"
+        onHide={() => setVisibleRight(false)}
+        style={{ width: '50vw' }}
+      >
+        <SettingsAddNewCategories />
+      </Sidebar>
     </div>
   )
 }

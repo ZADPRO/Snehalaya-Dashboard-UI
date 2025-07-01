@@ -1,3 +1,19 @@
 .p-column-header-content {
   justify-content: space-between;
 }
+
+.p-float-label label {
+  margin-top: -8px;
+}
+
+.p-inputtext:enabled:focus {
+  box-shadow: none;
+}
+
+.p-button {
+  box-shadow: none;
+}
+
+.p-dropdown:not(.p-disabled).p-focus {
+  box-shadow: none;
+}
