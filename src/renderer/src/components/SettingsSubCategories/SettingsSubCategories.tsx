@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { Button } from 'primereact/button'
@@ -8,12 +8,20 @@ import { Toolbar } from 'primereact/toolbar'
 import { IconField } from 'primereact/iconfield'
 import { InputIcon } from 'primereact/inputicon'
 import { Sidebar } from 'primereact/sidebar'
+import { Toast } from 'primereact/toast'
+
 import SettingsAddNewSubCategories from './SettingsAddNewSubCategories'
 
 interface Category {
   refCategoryId: number
   categoryName: string
-  categoryCode: string
+}
+
+interface SubCategory {
+  refSubCategoryId: number
+  parentCategoryId: number
+  subCategoryName: string
+  subCategoryCode: string
   isActive: boolean
   createdAt: string
   createdBy: string
@@ -22,35 +30,49 @@ interface Category {
 }
 
 const SettingsSubCategories: React.FC = () => {
+  const [subCategories, setSubCategories] = useState<SubCategory[]>([])
   const [categories, setCategories] = useState<Category[]>([])
-  const [globalFilter, setGlobalFilter] = useState<string>('')
+  const [globalFilter, setGlobalFilter] = useState('')
   const [visibleRight, setVisibleRight] = useState(false)
+  const [editData, setEditData] = useState<SubCategory | null>(null)
+  const [mode, setMode] = useState<'add' | 'edit'>('add')
 
-  const dtRef = React.useRef<DataTable<Category[]>>(null)
+  const dtRef = useRef<DataTable<SubCategory[]>>(null)
+  const toast = useRef<Toast>(null)
 
   useEffect(() => {
-    fetchData()
+    fetchCategories()
+    fetchSubCategories()
   }, [])
 
-  const fetchData = () => {
+  const fetchCategories = () => {
+    setCategories([
+      { refCategoryId: 1, categoryName: 'Category 001' },
+      { refCategoryId: 2, categoryName: 'Category 002' }
+    ])
+  }
+
+  const fetchSubCategories = () => {
     const response = {
       data: [
         {
-          refCategoryId: 0,
-          categoryName: 'Category 001',
-          categoryCode: 'C001',
+          refSubCategoryId: 100,
+          parentCategoryId: 1,
+          subCategoryName: 'Sub Cat A',
+          subCategoryCode: 'SCA',
           isActive: true,
-          createdAt: '2025-06-23 15:50:56',
+          createdAt: '2025-07-01',
           createdBy: 'Admin',
           updatedAt: '',
           updatedBy: ''
         },
         {
-          refCategoryId: 1,
-          categoryName: 'Category 002',
-          categoryCode: 'C002',
+          refSubCategoryId: 101,
+          parentCategoryId: 2,
+          subCategoryName: 'Sub Cat B',
+          subCategoryCode: 'SCB',
           isActive: false,
-          createdAt: '2025-06-23 15:53:12',
+          createdAt: '2025-07-01',
           createdBy: 'Admin',
           updatedAt: '',
           updatedBy: ''
@@ -60,7 +82,7 @@ const SettingsSubCategories: React.FC = () => {
     }
 
     if (response.status) {
-      setCategories(response.data)
+      setSubCategories(response.data)
     }
   }
 
@@ -68,18 +90,73 @@ const SettingsSubCategories: React.FC = () => {
     dtRef.current?.exportCSV()
   }
 
-  const activeStatusBody = (rowData: Category) => (
+  const activeStatusBody = (rowData: SubCategory) => (
     <Tag
       value={rowData.isActive ? 'Active' : 'Inactive'}
       severity={rowData.isActive ? 'success' : 'danger'}
     />
   )
 
+  const categoryNameBody = (rowData: SubCategory) => {
+    const category = categories.find((c) => c.refCategoryId === rowData.parentCategoryId)
+    return category ? category.categoryName : '-'
+  }
+
+  const actionBody = (rowData: SubCategory) => (
+    <div className="flex gap-2">
+      <Button
+        icon="pi pi-pencil"
+        outlined
+        severity="info"
+        onClick={() => {
+          setEditData(rowData)
+          setMode('edit')
+          setVisibleRight(true)
+        }}
+      />
+      <Button
+        icon="pi pi-trash"
+        outlined
+        severity="danger"
+        onClick={() => handleDelete(rowData.refSubCategoryId)}
+      />
+    </div>
+  )
+
+  const handleDelete = (id: number) => {
+    setSubCategories((prev) => prev.filter((s) => s.refSubCategoryId !== id))
+    toast.current?.show({
+      severity: 'success',
+      summary: 'Deleted',
+      detail: 'Sub-category deleted successfully',
+      life: 2000
+    })
+  }
+
+  const handleSave = (newSubCategory: SubCategory) => {
+    setSubCategories((prev) => [...prev, newSubCategory])
+  }
+
+  const handleUpdate = (updatedSubCategory: SubCategory) => {
+    setSubCategories((prev) =>
+      prev.map((s) =>
+        s.refSubCategoryId === updatedSubCategory.refSubCategoryId ? updatedSubCategory : s
+      )
+    )
+  }
+
   const leftHeader = (
     <div className="flex gap-2 items-center">
       <Button icon="pi pi-file-excel" severity="success" onClick={exportExcel} />
-      <Button label="" icon="pi pi-plus" onClick={() => setVisibleRight(true)} />
-      <Button label="" icon="pi pi-refresh" severity="secondary" onClick={fetchData} />
+      <Button
+        icon="pi pi-plus"
+        onClick={() => {
+          setMode('add')
+          setEditData(null)
+          setVisibleRight(true)
+        }}
+      />
+      <Button icon="pi pi-refresh" severity="secondary" onClick={fetchSubCategories} />
     </div>
   )
 
@@ -97,38 +174,51 @@ const SettingsSubCategories: React.FC = () => {
 
   return (
     <div className="card">
+      <Toast ref={toast} />
+
       <Toolbar className="mb-4" left={rightHeader} right={leftHeader} />
 
       <DataTable
         ref={dtRef}
-        value={categories}
+        value={subCategories}
         paginator
         rows={10}
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-        rowsPerPageOptions={[10, 25, 50]}
-        showGridlines
         scrollable
-        sortMode="multiple"
+        showGridlines
         globalFilter={globalFilter}
+        rowsPerPageOptions={[10, 25, 50]}
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        emptyMessage="No categories found."
+        emptyMessage="No sub-categories found."
         className="p-datatable-sm"
       >
-        <Column header="S.No" body={(_rowData, options) => options.rowIndex + 1} />
-        <Column field="categoryName" header="Category Name" sortable />
-        <Column field="categoryCode" header="Category Code" sortable />
+        <Column header="S.No" body={(_, options) => options.rowIndex + 1} />
+        <Column header="Category" body={categoryNameBody} sortable />
+        <Column field="subCategoryName" header="Sub-Category" sortable />
+        <Column field="subCategoryCode" header="Code" sortable />
         <Column header="Status" body={activeStatusBody} />
         <Column field="createdAt" header="Created At" sortable />
         <Column field="createdBy" header="Created By" sortable />
+        <Column header="Actions" body={actionBody} />
       </DataTable>
 
       <Sidebar
         visible={visibleRight}
         position="right"
-        onHide={() => setVisibleRight(false)}
+        onHide={() => {
+          setVisibleRight(false)
+          setEditData(null)
+          setMode('add')
+        }}
         style={{ width: '50vw' }}
       >
-        <SettingsAddNewSubCategories />
+        <SettingsAddNewSubCategories
+          mode={mode}
+          editData={editData}
+          categories={categories}
+          onSave={handleSave}
+          onUpdate={handleUpdate}
+          onClose={() => setVisibleRight(false)}
+        />
       </Sidebar>
     </div>
   )
