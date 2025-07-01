@@ -279,18 +279,8 @@ const SettingsBranches: React.FC = () => {
           body={(_rowData, options) => options.rowIndex + 1}
           style={{ minWidth: '1rem' }}
         />
-        <Column
-          field="refBranchName"
-          header="Branch Name"
-          sortable
-          style={{ minWidth: '5rem' }}
-        />
-        <Column
-          field="refBranchCode"
-          header="Branch Code"
-          sortable
-          style={{ minWidth: '5rem' }}
-        />
+        <Column field="refBranchName" header="Branch Name" sortable style={{ minWidth: '5rem' }} />
+        <Column field="refBranchCode" header="Branch Code" sortable style={{ minWidth: '5rem' }} />
         <Column field="refLocation" header="Location" sortable style={{ minWidth: '5rem' }} />
         <Column field="refMobile" header="Mobile" sortable style={{ minWidth: '5rem' }} />
         <Column header="Main Branch" body={branchStatusBody} style={{ minWidth: '5rem' }} />
