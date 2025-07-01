@@ -153,13 +153,17 @@ const SettingsCategories: React.FC = () => {
         emptyMessage="No categories found."
         className="p-datatable-sm"
       >
-        <Column header="S.No" body={(_rowData, options) => options.rowIndex + 1} />
-        <Column field="categoryName" header="Category Name" sortable />
-        <Column field="categoryCode" header="Category Code" sortable />
-        <Column header="Status" body={activeStatusBody} />
-        <Column field="createdAt" header="Created At" sortable />
-        <Column field="createdBy" header="Created By" sortable />
-        <Column header="Actions" body={actionBody} />
+        <Column
+          header="S.No"
+          body={(_rowData, options) => options.rowIndex + 1}
+          style={{ minWidth: '1rem' }}
+        />
+        <Column field="categoryName" header="Category Name" sortable style={{ minWidth: '5rem' }} />
+        <Column field="categoryCode" header="Category Code" sortable style={{ minWidth: '5rem' }} />
+        <Column header="Status" body={activeStatusBody} style={{ minWidth: '5rem' }} />
+        <Column field="createdAt" header="Created At" sortable style={{ minWidth: '5rem' }} />
+        <Column field="createdBy" header="Created By" sortable style={{ minWidth: '5rem' }} />
+        <Column header="Actions" body={actionBody} style={{ minWidth: '5rem' }} />
       </DataTable>
 
       <Sidebar

@@ -32,7 +32,7 @@ const bottomRoutes = [
     icon: <CircleUserRound />
   },
   {
-    path: '/logout',
+    path: '/login',
     name: 'Logout',
     icon: <LogOut />
   }
