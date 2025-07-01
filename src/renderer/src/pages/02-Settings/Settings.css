@@ -17,3 +17,8 @@
 .p-dropdown:not(.p-disabled).p-focus {
   box-shadow: none;
 }
+
+.p-inputswitch-slider::before,
+::after {
+  margin-top: -10px;
+}
