@@ -174,7 +174,7 @@ const SettingsBranches: React.FC = () => {
           refMobile: newCategory.refMobile.trim(),
           refEmail: newCategory.refEmail.trim(),
           isMainBranch: newCategory.isMainBranch,
-          isActive: newCategory.selectedStatus?.isActive ?? true,
+          isActive: newCategory?.isActive ?? true,
           refBTId: 1, // Hardcoded for now; make dynamic if needed
           createdAt: newCategory?.createdAt ?? new Date().toISOString(),
           createdBy: 'Admin',
@@ -215,10 +215,15 @@ const SettingsBranches: React.FC = () => {
       const response = await axios.put(
         `${import.meta.env.VITE_API_URL}/admin/settings/branches`,
         {
-          refCategoryId: updatedCategory.refCategoryId,
-          categoryName: updatedCategory.categoryName,
-          categoryCode: updatedCategory.categoryCode,
-          isActive: updatedCategory.isActive
+          refBranchId: updatedCategory.refBranchId,
+          refBranchName: updatedCategory.refBranchName,
+          refBranchCode: updatedCategory.refBranchCode,
+          refLocation: updatedCategory.refLocation,
+          refMobile: updatedCategory.refMobile,
+          refEmail: updatedCategory.refEmail,
+          isMainBranch: updatedCategory.isMainBranch,
+          isActive: updatedCategory.isActive,
+          refBTId: 1
         },
         {
           headers: {
