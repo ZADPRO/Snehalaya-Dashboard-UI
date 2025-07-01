@@ -44,15 +44,13 @@ const Dashboard: React.FC = () => {
       growth: '-0.8%'
     }
   ]
-
   const topProducts = [
-    { id: '01', name: 'Protein Shake', sales: 150 },
-    { id: '02', name: 'Yoga Mat', sales: 130 },
-    { id: '03', name: 'Fitness Band', sales: 110 },
-    { id: '04', name: 'Dumbbells Set', sales: 90 },
-    { id: '05', name: 'Running Shoes', sales: 75 }
+    { id: '01', name: 'Kanchipuram Silk Saree', sales: 150 },
+    { id: '02', name: 'Banarasi Saree', sales: 130 },
+    { id: '03', name: 'Cotton Handloom Saree', sales: 110 },
+    { id: '04', name: 'Chiffon Printed Saree', sales: 90 },
+    { id: '05', name: 'Tussar Silk Saree', sales: 75 }
   ]
-
   // Step 1: Fill up to 8 cards (data + skeletons)
   const totalCards = 8
 

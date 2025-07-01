@@ -51,13 +51,13 @@ const sidebarItems = [
     icon: <PackageSearch />,
     component: <SettingsSuppliers />
   },
+  { key: 'users', label: 'Users Roles', icon: <UsersRound />, component: <SettingsUsers /> },
   {
     key: 'attributes',
     label: 'Attributes',
     icon: <SlidersVertical />,
     component: <SettingsAttributes />
   },
-  { key: 'users', label: 'Users Roles', icon: <UsersRound />, component: <SettingsUsers /> },
   { key: 'employees', label: 'Employees', icon: <BadgeInfo />, component: <SettingsEmployees /> },
   { key: 'bank', label: 'Bank', icon: <Banknote />, component: <SettingsBank /> }
 ]
