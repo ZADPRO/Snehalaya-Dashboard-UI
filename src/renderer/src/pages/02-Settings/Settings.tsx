@@ -63,7 +63,7 @@ const sidebarItems = [
 ]
 
 const Settings: React.FC = () => {
-  const [activeKey, setActiveKey] = useState('categories')
+  const [activeKey, setActiveKey] = useState('overview')
 
   return (
     <div className="h-full flex flex-column">

@@ -112,24 +112,119 @@ const SettingsCategories: React.FC = () => {
     </div>
   )
 
-  const handleDelete = (id: number) => {
-    setCategories((prev) => prev.filter((c) => c.refCategoryId !== id))
-    toast.current?.show({
-      severity: 'success',
-      summary: 'Deleted',
-      detail: 'Category deleted successfully',
-      life: 2000
-    })
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_URL}/admin/settings/categories/${id}`,
+        {
+          headers: {
+            Authorization: sessionStorage.getItem('token')
+          }
+        }
+      )
+
+      const data = response.data
+
+      if (data.confirmationNeeded) {
+        toast.current?.show({
+          severity: 'warn',
+          summary: 'Confirmation Needed',
+          detail: `${data.message}. Contains ${data.subcategories.length} subcategories.`,
+          life: 5000
+        })
+      } else if (data.status) {
+        fetchData()
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Deleted',
+          detail: 'Category deleted successfully',
+          life: 2000
+        })
+      }
+    } catch (error) {
+      console.error(error)
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to delete category',
+        life: 2000
+      })
+    }
   }
 
-  const handleSave = (newCategory: Category) => {
-    setCategories((prev) => [...prev, newCategory])
+  const handleSave = async (newCategory: Category) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/admin/settings/categories`,
+        {
+          categoryName: newCategory.categoryName,
+          categoryCode: newCategory.categoryCode,
+          isActive: newCategory.isActive
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token')
+          }
+        }
+      )
+
+      if (response.data?.status) {
+        fetchData()
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Category created successfully',
+          life: 2000
+        })
+      }
+    } catch (error) {
+      console.log(error)
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to create category',
+        life: 2000
+      })
+    }
   }
 
-  const handleUpdate = (updatedCategory: Category) => {
-    setCategories((prev) =>
-      prev.map((c) => (c.refCategoryId === updatedCategory.refCategoryId ? updatedCategory : c))
-    )
+  const handleUpdate = async (updatedCategory: Category) => {
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/admin/settings/categories`,
+        {
+          refCategoryId: updatedCategory.refCategoryId,
+          categoryName: updatedCategory.categoryName,
+          categoryCode: updatedCategory.categoryCode,
+          isActive: updatedCategory.isActive
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: sessionStorage.getItem('token')
+          }
+        }
+      )
+
+      if (response.data?.status) {
+        fetchData()
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Updated',
+          detail: 'Category updated successfully',
+          life: 2000
+        })
+      }
+    } catch (error) {
+      console.log(error)
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to update category',
+        life: 2000
+      })
+    }
   }
 
   return (
