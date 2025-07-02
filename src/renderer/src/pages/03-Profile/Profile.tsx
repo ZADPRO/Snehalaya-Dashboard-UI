@@ -1,11 +1,12 @@
-import React from 'react';
+import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
+import React from 'react'
 
 const Profile: React.FC = () => {
-    return (
-        <div>
+  return (
+    <div>
+      <IndivHeader title="Profile" subtitle="Modify User Details" />
+    </div>
+  )
+}
 
-        </div>
-    );
-};
-
-export default Profile;
+export default Profile

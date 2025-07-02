@@ -22,7 +22,7 @@ interface BranchFormData {
 }
 
 export interface Branch {
-  refBranchId?: number
+  refBranchId: number
   refBranchName: string
   refBranchCode: string
   refLocation: string

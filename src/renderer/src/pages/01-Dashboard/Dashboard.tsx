@@ -205,7 +205,7 @@ const Dashboard: React.FC = () => {
           <div className="flex flex-column gap-3" style={{ width: '60%' }}>
             <DashboardChartAnalysisTesting />
           </div>
-          <div className="flex flex-column gap-3 mt-3" style={{ width: '20%' }}>
+          {/* <div className="flex flex-column gap-3 mt-3" style={{ width: '20%' }}>
             <div className="flex w-full flex-column shadow-2 border-round-md px-3 py-2 gap-2">
               <div className="flex items-center justify-content-between">
                 <Sparkles />
@@ -254,7 +254,7 @@ const Dashboard: React.FC = () => {
                 </React.Fragment>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

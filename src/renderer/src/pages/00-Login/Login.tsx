@@ -119,7 +119,11 @@ const Login: React.FC = () => {
           />
         </div>
 
-        <Button label="Login Now" className="login-button uppercase" onClick={handleSubmit} />
+        <Button
+          label="Login Now"
+          className="login-button uppercase font-bold"
+          onClick={handleSubmit}
+        />
       </div>
     </div>
   )

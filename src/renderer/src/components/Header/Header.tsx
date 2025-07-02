@@ -3,7 +3,16 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { NavLink, useLocation } from 'react-router-dom'
 
 import './Header.css'
-import { CircleUserRound, LayoutGrid, LogOut, Menu, PackageSearch, Settings } from 'lucide-react'
+import {
+  BellRing,
+  CircleUserRound,
+  LayoutGrid,
+  LogOut,
+  Menu,
+  PackageSearch,
+  Settings,
+  ShoppingCart
+} from 'lucide-react'
 
 import { Tooltip } from 'primereact/tooltip'
 
@@ -17,6 +26,16 @@ const topRoutes = [
     path: '/inventory',
     name: 'Inventory',
     icon: <PackageSearch />
+  },
+  {
+    path: '/pomgmt',
+    name: 'Purchsae Order',
+    icon: <ShoppingCart />
+  },
+  {
+    path: '/notifications',
+    name: 'Notifications',
+    icon: <BellRing />
   }
 ]
 
