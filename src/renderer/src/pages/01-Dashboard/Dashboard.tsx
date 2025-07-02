@@ -1,8 +1,9 @@
-import React, { JSX } from 'react'
+import React, { JSX, useRef } from 'react'
 import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
 import { ChartNoAxesCombined, ShoppingBasket, Sparkles, Users, IndianRupee } from 'lucide-react'
 import { Divider } from 'primereact/divider'
 import { Skeleton } from 'primereact/skeleton'
+import DashboardChartAnalysisTesting from '@renderer/components/DashboardChartAnalysisTesting/DashboardChartAnalysisTesting'
 
 const Dashboard: React.FC = () => {
   // CARD ALIGNMENT DATA
@@ -75,7 +76,7 @@ const Dashboard: React.FC = () => {
     const col1 = [filledMetrics[i], filledMetrics[i + 1]].map((metric, idx) => (
       <div
         key={`col1-${i + idx}`}
-        className="flex-1 flex flex-column shadow-2 border-round-md px-3 py-2 gap-2"
+        className="flex-1 flex flex-column cardBgSection shadow-2 border-round-md px-3 py-2 gap-2"
       >
         {metric ? (
           <>
@@ -117,7 +118,7 @@ const Dashboard: React.FC = () => {
     const col2 = [filledMetrics[i + 2], filledMetrics[i + 3]].map((metric, idx) => (
       <div
         key={`col2-${i + 2 + idx}`}
-        className="flex-1 flex flex-column shadow-2 border-round-md px-3 py-2 gap-2"
+        className="flex-1 flex flex-column cardBgSection shadow-2 border-round-md px-3 py-2 gap-2"
       >
         {metric ? (
           <>
@@ -174,6 +175,62 @@ const Dashboard: React.FC = () => {
 
           {/* Third Column - 40% */}
           <div className="flex flex-column lastGrids" style={{ width: '40%' }}>
+            <div className="flex w-full flex-column shadow-2 border-round-md px-3 py-2 gap-2">
+              <div className="flex items-center justify-content-between">
+                <Sparkles />
+                <p>Top Products</p>
+              </div>
+              <div className="flex items-center justify-content-between">
+                <p className="text-sm font-semibold">Name</p>
+                <p className="text-sm font-semibold">Sales</p>
+              </div>
+              <Divider />
+              {topProducts.map((product, idx) => (
+                <React.Fragment key={idx}>
+                  <div className="flex items-center justify-content-between">
+                    <div className="flex gap-2">
+                      <p>{product.id}</p>
+                      <p>{product.name}</p>
+                    </div>
+                    <p>{product.sales}</p>
+                  </div>
+                  {idx !== topProducts.length - 1 && <Divider />}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-row gap-3" style={{ width: '100%' }}>
+          <div className="flex flex-column gap-3" style={{ width: '60%' }}>
+            <DashboardChartAnalysisTesting />
+          </div>
+          <div className="flex flex-column gap-3 mt-3" style={{ width: '20%' }}>
+            <div className="flex w-full flex-column shadow-2 border-round-md px-3 py-2 gap-2">
+              <div className="flex items-center justify-content-between">
+                <Sparkles />
+                <p>Top Products</p>
+              </div>
+              <div className="flex items-center justify-content-between">
+                <p className="text-sm font-semibold">Name</p>
+                <p className="text-sm font-semibold">Sales</p>
+              </div>
+              <Divider />
+              {topProducts.map((product, idx) => (
+                <React.Fragment key={idx}>
+                  <div className="flex items-center justify-content-between">
+                    <div className="flex gap-2">
+                      <p>{product.id}</p>
+                      <p>{product.name}</p>
+                    </div>
+                    <p>{product.sales}</p>
+                  </div>
+                  {idx !== topProducts.length - 1 && <Divider />}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-column gap-3 mt-3" style={{ width: '20%' }}>
             <div className="flex w-full flex-column shadow-2 border-round-md px-3 py-2 gap-2">
               <div className="flex items-center justify-content-between">
                 <Sparkles />
