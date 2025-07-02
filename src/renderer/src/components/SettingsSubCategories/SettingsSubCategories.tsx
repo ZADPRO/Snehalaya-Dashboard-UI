@@ -20,7 +20,7 @@ interface Category {
 
 interface SubCategory {
   refSubCategoryId: number
-  refCategoryId: number // <- use this name to match API
+  refCategoryId: number
   subCategoryName: string
   subCategoryCode: string
   isActive: boolean
@@ -168,7 +168,7 @@ const SettingsSubCategories: React.FC = () => {
         {
           subCategoryName: newSubCategory.subCategoryName,
           subCategoryCode: newSubCategory.subCategoryCode,
-          refCategoryId: newSubCategory.parentCategoryId,
+          refCategoryId: newSubCategory.refCategoryId,
           isActive: newSubCategory.isActive
         },
         {
@@ -207,7 +207,7 @@ const SettingsSubCategories: React.FC = () => {
           refSubCategoryId: updatedSubCategory.refSubCategoryId,
           subCategoryName: updatedSubCategory.subCategoryName,
           subCategoryCode: updatedSubCategory.subCategoryCode,
-          refCategoryId: updatedSubCategory.parentCategoryId,
+          refCategoryId: updatedSubCategory.refCategoryId,
           isActive: updatedSubCategory.isActive
         },
         {

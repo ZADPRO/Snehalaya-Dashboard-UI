@@ -1,4 +1,4 @@
-import React, { JSX, useRef } from 'react'
+import React, { JSX } from 'react'
 import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
 import { ChartNoAxesCombined, ShoppingBasket, Sparkles, Users, IndianRupee } from 'lucide-react'
 import { Divider } from 'primereact/divider'

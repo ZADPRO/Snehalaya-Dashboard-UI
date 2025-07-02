@@ -90,7 +90,7 @@ const SettingsAddNewSubCategories: React.FC<Props> = ({
   const handleSubmit = () => {
     const subCategory: SubCategory = {
       refSubCategoryId: editData?.refSubCategoryId ?? Date.now(),
-      parentCategoryId: formData.parentCategory?.refCategoryId ?? 0,
+      refCategoryId: formData.parentCategory?.refCategoryId ?? 0,
       subCategoryName: formData.subCategoryName.trim(),
       subCategoryCode: formData.subCategoryCode.trim(),
       isActive: formData.selectedStatus?.isActive ?? true,

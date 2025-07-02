@@ -45,11 +45,9 @@ const SettingsSuppliers: React.FC = () => {
   const [visibleRight, setVisibleRight] = useState(false)
   const [globalFilter, setGlobalFilter] = useState('')
 
-  const [editData, setEditData] = useState<Supplier | null>(null)
+  const [_editData, setEditData] = useState<Supplier | null>(null)
   const [mode, setMode] = useState<'add' | 'edit'>('add')
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
-
-  const [subCategories, setSubCategories] = useState<Supplier[]>([])
 
   const exportExcel = () => {
     dtRef.current?.exportCSV()
@@ -132,7 +130,7 @@ const SettingsSuppliers: React.FC = () => {
       )
       console.log('response', response)
       if (response.status) {
-        setSubCategories(response.data.data)
+        // setSubCategories(response.data.data)
       }
     } catch (error) {
       console.log(error)
@@ -162,12 +160,13 @@ const SettingsSuppliers: React.FC = () => {
         rounded
         text
         severity="danger"
-        onClick={() => handleDelete(rowData.refCategoryId)}
+        onClick={() => handleDelete(rowData.supplierId)}
       />
     </div>
   )
 
   const handleDelete = async (id: number) => {
+    console.log('id', id)
     // try {
     //   const response = await axios.delete(
     //     `${import.meta.env.VITE_API_URL}/admin/settings/categories/${id}`,
@@ -281,7 +280,7 @@ const SettingsSuppliers: React.FC = () => {
             // categories={categories}
             // onSave={handleSave}
             // onUpdate={handleUpdate}
-            onClose={() => setVisibleRight(false)}
+            // onClose={() => setVisibleRight(false)}
           />
         </Sidebar>
       </div>

@@ -26,12 +26,12 @@ import './Settings.css'
 
 // Sidebar items config
 const sidebarItems = [
-  // {
-  //   key: 'overview',
-  //   label: 'Overview',
-  //   icon: <PanelsTopLeft />,
-  //   component: <SettingsOverview />
-  // },
+  {
+    key: 'overview',
+    label: 'Overview',
+    icon: <PanelsTopLeft />,
+    component: <SettingsOverview />
+  },
   {
     key: 'categories',
     label: 'Categories',
