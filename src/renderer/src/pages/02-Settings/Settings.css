@@ -22,3 +22,37 @@
 ::after {
   margin-top: -10px;
 }
+
+.react-tel-input {
+  font-family: var(--font-family);
+  font-feature-settings: var(--font-feature-settings, normal);
+  font-size: 1rem;
+  color: #495057;
+  background: #ffffff;
+  /* border: 1px solid #ced4da; */
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
+  appearance: none;
+  border-radius: 3px;
+  outline-color: transparent;
+}
+
+.form-control.p-inputtext {
+  position: relative;
+  font-size: 14px;
+  letter-spacing: 0.01rem;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-left: 48px;
+  margin-left: 0;
+  background: #ffffff;
+  border: 1px solid #cacaca;
+  border-radius: 3px !important;
+  line-height: 25px;
+  height: 2.5rem !important;
+  width: 100% !important;
+  outline: none;
+}

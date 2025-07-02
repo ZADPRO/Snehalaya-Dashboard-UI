@@ -4,6 +4,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
 
+import 'react-phone-input-2/lib/style.css'
+
 import 'primeicons/primeicons.css'
 import { PrimeReactProvider } from 'primereact/api'
 import 'primeflex/primeflex.css'

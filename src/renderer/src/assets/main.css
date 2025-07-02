@@ -3,9 +3,3 @@
 * {
   scrollbar-width: thin;
 }
-
-.cardBgSection {
-  width: 100%;
-  object-fit: cover;
-  background: url('../assets/dashboard/bgTwo.png');
-}

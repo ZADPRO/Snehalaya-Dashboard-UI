@@ -34,6 +34,7 @@
     "primeicons": "^7.0.0",
     "primereact": "^10.9.6",
     "quill": "^2.0.3",
+    "react-phone-input-2": "^2.15.1",
     "react-router-dom": "^7.6.2"
   },
   "devDependencies": {

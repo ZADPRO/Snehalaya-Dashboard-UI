@@ -4,6 +4,7 @@ import { InputText } from 'primereact/inputtext'
 import { Toast } from 'primereact/toast'
 import { Button } from 'primereact/button'
 import { Dropdown } from 'primereact/dropdown'
+import PhoneInput from 'react-phone-input-2'
 
 interface Supplier {
   supplierId: number
@@ -185,15 +186,17 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode }) => {
 
         {/* Row 3 */}
         <div className="flex gap-4">
-          <FloatLabel className="flex-1">
-            <InputText
-              id="supplierContactNumber"
+          <div className="flex-1 w-full">
+            <PhoneInput
+              country={'in'}
               value={formData.supplierContactNumber}
-              onChange={(e) => handleChange('supplierContactNumber', e.target.value)}
-              className="w-full"
+              countryCodeEditable={false}
+              enableSearch={true}
+              onChange={(e) => handleChange('supplierContactNumber', e)}
+              inputClass="p-inputtext"
+              buttonClass="custom-phone-button"
             />
-            <label htmlFor="supplierContactNumber">Contact Number</label>
-          </FloatLabel>
+          </div>
 
           <FloatLabel className="flex-1">
             <InputText
