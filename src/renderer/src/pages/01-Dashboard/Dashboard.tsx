@@ -74,40 +74,44 @@ const Dashboard: React.FC = () => {
     // 2 cards for column 1
     const col1 = [filledMetrics[i], filledMetrics[i + 1]]
       .filter((metric) => metric)
-      .map((metric, idx) => (
-        <div
-          key={`col1-${i + idx}`}
-          className="flex-1 flex flex-column cardBgSection shadow-2 border-round-md px-3 py-2 gap-1"
-          style={{
-            border: '1px solid #e39b9e'
-          }}
-        >
-          <div className="flex align-items-center justify-content-between">
-            <div
-              style={{
-                color: '#000000',
-                border: '1px solid #000000',
-                padding: '3px 6px',
-                background: '#f6f7ff',
-                borderRadius: '8px'
-              }}
-            >
-              {metric.icon}
+      .map((metric, idx) => {
+        if (!metric) return null // Safety check
+
+        return (
+          <div
+            key={`col1-${i + idx}`}
+            className="flex-1 flex flex-column cardBgSection shadow-2 border-round-md px-3 py-2 gap-1"
+            style={{
+              border: '1px solid #e39b9e'
+            }}
+          >
+            <div className="flex align-items-center justify-content-between">
+              <div
+                style={{
+                  color: '#000000',
+                  border: '1px solid #000000',
+                  padding: '3px 6px',
+                  background: '#f6f7ff',
+                  borderRadius: '8px'
+                }}
+              >
+                {metric.icon}
+              </div>
+              <p className="text-sm">{metric.title}</p>
             </div>
-            <p className="text-sm">{metric.title}</p>
+            <p className="text-2xl font-bold">{metric.value}</p>
+            <p className="text-xs">
+              <span
+                className="font-semibold"
+                style={{ color: metric.growth.startsWith('+') ? 'green' : 'red' }}
+              >
+                {metric.growth}
+              </span>{' '}
+              from last month
+            </p>
           </div>
-          <p className="text-2xl font-bold">{metric.value}</p>
-          <p className="text-xs">
-            <span
-              className="font-semibold"
-              style={{ color: metric.growth.startsWith('+') ? 'green' : 'red' }}
-            >
-              {metric.growth}
-            </span>{' '}
-            from last month
-          </p>
-        </div>
-      ))
+        )
+      })
 
     if (col1.length > 0) {
       col1Rows.push(
@@ -120,40 +124,44 @@ const Dashboard: React.FC = () => {
     // 2 cards for column 2
     const col2 = [filledMetrics[i + 2], filledMetrics[i + 3]]
       .filter((metric) => metric) // skip undefined/null entries
-      .map((metric, idx) => (
-        <div
-          key={`col2-${i + 2 + idx}`}
-          className="flex-1 flex flex-column cardBgSection shadow-2 border-round-md px-3 py-2 gap-1"
-          style={{
-            border: '1px solid #8cc472'
-          }}
-        >
-          <div className="flex align-items-center justify-content-between">
-            <div
-              style={{
-                color: '#8cc472',
-                border: '1px solid #8cc472',
-                padding: '3px 6px',
-                background: '#f6f7ff',
-                borderRadius: '8px'
-              }}
-            >
-              {metric.icon}
-            </div>{' '}
-            <p className="text-sm">{metric.title}</p>
+      .map((metric, idx) => {
+        if (!metric) return null
+
+        return (
+          <div
+            key={`col2-${i + 2 + idx}`}
+            className="flex-1 flex flex-column cardBgSection shadow-2 border-round-md px-3 py-2 gap-1"
+            style={{
+              border: '1px solid #8cc472'
+            }}
+          >
+            <div className="flex align-items-center justify-content-between">
+              <div
+                style={{
+                  color: '#8cc472',
+                  border: '1px solid #8cc472',
+                  padding: '3px 6px',
+                  background: '#f6f7ff',
+                  borderRadius: '8px'
+                }}
+              >
+                {metric.icon}
+              </div>
+              <p className="text-sm">{metric.title}</p>
+            </div>
+            <p className="text-2xl font-bold">{metric.value}</p>
+            <p className="text-xs">
+              <span
+                className="font-semibold"
+                style={{ color: metric.growth.startsWith('+') ? 'green' : 'red' }}
+              >
+                {metric.growth}
+              </span>{' '}
+              from last month
+            </p>
           </div>
-          <p className="text-2xl font-bold">{metric.value}</p>
-          <p className="text-xs">
-            <span
-              className="font-semibold"
-              style={{ color: metric.growth.startsWith('+') ? 'green' : 'red' }}
-            >
-              {metric.growth}
-            </span>{' '}
-            from last month
-          </p>
-        </div>
-      ))
+        )
+      })
 
     if (col2.length > 0) {
       col2Rows.push(
