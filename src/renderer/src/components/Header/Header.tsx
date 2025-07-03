@@ -14,6 +14,8 @@ import {
   ShoppingCart
 } from 'lucide-react'
 
+import snehalayaaLogo from '../../assets/logo/icon.png'
+
 import { Tooltip } from 'primereact/tooltip'
 
 const topRoutes = [
@@ -104,11 +106,9 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
               className="sidebar"
             >
               {/* Top: Logo */}
-              <div className="">
-                <div className="link">
-                  {/* <img src="/logo.png" alt="Logo" className="logo_image" /> */}
-                  <Menu />
-                </div>
+              <div className="flex align-items-center justify-content-center">
+                <img src={snehalayaaLogo} alt="Logo" className="logo_image" />
+                {/* <Menu /> */}
               </div>
 
               {/* Middle: Routes */}
