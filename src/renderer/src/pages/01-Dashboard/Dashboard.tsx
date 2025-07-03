@@ -2,7 +2,6 @@ import React, { JSX } from 'react'
 import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
 import { ChartNoAxesCombined, ShoppingBasket, Sparkles, Users, IndianRupee } from 'lucide-react'
 import { Divider } from 'primereact/divider'
-import { Skeleton } from 'primereact/skeleton'
 import DashboardChartAnalysisTesting from '@renderer/components/DashboardChartAnalysisTesting/DashboardChartAnalysisTesting'
 
 const Dashboard: React.FC = () => {
@@ -73,88 +72,96 @@ const Dashboard: React.FC = () => {
 
   for (let i = 0; i < totalCards; i += 4) {
     // 2 cards for column 1
-    const col1 = [filledMetrics[i], filledMetrics[i + 1]].map((metric, idx) => (
-      <div
-        key={`col1-${i + idx}`}
-        className="flex-1 flex flex-column cardBgSection shadow-2 border-round-md px-3 py-2 gap-2"
-      >
-        {metric ? (
-          <>
-            <div className="flex align-items-center justify-content-between">
+    const col1 = [filledMetrics[i], filledMetrics[i + 1]]
+      .filter((metric) => metric)
+      .map((metric, idx) => (
+        <div
+          key={`col1-${i + idx}`}
+          className="flex-1 flex flex-column cardBgSection shadow-2 border-round-md px-3 py-2 gap-1"
+          style={{
+            border: '1px solid #e39b9e'
+          }}
+        >
+          <div className="flex align-items-center justify-content-between">
+            <div
+              style={{
+                color: '#000000',
+                border: '1px solid #000000',
+                padding: '3px 6px',
+                background: '#f6f7ff',
+                borderRadius: '8px'
+              }}
+            >
               {metric.icon}
-              <p className="text-sm">{metric.title}</p>
             </div>
-            <p className="text-2xl font-bold">{metric.value}</p>
-            <p className="text-xs">
-              <span
-                className="font-semibold"
-                style={{ color: metric.growth.startsWith('+') ? 'green' : 'red' }}
-              >
-                {metric.growth}
-              </span>{' '}
-              from last month
-            </p>
-          </>
-        ) : (
-          <>
-            <div className="flex align-items-center justify-content-between">
-              <Skeleton width="1rem" height="1rem" shape="circle" />
-              <Skeleton width="6rem" height="1rem" />
-            </div>
-            <Skeleton width="8rem" height="1rem" />
-            <Skeleton width="6rem" height="1rem" />
-          </>
-        )}
-      </div>
-    ))
+            <p className="text-sm">{metric.title}</p>
+          </div>
+          <p className="text-2xl font-bold">{metric.value}</p>
+          <p className="text-xs">
+            <span
+              className="font-semibold"
+              style={{ color: metric.growth.startsWith('+') ? 'green' : 'red' }}
+            >
+              {metric.growth}
+            </span>{' '}
+            from last month
+          </p>
+        </div>
+      ))
 
-    col1Rows.push(
-      <div key={`row-col1-${i}`} className="flex gap-3">
-        {col1}
-      </div>
-    )
+    if (col1.length > 0) {
+      col1Rows.push(
+        <div key={`row-col1-${i}`} className="flex gap-3">
+          {col1}
+        </div>
+      )
+    }
 
     // 2 cards for column 2
-    const col2 = [filledMetrics[i + 2], filledMetrics[i + 3]].map((metric, idx) => (
-      <div
-        key={`col2-${i + 2 + idx}`}
-        className="flex-1 flex flex-column cardBgSection shadow-2 border-round-md px-3 py-2 gap-2"
-      >
-        {metric ? (
-          <>
-            <div className="flex align-items-center justify-content-between">
+    const col2 = [filledMetrics[i + 2], filledMetrics[i + 3]]
+      .filter((metric) => metric) // skip undefined/null entries
+      .map((metric, idx) => (
+        <div
+          key={`col2-${i + 2 + idx}`}
+          className="flex-1 flex flex-column cardBgSection shadow-2 border-round-md px-3 py-2 gap-1"
+          style={{
+            border: '1px solid #8cc472'
+          }}
+        >
+          <div className="flex align-items-center justify-content-between">
+            <div
+              style={{
+                color: '#8cc472',
+                border: '1px solid #8cc472',
+                padding: '3px 6px',
+                background: '#f6f7ff',
+                borderRadius: '8px'
+              }}
+            >
               {metric.icon}
-              <p className="text-sm">{metric.title}</p>
-            </div>
-            <p className="text-2xl font-bold">{metric.value}</p>
-            <p className="text-xs">
-              <span
-                className="font-semibold"
-                style={{ color: metric.growth.startsWith('+') ? 'green' : 'red' }}
-              >
-                {metric.growth}
-              </span>{' '}
-              from last month
-            </p>
-          </>
-        ) : (
-          <>
-            <div className="flex align-items-center gap-3">
-              <Skeleton width="1.3rem" height="1.3rem" shape="circle" />
-              <Skeleton width="7rem" height="1.3rem" />
-            </div>
-            <Skeleton width="10rem" height="1.5rem" />
-            <Skeleton width="9rem" height="1.5rem" />
-          </>
-        )}
-      </div>
-    ))
+            </div>{' '}
+            <p className="text-sm">{metric.title}</p>
+          </div>
+          <p className="text-2xl font-bold">{metric.value}</p>
+          <p className="text-xs">
+            <span
+              className="font-semibold"
+              style={{ color: metric.growth.startsWith('+') ? 'green' : 'red' }}
+            >
+              {metric.growth}
+            </span>{' '}
+            from last month
+          </p>
+        </div>
+      ))
 
-    col2Rows.push(
-      <div key={`row-col2-${i}`} className="flex gap-3">
-        {col2}
-      </div>
-    )
+    if (col2.length > 0) {
+      col2Rows.push(
+        <div key={`row-col2-${i}`} className="flex gap-3">
+          {col2}
+        </div>
+      )
+    }
   }
 
   return (
@@ -205,56 +212,6 @@ const Dashboard: React.FC = () => {
           <div className="flex flex-column gap-3" style={{ width: '60%' }}>
             <DashboardChartAnalysisTesting />
           </div>
-          {/* <div className="flex flex-column gap-3 mt-3" style={{ width: '20%' }}>
-            <div className="flex w-full flex-column shadow-2 border-round-md px-3 py-2 gap-2">
-              <div className="flex items-center justify-content-between">
-                <Sparkles />
-                <p>Top Products</p>
-              </div>
-              <div className="flex items-center justify-content-between">
-                <p className="text-sm font-semibold">Name</p>
-                <p className="text-sm font-semibold">Sales</p>
-              </div>
-              <Divider />
-              {topProducts.map((product, idx) => (
-                <React.Fragment key={idx}>
-                  <div className="flex items-center justify-content-between">
-                    <div className="flex gap-2">
-                      <p>{product.id}</p>
-                      <p>{product.name}</p>
-                    </div>
-                    <p>{product.sales}</p>
-                  </div>
-                  {idx !== topProducts.length - 1 && <Divider />}
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
-          <div className="flex flex-column gap-3 mt-3" style={{ width: '20%' }}>
-            <div className="flex w-full flex-column shadow-2 border-round-md px-3 py-2 gap-2">
-              <div className="flex items-center justify-content-between">
-                <Sparkles />
-                <p>Top Products</p>
-              </div>
-              <div className="flex items-center justify-content-between">
-                <p className="text-sm font-semibold">Name</p>
-                <p className="text-sm font-semibold">Sales</p>
-              </div>
-              <Divider />
-              {topProducts.map((product, idx) => (
-                <React.Fragment key={idx}>
-                  <div className="flex items-center justify-content-between">
-                    <div className="flex gap-2">
-                      <p>{product.id}</p>
-                      <p>{product.name}</p>
-                    </div>
-                    <p>{product.sales}</p>
-                  </div>
-                  {idx !== topProducts.length - 1 && <Divider />}
-                </React.Fragment>
-              ))}
-            </div>
-          </div> */}
         </div>
       </div>
     </div>

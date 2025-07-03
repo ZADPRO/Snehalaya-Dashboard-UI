@@ -211,7 +211,7 @@ const SettingsAddNewSidebar: React.FC = () => {
 
   const rowExpansionTemplate = (data: ModulePermission) => {
     return (
-      <div className="p-3">
+      <div className="p-1">
         <DataTable value={data.subModules}>
           <Column field="name" header="Sub Module" />
           <Column field="canView" header="Can View" body={(row) => (row.canView ? 'Yes' : 'No')} />

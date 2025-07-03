@@ -3,3 +3,10 @@
 * {
   scrollbar-width: thin;
 }
+
+.cardBgSection {
+  background-image: url('../assets/dashboard/bgLoss.png');
+  background-size: cover; /* This is similar to object-fit: cover */
+  background-position: center; /* Optional: center the image */
+  background-repeat: no-repeat;
+}
