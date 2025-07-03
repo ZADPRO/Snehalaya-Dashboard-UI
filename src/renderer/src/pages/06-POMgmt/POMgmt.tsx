@@ -1,7 +1,18 @@
 import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
+import POCreateProducts from '@renderer/components/POCreateProducts/POCreateProducts'
 import POMgmtCreatePurchase from '@renderer/components/POMgmtCreatePurchase/POMgmtCreatePurchase'
 import POMgmtOverview from '@renderer/components/POMgmtOverview/POMgmtOverview'
-import { PanelsTopLeft, SquarePlus } from 'lucide-react'
+import POMgmtViewPurchase from '@renderer/components/POMgmtViewPurchase/POMgmtViewPurchase'
+import POProducts from '@renderer/components/POProducts/POProducts'
+import {
+  Blocks,
+  PackageCheck,
+  PackageMinus,
+  PackagePlus,
+  PackageSearch,
+  ShoppingBag,
+  SquarePlus
+} from 'lucide-react'
 import { Divider } from 'primereact/divider'
 import React, { useState } from 'react'
 
@@ -10,14 +21,14 @@ const sidebarItems = [
   {
     key: 'overview',
     label: 'Overview',
-    icon: <PanelsTopLeft />,
+    icon: <Blocks />,
     component: <POMgmtOverview />
   },
   {
     key: 'list',
     label: 'Purchase Order',
-    icon: <PanelsTopLeft />,
-    component: <POMgmtOverview />
+    icon: <ShoppingBag />,
+    component: <POMgmtViewPurchase />
   },
   {
     key: 'create',
@@ -28,14 +39,26 @@ const sidebarItems = [
   {
     key: 'products',
     label: 'Products',
-    icon: <PanelsTopLeft />,
-    component: <POMgmtOverview />
+    icon: <PackageSearch />,
+    component: <POProducts />
   },
   {
     key: 'createProducts',
     label: 'Create Products',
-    icon: <PanelsTopLeft />,
-    component: <POMgmtOverview />
+    icon: <PackagePlus />,
+    component: <POCreateProducts />
+  },
+  {
+    key: 'goodsReceived',
+    label: 'Goods Received',
+    icon: <PackageCheck />,
+    component: <POCreateProducts />
+  },
+  {
+    key: 'returnedGoods',
+    label: 'Goods Returned',
+    icon: <PackageMinus />,
+    component: <POCreateProducts />
   }
 ]
 
@@ -49,7 +72,10 @@ const POMgmt: React.FC = () => {
         className="flex flex-1 m-3 border-round-md shadow-1"
         style={{ height: 'calc(100% - 80px)' }}
       >
-        <div className="flex flex-column p-3 border-round-md" style={{ width: '20%' }}>
+        <div
+          className="flex flex-column px-3 my-3 border-round-md overflow-auto"
+          style={{ width: '20%' }}
+        >
           <div className="sidebarContainer flex flex-column gap-2">
             {sidebarItems.map((item) => {
               const isActive = item.key === activeKey

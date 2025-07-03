@@ -72,7 +72,10 @@ const Settings: React.FC = () => {
         className="flex flex-1 m-3 border-round-md shadow-1"
         style={{ height: 'calc(100% - 80px)' }}
       >
-        <div className="flex flex-column p-3 border-round-md" style={{ width: '20%' }}>
+        <div
+          className="flex flex-column px-3 my-3 border-round-md overflow-auto"
+          style={{ width: '20%' }}
+        >
           <div className="sidebarContainer flex flex-column gap-2">
             {sidebarItems.map((item) => {
               const isActive = item.key === activeKey
