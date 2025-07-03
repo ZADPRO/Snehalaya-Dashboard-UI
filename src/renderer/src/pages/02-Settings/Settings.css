@@ -3,7 +3,23 @@
 }
 
 .p-float-label label {
-  margin-top: -8px;
+  margin-top: 4px;
+  background: white;
+  padding: 2px 5px;
+  border-radius: 5px;
+}
+
+.always-float label {
+  top: -0.75rem !important;
+  font-size: 0.75rem !important;
+  color: #6b7280;
+  transition: none !important;
+  background: white;
+  padding: 0px 4px;
+}
+
+.always-float .p-inputtext {
+  padding-top: 10px !important;
 }
 
 .p-inputtext:enabled:focus {

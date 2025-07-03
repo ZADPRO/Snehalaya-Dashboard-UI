@@ -8,7 +8,7 @@ import { Sidebar } from 'primereact/sidebar'
 import { Toast } from 'primereact/toast'
 import { Toolbar } from 'primereact/toolbar'
 import React, { useEffect, useRef, useState } from 'react'
-import SettingsAddNewSidebar from './SettingsAddNewSidebar'
+import SettingsAddNewSidebar from './SettingsUserRolesSidebar'
 
 interface UserRole {
   id: number

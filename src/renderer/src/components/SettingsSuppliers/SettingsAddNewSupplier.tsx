@@ -133,14 +133,15 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode }) => {
     <div className="p-4 pb-20">
       <Toast ref={toast} />
 
-      <p className="text-xl font-semibold mb-4">
+      <p className="text-md font-bold underline uppercase">
         {mode === 'add' ? 'Add New Supplier' : 'Edit Supplier'}
       </p>
 
-      <div className="flex flex-column gap-4 mt-5">
+      <div className="flex flex-column gap-4 mt-1">
+        <p className="text-lg uppercase font-bold">Basic Details</p>
         {/* Row 1 */}
         <div className="flex gap-4">
-          <FloatLabel className="flex-1">
+          <FloatLabel className="flex-1 always-float">
             <InputText
               id="supplierName"
               value={formData.supplierName}
@@ -150,7 +151,7 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode }) => {
             <label htmlFor="supplierName">Supplier Name*</label>
           </FloatLabel>
 
-          <FloatLabel className="flex-1">
+          <FloatLabel className="flex-1 always-float">
             <InputText
               id="supplierCompanyName"
               value={formData.supplierCompanyName}
@@ -163,7 +164,7 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode }) => {
 
         {/* Row 2 */}
         <div className="flex gap-4">
-          <FloatLabel className="flex-1">
+          <FloatLabel className="flex-1 always-float">
             <InputText
               id="supplierCode"
               value={formData.supplierCode}
@@ -173,7 +174,7 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode }) => {
             <label htmlFor="supplierCode">Supplier Code*</label>
           </FloatLabel>
 
-          <FloatLabel className="flex-1">
+          <FloatLabel className="flex-1 always-float">
             <InputText
               id="supplierEmail"
               value={formData.supplierEmail}
@@ -198,7 +199,7 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode }) => {
             />
           </div>
 
-          <FloatLabel className="flex-1">
+          <FloatLabel className="flex-1 always-float">
             <InputText
               id="supplierGSTNumber"
               value={formData.supplierGSTNumber}
@@ -211,7 +212,7 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode }) => {
 
         {/* Row 4 */}
         <div className="flex gap-4">
-          <FloatLabel className="flex-1">
+          <FloatLabel className="flex-1 always-float">
             <Dropdown
               inputId="supplierIsActive"
               value={formData.supplierIsActive}
@@ -224,7 +225,7 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode }) => {
             <label htmlFor="supplierIsActive">Status</label>
           </FloatLabel>
 
-          <FloatLabel className="flex-1">
+          <FloatLabel className="flex-1 always-float">
             <InputText
               id="supplierPaymentTerms"
               value={formData.supplierPaymentTerms}
@@ -237,7 +238,7 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode }) => {
 
         {/* Row 5 */}
         <div className="flex gap-4">
-          <FloatLabel className="flex-1">
+          <FloatLabel className="flex-1 always-float">
             <InputText
               id="emergencyContactName"
               value={formData.emergencyContactName}
@@ -247,7 +248,7 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode }) => {
             <label htmlFor="emergencyContactName">Emergency Contact Name</label>
           </FloatLabel>
 
-          <FloatLabel className="flex-1">
+          <FloatLabel className="flex-1 always-float">
             <InputText
               id="emergencyContactNumber"
               value={formData.emergencyContactNumber}

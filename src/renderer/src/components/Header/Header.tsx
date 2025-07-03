@@ -8,7 +8,6 @@ import {
   CircleUserRound,
   LayoutGrid,
   LogOut,
-  Menu,
   PackageSearch,
   Settings,
   ShoppingCart

@@ -1,5 +1,6 @@
 import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
-import SettingsOverview from '@renderer/components/SettingsOverview/SettingsOverview'
+import POMgmtCreatePurchase from '@renderer/components/POMgmtCreatePurchase/POMgmtCreatePurchase'
+import POMgmtOverview from '@renderer/components/POMgmtOverview/POMgmtOverview'
 import { PanelsTopLeft, SquarePlus } from 'lucide-react'
 import { Divider } from 'primereact/divider'
 import React, { useState } from 'react'
@@ -10,13 +11,31 @@ const sidebarItems = [
     key: 'overview',
     label: 'Overview',
     icon: <PanelsTopLeft />,
-    component: <SettingsOverview />
+    component: <POMgmtOverview />
+  },
+  {
+    key: 'list',
+    label: 'Purchase Order',
+    icon: <PanelsTopLeft />,
+    component: <POMgmtOverview />
   },
   {
     key: 'create',
     label: 'Create Purchase',
     icon: <SquarePlus />,
-    component: <SquarePlus />
+    component: <POMgmtCreatePurchase />
+  },
+  {
+    key: 'products',
+    label: 'Products',
+    icon: <PanelsTopLeft />,
+    component: <POMgmtOverview />
+  },
+  {
+    key: 'createProducts',
+    label: 'Create Products',
+    icon: <PanelsTopLeft />,
+    component: <POMgmtOverview />
   }
 ]
 
@@ -25,7 +44,7 @@ const POMgmt: React.FC = () => {
 
   return (
     <div className="h-full flex flex-column">
-      <IndivHeader title="Profile" subtitle="Modify User Details" />
+      <IndivHeader title="Purchase Order" subtitle="Modify User Details" />
       <div
         className="flex flex-1 m-3 border-round-md shadow-1"
         style={{ height: 'calc(100% - 80px)' }}

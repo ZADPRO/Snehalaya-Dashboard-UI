@@ -1,10 +1,22 @@
-import React, { useState } from 'react'
-import { DataTable } from 'primereact/datatable'
+import React, { useRef, useState } from 'react'
+import {
+  DataTable,
+  DataTableExpandedRows,
+  DataTableRowEvent,
+  DataTableValueArray
+} from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { InputSwitch } from 'primereact/inputswitch'
 import { Checkbox } from 'primereact/checkbox'
 import { Dropdown } from 'primereact/dropdown'
 import { Button } from 'primereact/button'
+import { Toast } from 'primereact/toast'
+
+interface SubModulePermission {
+  name: string
+  canView: boolean
+  canEdit?: boolean
+}
 
 interface ModulePermission {
   id: number
@@ -12,6 +24,7 @@ interface ModulePermission {
   visible: boolean
   canView: boolean
   canEdit: boolean
+  subModules?: SubModulePermission[]
 }
 
 interface RoleOption {
@@ -34,13 +47,85 @@ const roleOptions: RoleOption[] = [
 const SettingsAddNewSidebar: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null)
 
+  const toast = useRef<Toast>(null)
+
+  const [expandedRows, setExpandedRows] = useState<
+    DataTableExpandedRows | DataTableValueArray | undefined
+  >(undefined)
+
   const [permissions, setPermissions] = useState<ModulePermission[]>([
-    { id: 1, moduleName: 'Dashboard', visible: true, canView: true, canEdit: false },
-    { id: 2, moduleName: 'Inventory', visible: true, canView: false, canEdit: false },
-    { id: 3, moduleName: 'Products (PO)', visible: false, canView: false, canEdit: false },
-    { id: 4, moduleName: 'Sales Order', visible: true, canView: true, canEdit: true },
-    { id: 5, moduleName: 'Settings', visible: true, canView: true, canEdit: true },
-    { id: 6, moduleName: 'Profile', visible: true, canView: true, canEdit: true }
+    {
+      id: 1,
+      moduleName: 'Dashboard',
+      visible: true,
+      canView: true,
+      canEdit: false,
+      subModules: [
+        { name: 'Total Sales', canView: true },
+        { name: 'Total Orders', canView: true },
+        { name: 'Revenue', canView: true },
+        { name: 'New Customer', canView: true },
+        { name: 'Repeat Customer', canView: true },
+        { name: 'Pending Orders', canView: false }
+      ]
+    },
+    {
+      id: 2,
+      moduleName: 'Inventory',
+      visible: true,
+      canView: true,
+      canEdit: true,
+      subModules: [
+        { name: 'View', canView: true, canEdit: false },
+        { name: 'Modify', canView: true, canEdit: true }
+      ]
+    },
+    {
+      id: 3,
+      moduleName: 'Purchase Order',
+      visible: true,
+      canView: true,
+      canEdit: true,
+      subModules: [
+        { name: 'Overview', canView: true, canEdit: true },
+        { name: 'Purchase Order', canView: true, canEdit: false },
+        { name: 'Create Purchase', canView: false, canEdit: false },
+        { name: 'Products', canView: true, canEdit: true },
+        { name: 'Create Products', canView: false, canEdit: true }
+      ]
+    },
+    {
+      id: 4,
+      moduleName: 'Sales Order',
+      visible: true,
+      canView: true,
+      canEdit: true
+    },
+    {
+      id: 5,
+      moduleName: 'Settings',
+      visible: true,
+      canView: true,
+      canEdit: true,
+      subModules: [
+        { name: 'Overview', canView: true, canEdit: false },
+        { name: 'Categories', canView: true, canEdit: true },
+        { name: 'Sub Categories', canView: true, canEdit: true },
+        { name: 'Branches', canView: true, canEdit: true },
+        { name: 'Suppliers', canView: true, canEdit: false },
+        { name: 'User Roles', canView: true, canEdit: true },
+        { name: 'Attributes', canView: false, canEdit: false },
+        { name: 'Employees', canView: true, canEdit: true },
+        { name: 'Bank', canView: true, canEdit: true }
+      ]
+    },
+    {
+      id: 6,
+      moduleName: 'Profile',
+      visible: true,
+      canView: true,
+      canEdit: true
+    }
   ])
 
   const handleCheckboxChange = (id: number, field: keyof ModulePermission, checked: boolean) => {
@@ -102,6 +187,44 @@ const SettingsAddNewSidebar: React.FC = () => {
     // Save logic here...
   }
 
+  const allowExpansion = (rowData: ModulePermission) => {
+    return Array.isArray(rowData.subModules) && rowData.subModules.length > 0
+  }
+
+  const onRowCollapse = (event: DataTableRowEvent) => {
+    toast.current?.show({
+      severity: 'success',
+      summary: 'Product Collapsed',
+      detail: event.data.name,
+      life: 3000
+    })
+  }
+
+  const onRowExpand = (event: DataTableRowEvent) => {
+    toast.current?.show({
+      severity: 'info',
+      summary: 'Product Expanded',
+      detail: event.data.name,
+      life: 3000
+    })
+  }
+
+  const rowExpansionTemplate = (data: ModulePermission) => {
+    return (
+      <div className="p-3">
+        <DataTable value={data.subModules}>
+          <Column field="name" header="Sub Module" />
+          <Column field="canView" header="Can View" body={(row) => (row.canView ? 'Yes' : 'No')} />
+          <Column
+            field="canEdit"
+            header="Can Edit"
+            body={(row) => (row.canEdit !== undefined ? (row.canEdit ? 'Yes' : 'No') : '-')}
+          />
+        </DataTable>
+      </div>
+    )
+  }
+
   return (
     <div className="p-4 flex flex-column gap-4">
       {/* Role Dropdown */}
@@ -120,11 +243,21 @@ const SettingsAddNewSidebar: React.FC = () => {
       </div>
 
       {/* Permission Table */}
-      <DataTable value={permissions} className="p-datatable-sm" showGridlines>
+      <DataTable
+        value={permissions}
+        className="p-datatable-sm"
+        showGridlines
+        expandedRows={expandedRows}
+        onRowToggle={(e) => setExpandedRows(e.data)}
+        onRowExpand={onRowExpand}
+        onRowCollapse={onRowCollapse}
+        rowExpansionTemplate={rowExpansionTemplate}
+      >
+        <Column expander={allowExpansion} style={{ width: '3rem' }} />
         <Column
           header="S.No"
           body={(_, options) => options.rowIndex + 1}
-          style={{ width: '60px' }}
+          style={{ width: '3rem' }}
         />
         <Column field="moduleName" header="Module Name" />
         <Column header="Visibility" body={renderVisibility} style={{ textAlign: 'center' }} />

@@ -133,7 +133,7 @@ const SettingsAddNewSubCategories: React.FC<Props> = ({
 
       <div className="flex flex-row gap-4">
         <div className="flex-1 gap-3">
-          <FloatLabel>
+          <FloatLabel className="flex-1 always-float">
             <Dropdown
               id="parentCategory"
               value={formData.parentCategory}
@@ -147,7 +147,7 @@ const SettingsAddNewSubCategories: React.FC<Props> = ({
           </FloatLabel>
         </div>
         <div className="flex-1">
-          <FloatLabel>
+          <FloatLabel className="flex-1 always-float">
             <InputText
               id="subCategoryName"
               value={formData.subCategoryName}
@@ -160,7 +160,7 @@ const SettingsAddNewSubCategories: React.FC<Props> = ({
       </div>
       <div className="flex flex-row gap-4 mt-4">
         <div className="flex-1">
-          <FloatLabel>
+          <FloatLabel className="flex-1 always-float">
             <InputText
               id="subCategoryCode"
               value={formData.subCategoryCode}
@@ -172,7 +172,7 @@ const SettingsAddNewSubCategories: React.FC<Props> = ({
         </div>
 
         <div className="flex-1">
-          <FloatLabel>
+          <FloatLabel className="flex-1 always-float">
             <Dropdown
               id="status"
               value={formData.selectedStatus}
