@@ -129,138 +129,215 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode }) => {
   }
 
   return (
-    <div className="p-4 pb-20">
+    <div className="p- pb-20">
       <Toast ref={toast} />
 
-      <p className="text-xl font-semibold mb-4">
+      <p className="text-xl mt-0 font-semibold mb-4">
         {mode === 'add' ? 'Add New Supplier' : 'Edit Supplier'}
       </p>
+<div className="flex flex-column">
 
-      <div className="flex flex-column gap-4 mt-5">
-        {/* Row 1 */}
-        <div className="flex gap-4">
-          <FloatLabel className="flex-1">
-            <InputText
-              id="supplierName"
-              value={formData.supplierName}
-              onChange={(e) => handleChange('supplierName', e.target.value)}
-              className="w-full"
-            />
-            <label htmlFor="supplierName">Supplier Name*</label>
-          </FloatLabel>
-
-          <FloatLabel className="flex-1">
-            <InputText
-              id="supplierCompanyName"
-              value={formData.supplierCompanyName}
-              onChange={(e) => handleChange('supplierCompanyName', e.target.value)}
-              className="w-full"
-            />
-            <label htmlFor="supplierCompanyName">Company Name*</label>
-          </FloatLabel>
-        </div>
-
-        {/* Row 2 */}
-        <div className="flex gap-4">
-          <FloatLabel className="flex-1">
-            <InputText
-              id="supplierCode"
-              value={formData.supplierCode}
-              onChange={(e) => handleChange('supplierCode', e.target.value)}
-              className="w-full"
-            />
-            <label htmlFor="supplierCode">Supplier Code*</label>
-          </FloatLabel>
-
-          <FloatLabel className="flex-1">
-            <InputText
-              id="supplierEmail"
-              value={formData.supplierEmail}
-              onChange={(e) => handleChange('supplierEmail', e.target.value)}
-              className="w-full"
-            />
-            <label htmlFor="supplierEmail">Email</label>
-          </FloatLabel>
-        </div>
-
-        {/* Row 3 */}
-        <div className="flex gap-4">
-          <FloatLabel className="flex-1">
-            <InputText
-              id="supplierContactNumber"
-              value={formData.supplierContactNumber}
-              onChange={(e) => handleChange('supplierContactNumber', e.target.value)}
-              className="w-full"
-            />
-            <label htmlFor="supplierContactNumber">Contact Number</label>
-          </FloatLabel>
-
-          <FloatLabel className="flex-1">
-            <InputText
-              id="supplierGSTNumber"
-              value={formData.supplierGSTNumber}
-              onChange={(e) => handleChange('supplierGSTNumber', e.target.value)}
-              className="w-full"
-            />
-            <label htmlFor="supplierGSTNumber">GST Number</label>
-          </FloatLabel>
-        </div>
-
-        {/* Row 4 */}
-        <div className="flex gap-4">
-          <FloatLabel className="flex-1">
-            <Dropdown
-              inputId="supplierIsActive"
-              value={formData.supplierIsActive}
-              onChange={(e) => handleChange('supplierIsActive', e.value)}
-              options={statusOptions}
-              optionLabel="name"
-              className="w-full"
-              placeholder="Select Status"
-            />
-            <label htmlFor="supplierIsActive">Status</label>
-          </FloatLabel>
-
-          <FloatLabel className="flex-1">
-            <InputText
-              id="supplierPaymentTerms"
-              value={formData.supplierPaymentTerms}
-              onChange={(e) => handleChange('supplierPaymentTerms', e.target.value)}
-              className="w-full"
-            />
-            <label htmlFor="supplierPaymentTerms">Payment Terms</label>
-          </FloatLabel>
-        </div>
-
-        {/* Row 5 */}
-        <div className="flex gap-4">
-          <FloatLabel className="flex-1">
-            <InputText
-              id="emergencyContactName"
-              value={formData.emergencyContactName}
-              onChange={(e) => handleChange('emergencyContactName', e.target.value)}
-              className="w-full"
-            />
-            <label htmlFor="emergencyContactName">Emergency Contact Name</label>
-          </FloatLabel>
-
-          <FloatLabel className="flex-1">
-            <InputText
-              id="emergencyContactNumber"
-              value={formData.emergencyContactNumber}
-              onChange={(e) => handleChange('emergencyContactNumber', e.target.value)}
-              className="w-full"
-            />
-            <label htmlFor="emergencyContactNumber">Emergency Contact No</label>
-          </FloatLabel>
-        </div>
-
-        {/* Submit Button */}
-        <div className="fixed bottom-0 left-0 w-full shadow-md p-4 text-right">
-          <Button label="Save" className="gap-2" icon="pi pi-check" onClick={handleSubmit} />
-        </div>
-      </div>
+  {/* ---------------- Basic Details ---------------- */}
+  <p className="font-semibold text-sm ">Basic Details</p>
+  <div className="flex mt-3 gap-3">
+    <div className="flex-1">
+      <FloatLabel>
+        <InputText
+          id="supplierName"
+          value={formData.supplierName}
+          onChange={(e) => handleChange('supplierName', e.target.value)}
+          className="w-full"
+        />
+        <label htmlFor="supplierName">Supplier Name*</label>
+      </FloatLabel>
     </div>
+
+    <div className="flex-1">
+      <FloatLabel>
+        <InputText
+          id="supplierCompanyName"
+          value={formData.supplierCompanyName}
+          onChange={(e) => handleChange('supplierCompanyName', e.target.value)}
+          className="w-full"
+        />
+        <label htmlFor="supplierCompanyName">Company Name*</label>
+      </FloatLabel>
+    </div>
+  </div>
+
+  <div className="w-[900px] flex mt-3 gap-3">
+  <div className="w-[500px]">
+    <FloatLabel>
+      <InputText
+        id="supplierCode"
+        value={formData.supplierCode}
+        onChange={(e) => handleChange('supplierCode', e.target.value)}
+        className="w-full"
+      />
+      <label htmlFor="supplierCode">Supplier Code*</label>
+    </FloatLabel>
+  </div>
+</div>
+
+
+  {/* Communication Details ---------------- */}
+  <p className="font-semibold text-sm mt-3">Communication Details</p>
+
+  <div className="flex mt-3 gap-3">
+    <div className="flex-1">
+      <FloatLabel>
+        <InputText
+          id="supplierEmail"
+          value={formData.supplierEmail}
+          onChange={(e) => handleChange('supplierEmail', e.target.value)}
+          className="w-full"
+        />
+        <label htmlFor="supplierEmail">Email</label>
+      </FloatLabel>
+    </div>
+
+    <div className="flex-1">
+      <FloatLabel>
+        <InputText
+          id="supplierContactNumber"
+          value={formData.supplierContactNumber}
+          onChange={(e) => handleChange('supplierContactNumber', e.target.value)}
+          className="w-full"
+        />
+        <label htmlFor="supplierContactNumber">Contact Number</label>
+      </FloatLabel>
+    </div>
+  </div>
+
+  <div className="flex mt-3 gap-3">
+    <div className="flex-1">
+      <FloatLabel>
+        <InputText
+          id="supplierCity"
+          value={formData.supplierCity}
+          onChange={(e) => handleChange('supplierCity', e.target.value)}
+          className="w-full"
+        />
+        <label htmlFor="supplierCity">City</label>
+      </FloatLabel>
+    </div>
+
+    <div className="flex-1">
+      <FloatLabel>
+        <InputText
+          id="supplierStreet"
+          value={formData.supplierStreet}
+          onChange={(e) => handleChange('supplierStreet', e.target.value)}
+          className="w-full"
+        />
+        <label htmlFor="supplierStreet">Street Name</label>
+      </FloatLabel>
+    </div>
+  </div>
+
+  <div className="flex mt-3 gap-3">
+    <div className="flex-1 ">
+      <FloatLabel>
+        <InputText
+          id="supplierDoorNumber"
+          value={formData.supplierDoorNumber}
+          onChange={(e) => handleChange('supplierDoorNumber', e.target.value)}
+          className="w-[500px]"
+        />
+        <label htmlFor="supplierDoorNumber">Door No</label>
+      </FloatLabel>
+    </div>
+  </div>
+
+  {/*Bank Details ---------------- */}
+  <p className="font-semibold text-sm mt-3">Bank Details</p>
+
+  <div className="flex mt-3 gap-3">
+    <div className="flex-1">
+      <FloatLabel>
+        <InputText
+          id="supplierBankName"
+          value={formData.supplierBankName}
+          onChange={(e) => handleChange('supplierBankName', e.target.value)}
+          className="w-full"
+        />
+        <label htmlFor="supplierBankName">Acc Holder Name</label>
+      </FloatLabel>
+    </div>
+
+    <div className="flex-1">
+      <FloatLabel>
+        <InputText
+          id="supplierBankACNumber"
+          value={formData.supplierBankACNumber}
+          onChange={(e) => handleChange('supplierBankACNumber', e.target.value)}
+          className="w-full"
+        />
+        <label htmlFor="supplierBankACNumber">Account Number</label>
+      </FloatLabel>
+    </div>
+  </div>
+
+  <div className="flex mt-3 gap-3">
+    <div className="flex-1">
+      <FloatLabel>
+        <InputText
+          id="supplierIFSC"
+          value={formData.supplierIFSC}
+          onChange={(e) => handleChange('supplierIFSC', e.target.value)}
+          className="w-full"
+        />
+        <label htmlFor="supplierIFSC">IFSC Code</label>
+      </FloatLabel>
+    </div>
+
+    <div className="flex-1">
+      <FloatLabel>
+        <InputText
+          id="supplierGSTNumber"
+          value={formData.supplierGSTNumber}
+          onChange={(e) => handleChange('supplierGSTNumber', e.target.value)}
+          className="w-full"
+        />
+        <label htmlFor="supplierGSTNumber">GST Number</label>
+      </FloatLabel>
+    </div>
+  </div>
+
+  {/*Emergency Contact ---------------- */}
+  <p className="font-semibold text-sm mt-3">Emergency Contact</p>
+  <div className="flex mt-3 gap-3">
+    <div className="flex-1">
+      <FloatLabel>
+        <InputText
+          id="emergencyContactName"
+          value={formData.emergencyContactName}
+          onChange={(e) => handleChange('emergencyContactName', e.target.value)}
+          className="w-full "
+        />
+        <label htmlFor="emergencyContactName">Emergency Contact Name</label>
+      </FloatLabel>
+    </div>
+
+    <div className="flex-1">
+      <FloatLabel>
+        <InputText
+          id="emergencyContactNumber"
+          value={formData.emergencyContactNumber}
+          onChange={(e) => handleChange('emergencyContactNumber', e.target.value)}
+          className="w-full"
+        />
+        <label htmlFor="emergencyContactNumber">Emergency Contact No</label>
+      </FloatLabel>
+    </div>
+  </div>
+
+  {/* ---------------- Submit Button ---------------- */}
+  <div className="shadow-md p-4 text-right bg-white z-10">
+    <Button label="Save" className="gap-2" icon="pi pi-check" onClick={handleSubmit} />
+  </div>
+</div>
+</div>
   )
 }
 

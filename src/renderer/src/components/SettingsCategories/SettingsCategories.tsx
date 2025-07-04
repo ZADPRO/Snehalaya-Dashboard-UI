@@ -53,6 +53,11 @@ const SettingsCategories: React.FC = () => {
       if (response.status) {
         setCategories(response.data.data)
       }
+
+      // if(response.message === "Invalid Token"){
+      //   localStorage.clear();
+      //   navigator("/")
+      // }
     } catch (error) {
       console.log(error)
     }

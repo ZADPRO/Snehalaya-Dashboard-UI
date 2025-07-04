@@ -1,59 +1,58 @@
-import axios from 'axios'
-import { Button } from 'primereact/button'
-import { Column } from 'primereact/column'
-import { DataTable } from 'primereact/datatable'
-import { IconField } from 'primereact/iconfield'
-import { InputIcon } from 'primereact/inputicon'
-import { InputText } from 'primereact/inputtext'
-import { Sidebar } from 'primereact/sidebar'
-import { Toast } from 'primereact/toast'
-import { Toolbar } from 'primereact/toolbar'
-import React, { useEffect, useRef, useState } from 'react'
-import SettingsAddNewSupplier from './SettingsAddNewSupplier'
+// ✅ SettingsSuppliers.tsx
+import axios from 'axios';
+import { Button } from 'primereact/button';
+import { Column } from 'primereact/column';
+import { DataTable } from 'primereact/datatable';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
+import { InputText } from 'primereact/inputtext';
+import { Sidebar } from 'primereact/sidebar';
+import { Toast } from 'primereact/toast';
+import { Toolbar } from 'primereact/toolbar';
+import React, { useEffect, useRef, useState } from 'react';
+import SettingsAddNewSupplier from './SettingsAddNewSupplier';
 
 interface Supplier {
-  supplierId: number
-  supplierName?: string
-  supplierCompanyName?: string
-  supplierCode?: string
-  supplierEmail?: string
-  supplierGSTNumber?: string
-  supplierPaymentTerms?: string
-  supplierBankACNumber?: string
-  supplierIFSC?: string
-  supplierBankName?: string
-  supplierUPI?: string
-  supplierIsActive?: string
-  supplierContactNumber?: string
-  emergencyContactName?: string
-  emergencyContactNumber?: string
-  supplierDoorNumber?: string
-  supplierStreet?: string
-  supplierCity?: string
-  supplierState?: string
-  supplierCountry?: string
-  createdAt?: string
-  createdBy?: string
-  updatedAt?: string
-  updatedBy?: string
-  isDelete?: boolean
+  supplierId: number;
+  supplierName?: string;
+  supplierCompanyName?: string;
+  supplierCode?: string;
+  supplierEmail?: string;
+  supplierGSTNumber?: string;
+  supplierPaymentTerms?: string;
+  supplierBankACNumber?: string;
+  supplierIFSC?: string;
+  supplierBankName?: string;
+  supplierUPI?: string;
+  supplierIsActive?: string;
+  supplierContactNumber?: string;
+  emergencyContactName?: string;
+  emergencyContactNumber?: string;
+  supplierDoorNumber?: string;
+  supplierStreet?: string;
+  supplierCity?: string;
+  supplierState?: string;
+  supplierCountry?: string;
+  createdAt?: string;
+  createdBy?: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  isDelete?: boolean;
 }
 
 const SettingsSuppliers: React.FC = () => {
-  const dtRef = useRef<DataTable<Supplier[]>>(null)
-  const toast = useRef<Toast>(null)
-  const [visibleRight, setVisibleRight] = useState(false)
-  const [globalFilter, setGlobalFilter] = useState('')
+  const dtRef = useRef<DataTable<Supplier[]>>(null);
+  const toast = useRef<Toast>(null);
+  const [visibleRight, setVisibleRight] = useState(false);
+  const [globalFilter, setGlobalFilter] = useState('');
 
-  const [editData, setEditData] = useState<Supplier | null>(null)
-  const [mode, setMode] = useState<'add' | 'edit'>('add')
-  const [suppliers, setSuppliers] = useState<Supplier[]>([])
-
-  const [subCategories, setSubCategories] = useState<Supplier[]>([])
+  const [editData, setEditData] = useState<Supplier | null>(null);
+  const [mode, setMode] = useState<'add' | 'edit'>('add');
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
 
   const exportExcel = () => {
-    dtRef.current?.exportCSV()
-  }
+    dtRef.current?.exportCSV();
+  };
 
   const fetchSuppliers = () => {
     const dummyData: Supplier[] = [
@@ -84,9 +83,9 @@ const SettingsSuppliers: React.FC = () => {
         updatedBy: 'Admin',
         isDelete: true
       }
-    ]
-    setSuppliers(dummyData)
-  }
+    ];
+    setSuppliers(dummyData);
+  };
 
   const leftHeader = (
     <div className="flex gap-2 items-center">
@@ -94,18 +93,14 @@ const SettingsSuppliers: React.FC = () => {
       <Button
         icon="pi pi-plus"
         onClick={() => {
-          setMode('add')
-          setEditData(null)
-          setVisibleRight(true)
+          setMode('add');
+          setEditData(null);
+          setVisibleRight(true);
         }}
       />
-      <Button
-        icon="pi pi-refresh"
-        severity="secondary"
-        //  onClick={fetchSubCategories}
-      />
+      <Button icon="pi pi-refresh" severity="secondary" onClick={fetchSuppliers} />
     </div>
-  )
+  );
 
   const rightHeader = (
     <IconField iconPosition="left">
@@ -117,32 +112,20 @@ const SettingsSuppliers: React.FC = () => {
         onChange={(e) => setGlobalFilter(e.target.value)}
       />
     </IconField>
-  )
-
-  const fetchSubCategories = async () => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/admin/settings/subcategories`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: sessionStorage.getItem('token')
-          }
-        }
-      )
-      console.log('response', response)
-      if (response.status) {
-        setSubCategories(response.data.data)
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  );
 
   useEffect(() => {
-    fetchSuppliers()
-    fetchSubCategories()
-  }, [])
+    fetchSuppliers();
+  }, []);
+
+  const handleDelete = async (id: number) => {
+    toast.current?.show({
+      severity: 'warn',
+      summary: 'Delete Triggered',
+      detail: `Supplier with ID ${id} delete requested.`,
+      life: 3000
+    });
+  };
 
   const actionBody = (rowData: Supplier) => (
     <div className="flex gap-2">
@@ -152,9 +135,9 @@ const SettingsSuppliers: React.FC = () => {
         text
         severity="info"
         onClick={() => {
-          setEditData(rowData)
-          setMode('edit')
-          setVisibleRight(true)
+          setEditData(rowData);
+          setMode('edit');
+          setVisibleRight(true);
         }}
       />
       <Button
@@ -162,54 +145,15 @@ const SettingsSuppliers: React.FC = () => {
         rounded
         text
         severity="danger"
-        onClick={() => handleDelete(rowData.refCategoryId)}
+        onClick={() => handleDelete(rowData.supplierId)}
       />
     </div>
-  )
-
-  const handleDelete = async (id: number) => {
-    // try {
-    //   const response = await axios.delete(
-    //     `${import.meta.env.VITE_API_URL}/admin/settings/categories/${id}`,
-    //     {
-    //       headers: {
-    //         Authorization: sessionStorage.getItem('token')
-    //       }
-    //     }
-    //   )
-    //   const data = response.data
-    //   if (data.confirmationNeeded) {
-    //     toast.current?.show({
-    //       severity: 'warn',
-    //       summary: 'Confirmation Needed',
-    //       detail: `${data.message}. Contains ${data.subcategories.length} subcategories.`,
-    //       life: 5000
-    //     })
-    //   } else if (data.status) {
-    //     fetchData()
-    //     toast.current?.show({
-    //       severity: 'success',
-    //       summary: 'Deleted',
-    //       detail: 'Category deleted successfully',
-    //       life: 2000
-    //     })
-    //   }
-    // } catch (error) {
-    //   console.error(error)
-    //   toast.current?.show({
-    //     severity: 'error',
-    //     summary: 'Error',
-    //     detail: 'Failed to delete category',
-    //     life: 2000
-    //   })
-    // }
-  }
+  );
 
   return (
     <div>
       <div className="card">
         <Toast ref={toast} />
-
         <Toolbar className="mb-4" left={rightHeader} right={leftHeader} />
 
         <DataTable
@@ -221,72 +165,49 @@ const SettingsSuppliers: React.FC = () => {
           showGridlines
           globalFilter={globalFilter}
           rowsPerPageOptions={[10, 25, 50]}
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
           emptyMessage="No suppliers found."
           className="p-datatable-sm"
         >
-          <Column
-            header="S.No"
-            body={(_, options) => options.rowIndex + 1}
-            style={{ minWidth: '2rem' }}
-            frozen
-          />
-          <Column
-            field="supplierName"
-            header="Name"
-            frozen
-            sortable
-            style={{ minWidth: '11rem' }}
-          />
-          <Column
-            field="supplierCompanyName"
-            header="Company"
-            sortable
-            style={{ minWidth: '10rem' }}
-          />
+          <Column header="S.No" body={(_, options) => options.rowIndex + 1} style={{ minWidth: '2rem' }} frozen />
+          <Column field="supplierName" header="Name" frozen sortable style={{ minWidth: '11rem' }} />
+          <Column field="supplierCompanyName" header="Company" sortable style={{ minWidth: '10rem' }} />
           <Column field="supplierCode" header="Code" sortable style={{ minWidth: '7rem' }} />
           <Column field="supplierEmail" header="Email" sortable style={{ minWidth: '7rem' }} />
-          <Column
-            field="supplierContactNumber"
-            header="Contact No"
-            sortable
-            style={{ minWidth: '10rem' }}
-          />
+          <Column field="supplierContactNumber" header="Contact No" sortable style={{ minWidth: '10rem' }} />
           <Column field="supplierCity" header="City" sortable style={{ minWidth: '7rem' }} />
           <Column field="supplierCountry" header="Country" sortable style={{ minWidth: '7rem' }} />
-          <Column
-            field="supplierGSTNumber"
-            header="GST No."
-            sortable
-            style={{ minWidth: '7rem' }}
-          />
+          <Column field="supplierGSTNumber" header="GST No." sortable style={{ minWidth: '7rem' }} />
           <Column field="createdBy" header="Created By" style={{ minWidth: '7rem' }} />
           <Column field="createdAt" header="Created At" style={{ minWidth: '12rem' }} />
-          <Column header="Actions" body={actionBody} style={{ minWidth: '5rem' }} />
+          <Column header="Actions" body={actionBody} style={{ minWidth: '7rem' }} />
         </DataTable>
 
         <Sidebar
           visible={visibleRight}
           position="right"
           onHide={() => {
-            setVisibleRight(false)
-            setEditData(null)
-            setMode('add')
+            setVisibleRight(false);
+            setEditData(null);
+            setMode('add');
           }}
           style={{ width: '50vw' }}
         >
           <SettingsAddNewSupplier
             mode={mode}
-            // editData={editData}
-            // categories={categories}
-            // onSave={handleSave}
-            // onUpdate={handleUpdate}
-            onClose={() => setVisibleRight(false)}
+            editData={editData}
+            onClose={() => {
+              setVisibleRight(false);
+              setEditData(null);
+              setMode('add');
+              fetchSuppliers();
+            }}
           />
         </Sidebar>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SettingsSuppliers
+export default SettingsSuppliers;

@@ -19,12 +19,14 @@ export interface Category {
   createdBy: string
   updatedAt: string
   updatedBy: string
+  profitMargin?: number
 }
 
 interface CategoryFormData {
   categoryName: string
   categoryCode: string
   selectedStatus: CategoryStatusOptions | null
+  profitMargin: string
 }
 
 interface SettingsAddNewCategoriesProps {
@@ -47,7 +49,8 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
   const [formData, setFormData] = useState<CategoryFormData>({
     categoryName: '',
     categoryCode: '',
-    selectedStatus: { name: 'Active', isActive: true }
+    selectedStatus: { name: 'Active', isActive: true },
+    profitMargin: ''
   })
 
   const statusOptions: CategoryStatusOptions[] = [
@@ -63,7 +66,8 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
         selectedStatus: {
           name: editData.isActive ? 'Active' : 'In Active',
           isActive: editData.isActive
-        }
+        },
+        profitMargin: editData.profitMargin?.toString() || ''
       })
     }
   }, [mode, editData])
@@ -87,7 +91,8 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
       createdAt: editData?.createdAt ?? new Date().toISOString(),
       createdBy: 'Admin',
       updatedAt: new Date().toISOString(),
-      updatedBy: 'Admin'
+      updatedBy: 'Admin',
+      profitMargin: parseFloat(formData.profitMargin) || 0
     }
 
     if (mode === 'add') {
@@ -108,11 +113,12 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
       })
     }
 
-    // Optional: close sidebar after a short delay
     setTimeout(() => onClose(), 1000)
   }
 
-  const isSaveDisabled = !formData.categoryName.trim() || !formData.categoryCode.trim()
+  const isSaveDisabled = !formData.categoryName.trim() || !formData.categoryCode.trim()  ||
+    formData.profitMargin === '' ||
+    isNaN(Number(formData.profitMargin))
 
   return (
     <div className="p-4 pb-20 relative">
@@ -147,25 +153,39 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
           </FloatLabel>
         </div>
       </div>
+<div className="flex mt-5 gap-3">
+ 
+  <div className="flex-1">
+    <FloatLabel>
+      <Dropdown
+        id="status"
+        value={formData.selectedStatus}
+        onChange={(e: DropdownChangeEvent) => handleInputChange('selectedStatus', e.value)}
+        options={statusOptions}
+        optionLabel="name"
+        className="w-full"
+      />
+      <label htmlFor="status">Status</label>
+    </FloatLabel>
+  </div>
 
-      <div className="flex mt-4 gap-3">
-        <div className="flex-1">
-          <FloatLabel>
-            <Dropdown
-              id="status"
-              value={formData.selectedStatus}
-              onChange={(e: DropdownChangeEvent) => handleInputChange('selectedStatus', e.value)}
-              options={statusOptions}
-              optionLabel="name"
-              className="w-full"
-            />
-            <label htmlFor="status">Status</label>
-          </FloatLabel>
-        </div>
-        <div className="flex-1"></div>
-      </div>
+  <div className="flex-1">
+    <FloatLabel>
+      <InputText
+        id="profitMargin"
+        keyfilter="num"
+        value={formData.profitMargin}
+        className="w-full"
+        onChange={(e) => handleInputChange('profitMargin', e.target.value)}
+      />
+      <label htmlFor="profitMargin">Profit Margin (%)</label>
+    </FloatLabel>
+  </div>
+</div>
 
-      {/* Save/Update Button */}
+
+      
+
       <div className="fixed bottom-0 left-0 w-full shadow-md p-4 text-right">
         <Button
           label={mode === 'add' ? 'Save' : 'Update'}
