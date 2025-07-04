@@ -130,8 +130,10 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode }) => {
 
   return (
     <div className="p- pb-20">
+    <div className="p- pb-20">
       <Toast ref={toast} />
 
+      <p className="text-xl mt-0 font-semibold mb-4">
       <p className="text-xl mt-0 font-semibold mb-4">
         {mode === 'add' ? 'Add New Supplier' : 'Edit Supplier'}
       </p>

@@ -5,7 +5,7 @@ import { InputIcon } from 'primereact/inputicon'
 import { InputText } from 'primereact/inputtext'
 
 import './IndivHeader.css'
-import { Bell } from 'lucide-react'
+// import { Bell } from 'lucide-react'
 
 interface IndivHeaderProps {
   title: string
@@ -24,7 +24,7 @@ const IndivHeader: React.FC<IndivHeaderProps> = ({ title, subtitle }) => {
           <InputIcon className="pi pi-search" />
           <InputText placeholder="Search" className="w-25rem" />
         </IconField>
-        <Bell className="cursor-pointer" style={{ height: '30px', width: '30px' }} />
+        {/* <Bell className="cursor-pointer" style={{ height: '30px', width: '30px' }} /> */}
       </div>
     </div>
   )

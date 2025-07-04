@@ -7,8 +7,8 @@ import { InputText } from 'primereact/inputtext'
 import { Sidebar } from 'primereact/sidebar'
 import { Toast } from 'primereact/toast'
 import { Toolbar } from 'primereact/toolbar'
-import React, { useRef, useState } from 'react'
-import SettingsAddNewSidebar from './SettingsAddNewSidebar'
+import React, { useEffect, useRef, useState } from 'react'
+import SettingsAddNewSidebar from './SettingsUserRolesSidebar'
 
 interface UserRole {
   id: number
@@ -25,24 +25,7 @@ const SettingsUsers: React.FC = () => {
   const [visibleRight, setVisibleRight] = useState(false)
   const [globalFilter, setGlobalFilter] = useState('')
 
-  const [users, setUsers] = useState<UserRole[]>([
-    {
-      id: 1,
-      userName: 'Thiru Kumara',
-      email: 'thiru@example.com',
-      role: 'Admin',
-      createdAt: '2024-07-01 10:00',
-      createdBy: 'System'
-    },
-    {
-      id: 2,
-      userName: 'Arun Prasad',
-      email: 'arun@example.com',
-      role: 'Store Manager',
-      createdAt: '2024-07-03 15:22',
-      createdBy: 'Admin'
-    }
-  ])
+  const [users, setUsers] = useState<UserRole[]>([])
 
   const exportExcel = () => {
     dtRef.current?.exportCSV()
@@ -71,6 +54,29 @@ const SettingsUsers: React.FC = () => {
       />
     </IconField>
   )
+
+  useEffect(() => {
+    const data = [
+      {
+        id: 1,
+        userName: 'Thiru Kumara',
+        email: 'thiru@example.com',
+        role: 'Admin',
+        createdAt: '2024-07-01 10:00',
+        createdBy: 'System'
+      },
+      {
+        id: 2,
+        userName: 'Arun Prasad',
+        email: 'arun@example.com',
+        role: 'Store Manager',
+        createdAt: '2024-07-03 15:22',
+        createdBy: 'Admin'
+      }
+    ]
+
+    setUsers(data)
+  }, [])
 
   return (
     <div>

@@ -3,7 +3,17 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { NavLink, useLocation } from 'react-router-dom'
 
 import './Header.css'
-import { CircleUserRound, LayoutGrid, LogOut, Menu, PackageSearch, Settings } from 'lucide-react'
+import {
+  BellRing,
+  CircleUserRound,
+  LayoutGrid,
+  LogOut,
+  PackageSearch,
+  Settings,
+  ShoppingCart
+} from 'lucide-react'
+
+import snehalayaaLogo from '../../assets/logo/icon.png'
 
 import { Tooltip } from 'primereact/tooltip'
 
@@ -17,6 +27,16 @@ const topRoutes = [
     path: '/inventory',
     name: 'Inventory',
     icon: <PackageSearch />
+  },
+  {
+    path: '/pomgmt',
+    name: 'Purchsae Order',
+    icon: <ShoppingCart />
+  },
+  {
+    path: '/notifications',
+    name: 'Notifications',
+    icon: <BellRing />
   }
 ]
 
@@ -85,11 +105,9 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
               className="sidebar"
             >
               {/* Top: Logo */}
-              <div className="">
-                <div className="link">
-                  {/* <img src="/logo.png" alt="Logo" className="logo_image" /> */}
-                  <Menu />
-                </div>
+              <div className="flex align-items-center justify-content-center">
+                <img src={snehalayaaLogo} alt="Logo" className="logo_image" />
+                {/* <Menu /> */}
               </div>
 
               {/* Middle: Routes */}

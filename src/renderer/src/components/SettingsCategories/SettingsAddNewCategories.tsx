@@ -20,12 +20,14 @@ export interface Category {
   updatedAt: string
   updatedBy: string
   profitMargin?: number
+  profitMargin?: number
 }
 
 interface CategoryFormData {
   categoryName: string
   categoryCode: string
   selectedStatus: CategoryStatusOptions | null
+  profitMargin: string
   profitMargin: string
 }
 
@@ -51,6 +53,8 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
     categoryCode: '',
     selectedStatus: { name: 'Active', isActive: true },
     profitMargin: ''
+    selectedStatus: { name: 'Active', isActive: true },
+    profitMargin: ''
   })
 
   const statusOptions: CategoryStatusOptions[] = [
@@ -66,6 +70,8 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
         selectedStatus: {
           name: editData.isActive ? 'Active' : 'In Active',
           isActive: editData.isActive
+        },
+        profitMargin: editData.profitMargin?.toString() || ''
         },
         profitMargin: editData.profitMargin?.toString() || ''
       })
@@ -91,6 +97,8 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
       createdAt: editData?.createdAt ?? new Date().toISOString(),
       createdBy: 'Admin',
       updatedAt: new Date().toISOString(),
+      updatedBy: 'Admin',
+      profitMargin: parseFloat(formData.profitMargin) || 0
       updatedBy: 'Admin',
       profitMargin: parseFloat(formData.profitMargin) || 0
     }

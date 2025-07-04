@@ -70,7 +70,7 @@
   border-right: 4px solid white;
   transition: 0.2s cubic-bezier(0.6, -0.28, 0.735, 0.045);
   background-color: white;
-  margin: 10px;
+  margin: 5px 10px;
   border-radius: 8px;
   font-weight: bold;
 }
@@ -98,9 +98,8 @@
 .logo_image {
   width: 40px;
   height: 40px;
-  margin: 20px auto;
+  margin: 20px 0px 10px 0px;
   display: block;
-  border-radius: 50%;
 }
 
 .bottom_section {
@@ -117,5 +116,10 @@
 
 .p-tooltip {
   font-size: 0.75rem;
-  padding: 6px 5px;
+  padding: 0px 10px;
+}
+
+.p-tooltip-text {
+  padding: 10px !important;
+  font-size: 15px;
 }

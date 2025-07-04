@@ -22,7 +22,7 @@ interface BranchFormData {
 }
 
 export interface Branch {
-  refBranchId?: number
+  refBranchId: number
   refBranchName: string
   refBranchCode: string
   refLocation: string
@@ -156,7 +156,7 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
         {/* Row 1 */}
         <div className="flex gap-4 align-items-center">
           <div className="flex-1">
-            <FloatLabel>
+            <FloatLabel className="flex-1 always-float">
               <InputText
                 id="refBranchName"
                 value={formData.refBranchName}
@@ -168,7 +168,7 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
           </div>
 
           <div className="flex-1">
-            <FloatLabel>
+            <FloatLabel className="flex-1 always-float">
               <InputText
                 id="refBranchCode"
                 value={formData.refBranchCode}
@@ -183,7 +183,7 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
         {/* Row 2 */}
         <div className="flex gap-4 align-items-center">
           <div className="flex-1">
-            <FloatLabel>
+            <FloatLabel className="flex-1 always-float">
               <InputText
                 id="refLocation"
                 value={formData.refLocation}
@@ -195,7 +195,7 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
           </div>
 
           <div className="flex-1">
-            <FloatLabel>
+            <FloatLabel className="flex-1 always-float">
               <InputText
                 id="refMobile"
                 value={formData.refMobile}
@@ -210,7 +210,7 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
         {/* Row 3 */}
         <div className="flex gap-4 align-items-center">
           <div className="flex-1">
-            <FloatLabel>
+            <FloatLabel className="flex-1 always-float">
               <InputText
                 id="refEmail"
                 value={formData.refEmail}
@@ -236,7 +236,7 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
         {/* Row 4 */}
         <div className="flex gap-4 align-items-center">
           <div className="flex-1">
-            <FloatLabel>
+            <FloatLabel className="flex-1 always-float">
               <Dropdown
                 id="status"
                 value={formData.selectedStatus}

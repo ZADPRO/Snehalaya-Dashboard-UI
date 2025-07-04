@@ -11,6 +11,19 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import React, { useEffect, useRef, useState } from 'react';
 import SettingsAddNewSupplier from './SettingsAddNewSupplier';
+// ✅ SettingsSuppliers.tsx
+import axios from 'axios'
+import { Button } from 'primereact/button'
+import { Column } from 'primereact/column'
+import { DataTable } from 'primereact/datatable'
+import { IconField } from 'primereact/iconfield'
+import { InputIcon } from 'primereact/inputicon'
+import { InputText } from 'primereact/inputtext'
+import { Sidebar } from 'primereact/sidebar'
+import { Toast } from 'primereact/toast'
+import { Toolbar } from 'primereact/toolbar'
+import React, { useEffect, useRef, useState } from 'react'
+import SettingsAddNewSupplier from './SettingsAddNewSupplier'
 
 interface Supplier {
   supplierId: number;
@@ -126,6 +139,15 @@ const SettingsSuppliers: React.FC = () => {
       life: 3000
     });
   };
+
+  const handleDelete = async (id: number) => {
+    toast.current?.show({
+      severity: 'warn',
+      summary: 'Delete Triggered',
+      detail: `Supplier with ID ${id} delete requested.`,
+      life: 3000
+    })
+  }
 
   const actionBody = (rowData: Supplier) => (
     <div className="flex gap-2">

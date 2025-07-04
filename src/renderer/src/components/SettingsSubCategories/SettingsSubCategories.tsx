@@ -319,6 +319,20 @@ const SettingsSubCategories: React.FC = () => {
     return matchesCode && matchesSearch;
   });
 
+  const filteredSubCategories = subCategories.filter((subCat) => {
+    const category = categories.find((cat) => cat.refCategoryId === subCat.refCategoryId)
+    const matchesCode =
+      selectedCategoryCodes.length === 0 ||
+      (category && selectedCategoryCodes.includes(category.categoryCode))
+    const matchesSearch =
+      globalFilter === '' ||
+      subCat.subCategoryName.toLowerCase().includes(globalFilter.toLowerCase()) ||
+      subCat.subCategoryCode.toLowerCase().includes(globalFilter.toLowerCase()) ||
+      (category && category.categoryName.toLowerCase().includes(globalFilter.toLowerCase()))
+
+    return matchesCode && matchesSearch
+  })
+
   return (
     <div className="card">
       <Toast ref={toast} />
