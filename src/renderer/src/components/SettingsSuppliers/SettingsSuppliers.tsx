@@ -125,14 +125,6 @@ const SettingsSuppliers: React.FC = () => {
     });
   };
 
-  const handleDelete = async (id: number) => {
-    toast.current?.show({
-      severity: 'warn',
-      summary: 'Delete Triggered',
-      detail: `Supplier with ID ${id} delete requested.`,
-      life: 3000
-    })
-  }
 
   const actionBody = (rowData: Supplier) => (
     <div className="flex gap-2">
@@ -201,6 +193,7 @@ const SettingsSuppliers: React.FC = () => {
           }}
           style={{ width: '50vw' }}
         >
+          {/* Passing the props data  */}
           <SettingsAddNewSupplier
             mode={mode}
             editData={editData}

@@ -16,7 +16,7 @@ import axios from 'axios'
 interface Category {
   refCategoryId: number
   categoryName: string
-    categoryCode: string
+  categoryCode: string
 }
 
 interface SubCategory {
@@ -319,19 +319,7 @@ const SettingsSubCategories: React.FC = () => {
     return matchesCode && matchesSearch;
   });
 
-  const filteredSubCategories = subCategories.filter((subCat) => {
-    const category = categories.find((cat) => cat.refCategoryId === subCat.refCategoryId)
-    const matchesCode =
-      selectedCategoryCodes.length === 0 ||
-      (category && selectedCategoryCodes.includes(category.categoryCode))
-    const matchesSearch =
-      globalFilter === '' ||
-      subCat.subCategoryName.toLowerCase().includes(globalFilter.toLowerCase()) ||
-      subCat.subCategoryCode.toLowerCase().includes(globalFilter.toLowerCase()) ||
-      (category && category.categoryName.toLowerCase().includes(globalFilter.toLowerCase()))
 
-    return matchesCode && matchesSearch
-  })
 
   return (
     <div className="card">
@@ -340,36 +328,36 @@ const SettingsSubCategories: React.FC = () => {
       <Toolbar className="mb-4" left={rightHeader} right={leftHeader} />
 
       <DataTable
-  ref={dtRef}
-  value={filteredSubCategories}
-  paginator
-  rows={10}
-  scrollable
-  showGridlines
-  rowGroupMode="rowspan"
-  groupRowsBy="refCategoryId"
-  sortField="refCategoryId"
-  sortOrder={1}
-  paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-  rowsPerPageOptions={[10, 25, 50]}
-  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-  emptyMessage="No sub-categories found."
-  className="p-datatable-sm"
->
-  <Column header="S.No" body={(_, options) => options.rowIndex + 1} />
-  <Column
-    field="refCategoryId"
-    header="Category"
-    body={categoryNameBody}
-    style={{ minWidth: '200px' }}
-  />
-  <Column field="subCategoryName" header="Sub-Category" sortable />
-  <Column field="subCategoryCode" header="Code" sortable />
-  <Column header="Status" body={activeStatusBody} />
-  <Column field="createdAt" header="Created At" sortable />
-  <Column field="createdBy" header="Created By" sortable />
-  <Column header="Actions" body={actionBody} />
-</DataTable>
+        ref={dtRef}
+        value={filteredSubCategories}
+        paginator
+        rows={10}
+        scrollable
+        showGridlines
+        rowGroupMode="rowspan"
+        groupRowsBy="refCategoryId"
+        sortField="refCategoryId"
+        sortOrder={1}
+        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+        rowsPerPageOptions={[10, 25, 50]}
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        emptyMessage="No sub-categories found."
+        className="p-datatable-sm"
+      >
+        <Column header="S.No" body={(_, options) => options.rowIndex + 1} />
+        <Column
+          field="refCategoryId"
+          header="Category"
+          body={categoryNameBody}
+          style={{ minWidth: '200px' }}
+        />
+        <Column field="subCategoryName" header="Sub-Category" sortable />
+        <Column field="subCategoryCode" header="Code" sortable />
+        <Column header="Status" body={activeStatusBody} />
+        <Column field="createdAt" header="Created At" sortable />
+        <Column field="createdBy" header="Created By" sortable />
+        <Column header="Actions" body={actionBody} />
+      </DataTable>
 
 
       <Sidebar
