@@ -101,13 +101,12 @@ const Login: React.FC = () => {
             <p className="mt-2">Snehalaya Silks</p>
           </div>
           <p className="slide-text">Discover timeless fashion, crafted with care.</p>
-          <p className="slide-text">Discover timeless fashion, crafted with care.</p>
+          
         </div>
       </div>
 
       <div className="login-form flex-2">
         <div className="text-center flex flex-column gap-2">
-          <p className="text-xl font-semibold">Welcome to</p>
           <p className="text-xl font-semibold">Welcome to</p>
           <p className="text-5xl uppercase font-bold">Snehalayaa</p>
         </div>
@@ -152,22 +151,6 @@ const Login: React.FC = () => {
             Reset Your Password?
           </Link>
         </div>
-
-        <div className="flex justify-content-between align-items-center gap-8  px-3 my-3">
-          <div className="flex align-items-left gap-2">
-            <Checkbox
-              inputId="rememberme"
-              checked={checked}
-              onChange={(e) => setChecked(e.checked!)}
-            />
-            <label htmlFor="remember me" className="text-sm">Remember Me</label>
-          </div>
-
-          <Link to="/forgetpass" className="text-blue-600 text-sm hover:underline">
-            Reset Your Password?
-          </Link>
-        </div>
-
         <Button
           label="Login Now"
           className="login-button uppercase"
