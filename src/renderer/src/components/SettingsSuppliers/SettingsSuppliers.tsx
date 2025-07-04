@@ -1,3 +1,4 @@
+// ✅ SettingsSuppliers.tsx
 import axios from 'axios'
 import { Button } from 'primereact/button'
 import { Column } from 'primereact/column'
@@ -45,7 +46,7 @@ const SettingsSuppliers: React.FC = () => {
   const [visibleRight, setVisibleRight] = useState(false)
   const [globalFilter, setGlobalFilter] = useState('')
 
-  const [_editData, setEditData] = useState<Supplier | null>(null)
+  const [editData, setEditData] = useState<Supplier | null>(null)
   const [mode, setMode] = useState<'add' | 'edit'>('add')
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
 
@@ -97,11 +98,7 @@ const SettingsSuppliers: React.FC = () => {
           setVisibleRight(true)
         }}
       />
-      <Button
-        icon="pi pi-refresh"
-        severity="secondary"
-        //  onClick={fetchSubCategories}
-      />
+      <Button icon="pi pi-refresh" severity="secondary" onClick={fetchSuppliers} />
     </div>
   )
 
@@ -117,30 +114,18 @@ const SettingsSuppliers: React.FC = () => {
     </IconField>
   )
 
-  const fetchSubCategories = async () => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/admin/settings/subcategories`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: sessionStorage.getItem('token')
-          }
-        }
-      )
-      console.log('response', response)
-      if (response.status) {
-        // setSubCategories(response.data.data)
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
   useEffect(() => {
     fetchSuppliers()
-    fetchSubCategories()
   }, [])
+
+  const handleDelete = async (id: number) => {
+    toast.current?.show({
+      severity: 'warn',
+      summary: 'Delete Triggered',
+      detail: `Supplier with ID ${id} delete requested.`,
+      life: 3000
+    })
+  }
 
   const actionBody = (rowData: Supplier) => (
     <div className="flex gap-2">
@@ -165,50 +150,10 @@ const SettingsSuppliers: React.FC = () => {
     </div>
   )
 
-  const handleDelete = async (id: number) => {
-    console.log('id', id)
-    // try {
-    //   const response = await axios.delete(
-    //     `${import.meta.env.VITE_API_URL}/admin/settings/categories/${id}`,
-    //     {
-    //       headers: {
-    //         Authorization: sessionStorage.getItem('token')
-    //       }
-    //     }
-    //   )
-    //   const data = response.data
-    //   if (data.confirmationNeeded) {
-    //     toast.current?.show({
-    //       severity: 'warn',
-    //       summary: 'Confirmation Needed',
-    //       detail: `${data.message}. Contains ${data.subcategories.length} subcategories.`,
-    //       life: 5000
-    //     })
-    //   } else if (data.status) {
-    //     fetchData()
-    //     toast.current?.show({
-    //       severity: 'success',
-    //       summary: 'Deleted',
-    //       detail: 'Category deleted successfully',
-    //       life: 2000
-    //     })
-    //   }
-    // } catch (error) {
-    //   console.error(error)
-    //   toast.current?.show({
-    //     severity: 'error',
-    //     summary: 'Error',
-    //     detail: 'Failed to delete category',
-    //     life: 2000
-    //   })
-    // }
-  }
-
   return (
     <div>
       <div className="card">
         <Toast ref={toast} />
-
         <Toolbar className="mb-4" left={rightHeader} right={leftHeader} />
 
         <DataTable
@@ -220,6 +165,7 @@ const SettingsSuppliers: React.FC = () => {
           showGridlines
           globalFilter={globalFilter}
           rowsPerPageOptions={[10, 25, 50]}
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
           emptyMessage="No suppliers found."
           className="p-datatable-sm"
@@ -261,7 +207,7 @@ const SettingsSuppliers: React.FC = () => {
           />
           <Column field="createdBy" header="Created By" style={{ minWidth: '7rem' }} />
           <Column field="createdAt" header="Created At" style={{ minWidth: '12rem' }} />
-          <Column header="Actions" body={actionBody} style={{ minWidth: '5rem' }} />
+          <Column header="Actions" body={actionBody} style={{ minWidth: '7rem' }} />
         </DataTable>
 
         <Sidebar
@@ -276,11 +222,13 @@ const SettingsSuppliers: React.FC = () => {
         >
           <SettingsAddNewSupplier
             mode={mode}
-            // editData={editData}
-            // categories={categories}
-            // onSave={handleSave}
-            // onUpdate={handleUpdate}
-            // onClose={() => setVisibleRight(false)}
+            editData={editData}
+            onClose={() => {
+              setVisibleRight(false)
+              setEditData(null)
+              setMode('add')
+              fetchSuppliers()
+            }}
           />
         </Sidebar>
       </div>

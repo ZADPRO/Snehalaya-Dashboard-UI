@@ -10,6 +10,7 @@ import {
   PackageMinus,
   PackagePlus,
   PackageSearch,
+  PackageX,
   ShoppingBag,
   SquarePlus
 } from 'lucide-react'
@@ -55,9 +56,15 @@ const sidebarItems = [
     component: <POCreateProducts />
   },
   {
+    key: 'goodsHold',
+    label: 'Goods Hold',
+    icon: <PackageMinus />,
+    component: <POCreateProducts />
+  },
+  {
     key: 'returnedGoods',
     label: 'Goods Returned',
-    icon: <PackageMinus />,
+    icon: <PackageX />,
     component: <POCreateProducts />
   }
 ]

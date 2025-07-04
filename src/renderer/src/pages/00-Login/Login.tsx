@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { InputText } from 'primereact/inputtext'
 import { Password } from 'primereact/password'
 import { Button } from 'primereact/button'
+import { Toast } from 'primereact/toast'
 import { User, Lock } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Checkbox } from 'primereact/checkbox'
+
 import './Login.css'
-import { useNavigate } from 'react-router-dom'
 
 import carousel1 from '../../assets/login/carousel1.png'
 import carousel2 from '../../assets/login/carousel2.png'
@@ -18,6 +21,8 @@ const Login: React.FC = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [index, setIndex] = useState(0)
+  const [checked, setChecked] = useState(false)
+  const toast = useRef<Toast>(null)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -41,40 +46,47 @@ const Login: React.FC = () => {
       Username: username,
       Password: password
     }
-    console.log('payload', payload)
 
     try {
-      const response = await axios.post(
-        import.meta.env.VITE_API_URL + '/admin/login',
-        {
-          Username: username,
-          Password: password
-        }
-        // {
-        //   headers: {
-        //     'Content-Type': 'application/json'
-        //   }
-        // }
-      )
+      const response = await axios.post(import.meta.env.VITE_API_URL + '/admin/login', payload)
 
       const result = response.data
-      console.log('API Response:', result)
 
       if (result?.data?.status && result.data.token) {
-        sessionStorage.setItem('token', 'Bearer ' + result.data.token)
-        sessionStorage.setItem('user', JSON.stringify(result.data.user))
-        navigate('/dashboard')
+        const storage = checked ? localStorage : sessionStorage
+        storage.setItem('token', 'Bearer ' + result.data.token)
+        storage.setItem('user', JSON.stringify(result.data.user))
+
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Login Successful',
+          detail: 'Welcome to Snehalaya',
+          life: 2500
+        })
+
+        setTimeout(() => navigate('/dashboard'), 2500)
       } else {
-        alert('Login failed: ' + (result.data?.message || 'Invalid credentials'))
+        toast.current?.show({
+          severity: 'error',
+          summary: 'Login Failed',
+          detail: 'Enter details correctly',
+          life: 3000
+        })
       }
-    } catch (error: any) {
-      console.error('Login error:', error)
-      alert(error?.response?.data?.message || 'Something went wrong.')
+    } catch (error) {
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Login Failed',
+        detail: 'Enter details correctly',
+        life: 3000
+      })
     }
   }
 
   return (
     <div className="login-wrapper flex justify-content-between gap-3 px-5">
+      <Toast ref={toast} />
+
       <div className="carousel-box flex-3">
         <img src={images[index]} alt="Slide" className="slide-image" />
         <div className="overlay">
@@ -82,23 +94,18 @@ const Login: React.FC = () => {
             <img src={logo} alt="Logo" className="logo" />
             <p className="mt-2">Snehalaya Silks</p>
           </div>
-          <div>
-            <p className="slide-text">Discover timeless fashion, crafted with care.</p>
-            {/* <div className="indicator">
-            {images.map((_, i) => (
-              <span key={i} className={i === index ? 'dot active' : 'dot'}></span>
-              ))}
-              </div> */}
-          </div>
+          <p className="slide-text">Discover timeless fashion, crafted with care.</p>
         </div>
       </div>
 
       <div className="login-form flex-2">
         <div className="text-center flex flex-column gap-2">
-          <p className="text-xl font-semibold">Welcome to </p>
+          <p className="text-xl font-semibold">Welcome to</p>
           <p className="text-5xl uppercase font-bold">Snehalayaa</p>
         </div>
+
         <p className="mt-5 mb-3 text-xl uppercase font-semibold">Admin Login</p>
+
         <div className="input-group">
           <User className="icon" />
           <InputText
@@ -119,11 +126,24 @@ const Login: React.FC = () => {
           />
         </div>
 
-        <Button
-          label="Login Now"
-          className="login-button uppercase font-bold"
-          onClick={handleSubmit}
-        />
+        <div className="flex justify-content-between align-items-center gap-8  px-3 my-3">
+          <div className="flex align-items-left gap-2">
+            <Checkbox
+              inputId="rememberme"
+              checked={checked}
+              onChange={(e) => setChecked(e.checked!)}
+            />
+            <label htmlFor="remember me" className="text-sm">
+              Remember Me
+            </label>
+          </div>
+
+          <Link to="/forgetpass" className="text-blue-600 text-sm hover:underline">
+            Reset Your Password?
+          </Link>
+        </div>
+
+        <Button label="Login Now" className="login-button uppercase" onClick={handleSubmit} />
       </div>
     </div>
   )
