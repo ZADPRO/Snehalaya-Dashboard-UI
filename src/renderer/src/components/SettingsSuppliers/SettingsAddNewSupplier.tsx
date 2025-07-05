@@ -10,7 +10,7 @@ interface StatusOption {
   value: boolean;
 }
 
-interface Supplier {
+export interface Supplier {
   supplierId: number;
   supplierName?: string;
   supplierCompanyName?: string;
@@ -22,7 +22,7 @@ interface Supplier {
   supplierIFSC?: string;
   supplierBankName?: string;
   supplierUPI?: string;
-  supplierIsActive?: boolean;
+  supplierIsActive?: string | boolean;
   supplierContactNumber?: string;
   emergencyContactName?: string;
   emergencyContactNumber?: string;
@@ -57,7 +57,7 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onClose, onSa
     supplierIFSC: '',
     supplierBankName: '',
     supplierUPI: '',
-    supplierIsActive: true,
+    supplierIsActive: 'true',
     supplierContactNumber: '',
     emergencyContactName: '',
     emergencyContactNumber: '',
@@ -114,7 +114,8 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onClose, onSa
 
     const supplierPayload: Supplier = {
       ...formData,
-      supplierIsActive: formData.supplierIsActive ?? true,
+      supplierIsActive:
+        formData.supplierIsActive === true || formData.supplierIsActive === 'true' ? 'true' : 'false',
       isDelete: false,
       supplierId: editData?.supplierId ?? 0,
     };
@@ -124,44 +125,6 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onClose, onSa
         await onSave(supplierPayload);
       } else if (mode === 'edit' && onUpdate) {
         await onUpdate(supplierPayload);
-      } else {
-        
-        const url =
-          mode === 'add'
-            ? 'http://localhost:8080/api/v1/admin/suppliers/create'
-            : `http://localhost:8080/api/v1/admin/suppliers/update/${supplierPayload.supplierId}`;
-
-        const method = mode === 'add' ? 'POST' : 'PUT';
-
-        const response = await fetch(url, {
-          method,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(supplierPayload),
-        });
-
-        const data = await response.json();
-
-        if (data.status === true) {
-          localStorage.setItem('token', 'Bearer ' + data.token);
-          toast.current?.show({
-            severity: 'success',
-            summary: mode === 'add' ? 'Saved' : 'Updated',
-            detail: data.message || `Supplier ${mode === 'add' ? 'created' : 'updated'} successfully`,
-            life: 3000,
-          });
-          setTimeout(() => onClose(), 1000);
-          return;
-        } else {
-          toast.current?.show({
-            severity: 'warn',
-            summary: 'Error',
-            detail: data.message || 'Something went wrong',
-            life: 3000,
-          });
-          return;
-        }
       }
 
       toast.current?.show({
@@ -170,6 +133,7 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onClose, onSa
         detail: `Supplier ${mode === 'add' ? 'created' : 'updated'} successfully`,
         life: 3000,
       });
+
       setTimeout(() => onClose(), 1000);
     } catch (error) {
       toast.current?.show({
@@ -188,149 +152,62 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onClose, onSa
 
       <p className="font-medium text-sm mt-4 mb-2">Basic Details</p>
       <div className="flex gap-4">
-        <InputText
-          className="flex-1"
-          placeholder="Supplier Name*"
-          value={formData.supplierName}
-          onChange={(e) => handleChange('supplierName', e.target.value)}
-        />
-        <InputText
-          className="flex-1"
-          placeholder="Company Name*"
-          value={formData.supplierCompanyName}
-          onChange={(e) => handleChange('supplierCompanyName', e.target.value)}
-        />
+        <InputText className="flex-1" placeholder="Supplier Name*" value={formData.supplierName} onChange={(e) => handleChange('supplierName', e.target.value)} />
+        <InputText className="flex-1" placeholder="Company Name*" value={formData.supplierCompanyName} onChange={(e) => handleChange('supplierCompanyName', e.target.value)} />
       </div>
       <div className="flex gap-4 mt-3">
-        <InputText
-          className="flex-1"
-          placeholder="Supplier Code*"
-          value={formData.supplierCode}
-          onChange={(e) => handleChange('supplierCode', e.target.value)}
-        />
-        <FloatLabel className="flex-1 always-float">
+        <InputText className="flex-1" placeholder="Supplier Code*" value={formData.supplierCode} onChange={(e) => handleChange('supplierCode', e.target.value)} />
+       <FloatLabel className="flex-1 always-float">
           <Dropdown
             id="status"
             value={formData.supplierIsActive}
             onChange={(e: DropdownChangeEvent) => handleChange('supplierIsActive', e.value)}
             options={statusOptions}
             optionLabel="name"
+            optionValue="value"
+            placeholder="Select Status"
             className="w-full"
           />
           <label htmlFor="status">Status</label>
         </FloatLabel>
+
       </div>
 
       <p className="font-medium text-sm mt-5 mb-2">Communication Details</p>
       <div className="flex gap-4">
-        <InputText
-          className="flex-1"
-          placeholder="Email"
-          value={formData.supplierEmail}
-          onChange={(e) => handleChange('supplierEmail', e.target.value)}
-        />
-        <InputText
-          className="flex-1"
-          placeholder="Contact Number"
-          value={formData.supplierContactNumber}
-          onChange={(e) => handleChange('supplierContactNumber', e.target.value)}
-        />
+        <InputText className="flex-1" placeholder="Email" value={formData.supplierEmail} onChange={(e) => handleChange('supplierEmail', e.target.value)} />
+        <InputText className="flex-1" placeholder="Contact Number" value={formData.supplierContactNumber} onChange={(e) => handleChange('supplierContactNumber', e.target.value)} />
       </div>
       <div className="flex gap-4 mt-3">
-        <InputText
-          className="flex-1"
-          placeholder="Door Number"
-          value={formData.supplierDoorNumber}
-          onChange={(e) => handleChange('supplierDoorNumber', e.target.value)}
-        />
-        <InputText
-          className="flex-1"
-          placeholder="Street"
-          value={formData.supplierStreet}
-          onChange={(e) => handleChange('supplierStreet', e.target.value)}
-        />
+        <InputText className="flex-1" placeholder="Door Number" value={formData.supplierDoorNumber} onChange={(e) => handleChange('supplierDoorNumber', e.target.value)} />
+        <InputText className="flex-1" placeholder="Street" value={formData.supplierStreet} onChange={(e) => handleChange('supplierStreet', e.target.value)} />
       </div>
       <div className="flex gap-4 mt-3">
-        <InputText
-          className="flex-1"
-          placeholder="City"
-          value={formData.supplierCity}
-          onChange={(e) => handleChange('supplierCity', e.target.value)}
-        />
-        <InputText
-          className="flex-1"
-          placeholder="State"
-          value={formData.supplierState}
-          onChange={(e) => handleChange('supplierState', e.target.value)}
-        />
+        <InputText className="flex-1" placeholder="City" value={formData.supplierCity} onChange={(e) => handleChange('supplierCity', e.target.value)} />
+        <InputText className="flex-1" placeholder="State" value={formData.supplierState} onChange={(e) => handleChange('supplierState', e.target.value)} />
       </div>
       <div className="flex gap-4 mt-3">
-        <InputText
-          className="flex-1"
-          placeholder="Country"
-          value={formData.supplierCountry}
-          onChange={(e) => handleChange('supplierCountry', e.target.value)}
-        />
+        <InputText className="flex-1" placeholder="Country" value={formData.supplierCountry} onChange={(e) => handleChange('supplierCountry', e.target.value)} />
       </div>
 
       <p className="font-medium text-sm mt-5 mb-2">Bank Details</p>
       <div className="flex gap-4">
-        <InputText
-          className="flex-1"
-          placeholder="Account Holder Name"
-          value={formData.supplierBankName}
-          onChange={(e) => handleChange('supplierBankName', e.target.value)}
-        />
-        <InputText
-          className="flex-1"
-          placeholder="Account Number"
-          value={formData.supplierBankACNumber}
-          onChange={(e) => handleChange('supplierBankACNumber', e.target.value)}
-        />
+        <InputText className="flex-1" placeholder="Account Holder Name" value={formData.supplierBankName} onChange={(e) => handleChange('supplierBankName', e.target.value)} />
+        <InputText className="flex-1" placeholder="Account Number" value={formData.supplierBankACNumber} onChange={(e) => handleChange('supplierBankACNumber', e.target.value)} />
       </div>
       <div className="flex gap-4 mt-3">
-        <InputText
-          className="flex-1"
-          placeholder="IFSC Code"
-          value={formData.supplierIFSC}
-          onChange={(e) => handleChange('supplierIFSC', e.target.value)}
-        />
-        <InputText
-          className="flex-1"
-          placeholder="GST Number"
-          value={formData.supplierGSTNumber}
-          onChange={(e) => handleChange('supplierGSTNumber', e.target.value)}
-        />
+        <InputText className="flex-1" placeholder="IFSC Code" value={formData.supplierIFSC} onChange={(e) => handleChange('supplierIFSC', e.target.value)} />
+        <InputText className="flex-1" placeholder="GST Number" value={formData.supplierGSTNumber} onChange={(e) => handleChange('supplierGSTNumber', e.target.value)} />
       </div>
       <div className="flex gap-4 mt-3">
-        <InputText
-          className="flex-1"
-          placeholder="UPI ID"
-          value={formData.supplierUPI}
-          onChange={(e) => handleChange('supplierUPI', e.target.value)}
-        />
-        <InputText
-          className="flex-1"
-          placeholder="Payment Terms"
-          value={formData.supplierPaymentTerms}
-          onChange={(e) => handleChange('supplierPaymentTerms', e.target.value)}
-        />
+        <InputText className="flex-1" placeholder="UPI ID" value={formData.supplierUPI} onChange={(e) => handleChange('supplierUPI', e.target.value)} />
+        <InputText className="flex-1" placeholder="Payment Terms" value={formData.supplierPaymentTerms} onChange={(e) => handleChange('supplierPaymentTerms', e.target.value)} />
       </div>
 
       <p className="font-medium text-sm mt-5 mb-2">Emergency Contact</p>
       <div className="flex gap-4">
-        <InputText
-          className="flex-1"
-          placeholder="Emergency Contact Name"
-          value={formData.emergencyContactName}
-          onChange={(e) => handleChange('emergencyContactName', e.target.value)}
-        />
-        <InputText
-          className="flex-1"
-          placeholder="Emergency Contact Number"
-          value={formData.emergencyContactNumber}
-          onChange={(e) => handleChange('emergencyContactNumber', e.target.value)}
-        />
+        <InputText className="flex-1" placeholder="Emergency Contact Name" value={formData.emergencyContactName} onChange={(e) => handleChange('emergencyContactName', e.target.value)} />
+        <InputText className="flex-1" placeholder="Emergency Contact Number" value={formData.emergencyContactNumber} onChange={(e) => handleChange('emergencyContactNumber', e.target.value)} />
       </div>
 
       <div className="text-right pt-6">
