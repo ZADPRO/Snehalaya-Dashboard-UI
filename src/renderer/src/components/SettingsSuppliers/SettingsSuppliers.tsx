@@ -1,14 +1,14 @@
-import { Button } from 'primereact/button'
-import { Column } from 'primereact/column'
-import { DataTable } from 'primereact/datatable'
-import { IconField } from 'primereact/iconfield'
-import { InputIcon } from 'primereact/inputicon'
-import { InputText } from 'primereact/inputtext'
-import { Sidebar } from 'primereact/sidebar'
-import { Toast } from 'primereact/toast'
-import { Toolbar } from 'primereact/toolbar'
-import React, { useEffect, useRef, useState } from 'react'
-import SettingsAddNewSupplier from './SettingsAddNewSupplier'
+import React, { useEffect, useRef, useState } from 'react';
+import { Button } from 'primereact/button';
+import { Column } from 'primereact/column';
+import { DataTable } from 'primereact/datatable';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
+import { InputText } from 'primereact/inputtext';
+import { Sidebar } from 'primereact/sidebar';
+import { Toast } from 'primereact/toast';
+import { Toolbar } from 'primereact/toolbar';
+import SettingsAddNewSupplier from './SettingsAddNewSupplier';
 
 interface Supplier {
   supplierId: number;
@@ -22,7 +22,7 @@ interface Supplier {
   supplierIFSC?: string;
   supplierBankName?: string;
   supplierUPI?: string;
-  supplierIsActive?: string;
+  supplierIsActive?: boolean;
   supplierContactNumber?: string;
   emergencyContactName?: string;
   emergencyContactNumber?: string;
@@ -31,10 +31,7 @@ interface Supplier {
   supplierCity?: string;
   supplierState?: string;
   supplierCountry?: string;
-  createdAt?: string;
-  createdBy?: string;
-  updatedAt?: string;
-  updatedBy?: string;
+  
   isDelete?: boolean;
 }
 
@@ -52,37 +49,66 @@ const SettingsSuppliers: React.FC = () => {
     dtRef.current?.exportCSV();
   };
 
-  const fetchSuppliers = () => {
-    const dummyData: Supplier[] = [
-      {
-        supplierId: 12,
-        supplierName: 'Thiru Kumara Updated',
-        supplierCompanyName: 'IT Solutions',
-        supplierCode: 'SUP001',
-        supplierEmail: 'thiru.updated@example.com',
-        supplierGSTNumber: '33AABCT3518Q1ZZ',
-        supplierPaymentTerms: 'Net 45',
-        supplierBankACNumber: '123456789012',
-        supplierIFSC: 'SBIN0001234',
-        supplierBankName: 'SBI',
-        supplierUPI: 'thiru@upi',
-        supplierIsActive: 'true',
-        supplierContactNumber: '9876543210',
-        emergencyContactName: 'Arun Kumar',
-        emergencyContactNumber: '9876543211',
-        supplierDoorNumber: '12B',
-        supplierStreet: 'MG Road',
-        supplierCity: 'Chennai',
-        supplierState: 'Tamil Nadu',
-        supplierCountry: 'India',
-        createdAt: '2025-06-26 17:03:55',
-        createdBy: 'Admin',
-        updatedAt: '2025-06-26 17:10:30',
-        updatedBy: 'Admin',
-        isDelete: true
+  const fetchSuppliers = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/v1/admin/suppliers/read');
+      const data = await response.json();
+      if (data.status && Array.isArray(data.data)) {
+        setSuppliers(data.data);
+      } else {
+        toast.current?.show({
+          severity: 'warn',
+          summary: 'Fetch Failed',
+          detail: data.message || 'Unable to fetch suppliers',
+          life: 3000
+        });
       }
-    ];
-    setSuppliers(dummyData);
+    } catch (error) {
+      console.error('Fetch Error:', error);
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to load supplier data',
+        life: 3000
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchSuppliers();
+  }, []);
+
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/v1/admin/suppliers/delete/${id}`, {
+        method: 'DELETE'
+      });
+      const data = await response.json();
+      if (data.status) {
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Deleted',
+          detail: data.message || 'Supplier deleted successfully',
+          life: 3000
+        });
+        fetchSuppliers();
+      } else {
+        toast.current?.show({
+          severity: 'warn',
+          summary: 'Delete Failed',
+          detail: data.message || 'Could not delete supplier',
+          life: 3000
+        });
+      }
+    } catch (error) {
+      console.error('Delete Error:', error);
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Something went wrong while deleting',
+        life: 3000
+      });
+    }
   };
 
   const leftHeader = (
@@ -111,20 +137,6 @@ const SettingsSuppliers: React.FC = () => {
       />
     </IconField>
   );
-
-  useEffect(() => {
-    fetchSuppliers();
-  }, []);
-
-  const handleDelete = async (id: number) => {
-    toast.current?.show({
-      severity: 'warn',
-      summary: 'Delete Triggered',
-      detail: `Supplier with ID ${id} delete requested.`,
-      life: 3000
-    });
-  };
-
 
   const actionBody = (rowData: Supplier) => (
     <div className="flex gap-2">
@@ -193,7 +205,6 @@ const SettingsSuppliers: React.FC = () => {
           }}
           style={{ width: '50vw' }}
         >
-          {/* Passing the props data  */}
           <SettingsAddNewSupplier
             mode={mode}
             editData={editData}
