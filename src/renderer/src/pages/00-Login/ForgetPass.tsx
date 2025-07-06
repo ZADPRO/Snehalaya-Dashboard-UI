@@ -194,6 +194,7 @@ const ForgotPassword: React.FC = () => {
 
         {step === 3 && (
           <>
+            {/* New Password */}
             <div className="input-group mt-4">
               <Lock className="icon" />
               <Password
@@ -203,11 +204,9 @@ const ForgotPassword: React.FC = () => {
                 toggleMask
                 className="w-full"
                 feedback={true}
-               
                 footer={
                   <>
                     <Divider />
-                   
                     <ul className="pl-2 ml-2 mt-0 line-height-3 text-sm">
                       <li>✔ At least one lowercase</li>
                       <li>✔ At least one uppercase</li>
@@ -219,16 +218,37 @@ const ForgotPassword: React.FC = () => {
                 }
               />
             </div>
+
             <div className="input-group mt-3">
               <Lock className="icon" />
+               <div className="w-full">
               <Password
                 placeholder="Confirm Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 toggleMask
                 className="w-full"
-              />
+                feedback={false}/>
+  
+                 { confirmPassword.length > 0 && (
+                    <div className="text-sm mt-2"
+                         style={{
+                         color: newPassword === confirmPassword ? '#22c55e' : '#ef4444',
+                          fontWeight: 500,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                        }}>
+                      
+                        {newPassword === confirmPassword
+                          ? '✅ Password match'
+                          : '❌ Password do not match'}
+                      
+                    </div>
+                  )}
+             </div>
             </div>
+
             <Button
               label="Reset Password"
               className="login-button mt-4 uppercase"
