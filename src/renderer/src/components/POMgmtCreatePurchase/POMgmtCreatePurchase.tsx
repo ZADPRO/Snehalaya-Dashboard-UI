@@ -129,13 +129,14 @@ const AddNewPurchase: React.FC = () => {
         <Button
           label="Print Invoice"
           icon="pi pi-print"
-          className="mr-2"
+          className="mr-2 gap-2"
           onClick={handlePrintInvoice}
           severity="secondary"
         />
         <Button
           label="Save Purchase"
           icon="pi pi-check"
+          className=" gap-2"
           onClick={handleSave}
           disabled={isSaveDisabled}
         />

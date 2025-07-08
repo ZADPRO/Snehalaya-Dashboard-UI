@@ -226,6 +226,7 @@ const AddProduct: React.FC = () => {
         <Button
           label="Save Product"
           icon="pi pi-check"
+          className=" gap-2"
           onClick={handleSaveProduct}
           disabled={!isDirty}
         />

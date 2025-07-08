@@ -140,6 +140,7 @@ const POMgmtEditPurchase: React.FC<Props> = ({ data, onSave }) => {
         <Button
           label="Save"
           icon="pi pi-check"
+          className="gap-2"
           onClick={handleSubmit}
           disabled={!isDirty}
         />

@@ -7,6 +7,9 @@ import { InputText } from 'primereact/inputtext';
 import { Sidebar } from 'primereact/sidebar';
 import { Button } from 'primereact/button';
 import axios from 'axios';
+// import { Textarea } from 'primereact/textarea';
+import { InputTextarea } from 'primereact/inputtextarea';
+
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
 import { FloatLabel } from 'primereact/floatlabel'
@@ -227,17 +230,22 @@ const Products: React.FC = () => {
     </FloatLabel>
   </div>
 
-  <div className="field col-12 md:col-6">
-    <FloatLabel className="always-float">
-      <InputText
-        id="poDescription"
-        value={editData.poDescription}
-        onChange={(e) => setEditData({ ...editData, poDescription: e.target.value })}
-        className="w-full"
-      />
-      <label htmlFor="poDescription">Description</label>
-    </FloatLabel>
-  </div>
+ <div className="field col-12">
+  <FloatLabel className="always-float">
+    <InputTextarea
+      id="poDescription"
+      value={editData.poDescription || ""}
+      onChange={(e) =>
+        setEditData({ ...editData, poDescription: e.target.value })
+      }
+      rows={4}
+      className="w-full"
+      placeholder='You can use HTML like <b>bold</b>, <i>italic</i>, etc.'
+    />
+    <label htmlFor="poDescription">Description</label>
+  </FloatLabel>
+</div>
+
 
   <div className="field col-12 md:col-6">
     <FloatLabel className="always-float">
@@ -317,6 +325,7 @@ const Products: React.FC = () => {
   <Button
     label="Save"
     icon="pi pi-check"
+    className="gap-2"
     onClick={() => handleUpdateProduct(editData)}
     disabled={!isDirty()}
   />
