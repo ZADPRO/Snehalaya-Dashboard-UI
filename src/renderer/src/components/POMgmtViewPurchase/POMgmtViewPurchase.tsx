@@ -125,10 +125,11 @@ const header = (
           <DataTable
             value={products}
             paginator
-            rows={5}
+            rows={10}
+            rowsPerPageOptions={[10, 25, 50]}
             globalFilter={globalFilter}
-             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             emptyMessage="No products"
           >
             <Column header="S.No" body={(_, opts) => opts.rowIndex + 1} />

@@ -3,8 +3,19 @@ import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import axios from 'axios';
-import { FloatLabel } from 'primereact/floatlabel'
-import { Product } from '../../components/POMgmtViewPurchase/Product';
+import { FloatLabel } from 'primereact/floatlabel';
+import { generateInvoicePDF } from '../../components/POMgmtCreatePurchase/InvoicePdf';
+
+export interface Product {
+  refPName?: string;
+  refPSKU?: string;
+  refPBrand?: string;
+  refPStatus?: boolean;
+  refPPrice?: number;
+  refPMRP?: number;
+  createdBy?: string;
+  createdAt?: string;
+}
 
 const AddNewPurchase: React.FC = () => {
   const toast = useRef<Toast>(null);
@@ -16,34 +27,13 @@ const AddNewPurchase: React.FC = () => {
     refPStatus: true,
     refPPrice: 0,
     refPMRP: 0,
-    // refPCost: 0,
-    // refPShortDescription: '',
-    // refPLongDescription: '',
-    createdBy: '',
-    createdAt: new Date().toISOString().split('T')[0],
+    createdBy: 'Admin',
+    createdAt: new Date().toLocaleString(),
   });
 
-
   const handleChange = (field: keyof Product, value: string | number | boolean) => {
-    setProduct(prev => ({ ...prev, [field]: value }));
-
-    if (field === 'refPPrice' || field === 'refPMRP') {
-      const price = parseFloat(field === 'refPPrice' ? value.toString() : product.refPPrice?.toString() || '0');
-      // const mrp = parseFloat(field === 'refPMRP' ? value.toString() : product.refPMRP?.toString() || '0');
-      setProduct(prev => ({
-        ...prev,
-        refPCost: price, 
-      }));
-    }
+    setProduct((prev) => ({ ...prev, [field]: value }));
   };
-
-
- const handlePrintInvoice = async () => {
-  const { saveAs } = await import('file-saver');
-  const blob = new Blob(['Test Invoice PDF Content'], { type: 'application/pdf' });
-  saveAs(blob, 'test-invoice.pdf');
-};
-
 
   const handleSave = async () => {
     try {
@@ -73,11 +63,8 @@ const AddNewPurchase: React.FC = () => {
           refPStatus: true,
           refPPrice: 0,
           refPMRP: 0,
-        //   refPCost: 0,
-        //   refPShortDescription: '',
-        //   refPLongDescription: '',
-          createdBy: '',
-          createdAt: new Date().toISOString().split('T')[0],
+          createdBy: 'Admin',
+          createdAt: new Date().toLocaleString(),
         });
       } else {
         toast.current?.show({
@@ -97,126 +84,61 @@ const AddNewPurchase: React.FC = () => {
     }
   };
 
+  const handlePrintInvoice = async () => {
+    await generateInvoicePDF();
+  };
+
+  const isSaveDisabled =
+    !product.refPName ||
+    !product.refPSKU ||
+    !product.refPBrand ||
+    !product.refPPrice ||
+    !product.refPMRP;
+
   return (
     <div className="p-4">
       <Toast ref={toast} />
       <h2 className="text-xl font-semibold mb-4">Add New Purchase</h2>
 
-     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-  <FloatLabel className="always-float">
-    <InputText
-      id="refPName"
-      value={product.refPName}
-      onChange={(e) => handleChange('refPName', e.target.value)}
-      className="w-full"
-    />
-    <label htmlFor="refPName">Product Name</label>
-  </FloatLabel>
-
-  <FloatLabel className="always-float">
-    <InputText
-      id="refPSKU"
-      value={product.refPSKU}
-      onChange={(e) => handleChange('refPSKU', e.target.value)}
-      className="w-full"
-    />
-    <label htmlFor="refPSKU">SKU</label>
-  </FloatLabel>
-
-  <FloatLabel className="always-float">
-    <InputText
-      id="refPBrand"
-      value={product.refPBrand}
-      onChange={(e) => handleChange('refPBrand', e.target.value)}
-      className="w-full"
-    />
-    <label htmlFor="refPBrand">Brand</label>
-  </FloatLabel>
-
-  <FloatLabel className="always-float">
-    <InputText
-      id="refPPrice"
-      value={product.refPPrice?.toString() || ''}
-      onChange={(e) => handleChange('refPPrice', e.target.value)}
-      className="w-full"
-    />
-    <label htmlFor="refPPrice">Price</label>
-  </FloatLabel>
-
-  <FloatLabel className="always-float">
-    <InputText
-      id="refPMRP"
-      value={product.refPMRP?.toString() || ''}
-      onChange={(e) => handleChange('refPMRP', e.target.value)}
-      className="w-full"
-    />
-    <label htmlFor="refPMRP">MRP</label>
-  </FloatLabel>
-
-  {/* Uncomment if you want to show Cost */}
-  {/* 
-  <FloatLabel className="always-float">
-    <InputText
-      id="refPCost"
-      value={product.refPCost?.toString() || ''}
-      onChange={(e) => handleChange('refPCost', e.target.value)}
-      className="w-full"
-    />
-    <label htmlFor="refPCost">Cost</label>
-  </FloatLabel>
-  */}
-
-  <FloatLabel className="always-float">
-    <InputText
-      id="createdBy"
-      value={product.createdBy}
-      onChange={(e) => handleChange('createdBy', e.target.value)}
-      className="w-full"
-    />
-    <label htmlFor="createdBy">Created By</label>
-  </FloatLabel>
-
-  <FloatLabel className="always-float">
-    <InputText
-      id="createdAt"
-      value={product.createdAt}
-      onChange={(e) => handleChange('createdAt', e.target.value)}
-      className="w-full"
-    />
-    <label htmlFor="createdAt">Created At</label>
-  </FloatLabel>
-</div>
-
-
-      {/* <div className="mt-4 grid grid-cols-1 gap-4">
-        <InputTextarea
-          placeholder="Short Description"
-          value={product.refPShortDescription}
-          onChange={(e) => handleChange('refPShortDescription', e.target.value)}
-          rows={2}
-          className="w-full"
-        />
-        <InputTextarea
-          placeholder="Long Description"
-          value={product.refPLongDescription}
-          onChange={(e) => handleChange('refPLongDescription', e.target.value)}
-          rows={4}
-          className="w-full"
-        />
-      </div> */}
-        <div className="text-right mr-3 mt-15 mb-9">
-        {/* <Button label="Save Purchase" icon="pi pi-check" onClick={handleSave} /> */}
-        <Button
-          label="Print Invoice"
-          icon="pi pi-print"
-          className="ml-2 mt-[1] mb-4"
-          severity="secondary"
-          onClick={handlePrintInvoice}
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {[
+          { id: 'refPName', label: 'Product Name' },
+          { id: 'refPSKU', label: 'SKU' },
+          { id: 'refPBrand', label: 'Brand' },
+          { id: 'refPPrice', label: 'Price', type: 'number' },
+          { id: 'refPMRP', label: 'MRP', type: 'number' },
+        ].map(({ id, label, type }) => (
+          <FloatLabel className="always-float" key={id}>
+            <InputText
+              id={id}
+              value={String(product[id as keyof Product] || '')}
+              onChange={(e) =>
+                handleChange(
+                  id as keyof Product,
+                  type === 'number' ? parseFloat(e.target.value) || 0 : e.target.value
+                )
+              }
+              className="w-full"
+            />
+            <label htmlFor={id}>{label}</label>
+          </FloatLabel>
+        ))}
       </div>
 
       <div className="text-right mt-6">
-        <Button label="Save Purchase" icon="pi pi-check" onClick={handleSave} />
+        <Button
+          label="Print Invoice"
+          icon="pi pi-print"
+          className="mr-2"
+          onClick={handlePrintInvoice}
+          severity="secondary"
+        />
+        <Button
+          label="Save Purchase"
+          icon="pi pi-check"
+          onClick={handleSave}
+          disabled={isSaveDisabled}
+        />
       </div>
     </div>
   );

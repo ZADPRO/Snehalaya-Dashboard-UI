@@ -63,6 +63,13 @@ const Products: React.FC = () => {
     }
   };
 
+  const [originalData, setOriginalData] = useState<Product | null>(null);
+
+  const isDirty = () => {
+  return JSON.stringify(editData) !== JSON.stringify(originalData);
+};
+
+
   const handleUpdateProduct = async (product: Product) => {
     try {
       const response = await axios.put(
@@ -138,8 +145,10 @@ const Products: React.FC = () => {
         severity="info"
         onClick={() => {
           setEditData(rowData);
+          setOriginalData(rowData); 
           setVisible(true);
         }}
+
       />
       <Button
         icon="pi pi-trash"
@@ -171,6 +180,7 @@ const Products: React.FC = () => {
         value={products}
         paginator
         rows={10}
+        rowsPerPageOptions={[10, 25, 50]}
         globalFilter={globalFilter}
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -303,13 +313,15 @@ const Products: React.FC = () => {
 </div>
 
 
-      <div className="text-right pt-3">
-        <Button
-          label="Save"
-          icon="pi pi-check"
-          onClick={() => handleUpdateProduct(editData)}
-        />
-      </div>
+     <div className="text-right pt-3">
+  <Button
+    label="Save"
+    icon="pi pi-check"
+    onClick={() => handleUpdateProduct(editData)}
+    disabled={!isDirty()}
+  />
+</div>
+
     </div>
   )}
 </Sidebar>

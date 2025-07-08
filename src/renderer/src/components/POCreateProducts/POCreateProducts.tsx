@@ -4,7 +4,8 @@ import { Editor, EditorTextChangeEvent } from 'primereact/editor';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import axios from 'axios';
-import { FloatLabel } from 'primereact/floatlabel'
+import { FloatLabel } from 'primereact/floatlabel';
+
 interface ProductPayload {
   poName: string;
   poDescription: string;
@@ -18,6 +19,7 @@ interface ProductPayload {
 
 const AddProduct: React.FC = () => {
   const toast = useRef<Toast>(null);
+  const [isDirty, setIsDirty] = useState(false);
 
   const [product, setProduct] = useState<ProductPayload>({
     poName: '',
@@ -30,36 +32,55 @@ const AddProduct: React.FC = () => {
     poTotalPrice: '',
   });
 
-  const handleChange = (field: keyof ProductPayload, value: string) => {
-    const numericFields: (keyof ProductPayload)[] = [
-      'poHSN',
-      'poQuantity',
-      'poPrice',
-      'poDiscPercent',
-      'poDisc',
-      'poTotalPrice',
-    ];
+ 
+ const handleChange = (field: keyof ProductPayload, value: string) => {
+  const currentValue = product[field];
 
-    if (numericFields.includes(field)) {
-      if (!/^\d*\.?\d*$/.test(value)) return; 
-    }
+  if (currentValue === value) return;
 
-    setProduct((prev) => {
-      const updated = { ...prev, [field]: value };
+  setIsDirty(true); // Now this only triggers when value truly changes
 
-      const price = parseFloat(updated.poPrice);
-      const percent = parseFloat(updated.poDiscPercent);
+  const numericFields: (keyof ProductPayload)[] = [
+    'poHSN',
+    'poQuantity',
+    'poPrice',
+    'poDiscPercent',
+    'poDisc',
+    'poTotalPrice',
+  ];
 
-      if (!isNaN(price) && !isNaN(percent)) {
-        const discount = parseFloat(((price * percent) / 100).toFixed(2));
-        const total = parseFloat((price - discount).toFixed(2));
+  if (numericFields.includes(field)) {
+    if (!/^\d*\.?\d*$/.test(value)) return;
+  }
+
+  setProduct((prev) => {
+    const updated = { ...prev, [field]: value };
+
+    const quantity = parseFloat(updated.poQuantity);
+    const price = parseFloat(updated.poPrice);
+    const discountPercent = parseFloat(updated.poDiscPercent);
+
+    if (!isNaN(quantity) && !isNaN(price)) {
+      const baseAmount = quantity * price;
+
+      if (!isNaN(discountPercent)) {
+        const discount = parseFloat(((baseAmount * discountPercent) / 100).toFixed(2));
+        const total = parseFloat((baseAmount - discount).toFixed(2));
         updated.poDisc = discount.toString();
         updated.poTotalPrice = total.toString();
+      } else {
+        updated.poDisc = '';
+        updated.poTotalPrice = baseAmount.toFixed(2);
       }
+    } else {
+      updated.poDisc = '';
+      updated.poTotalPrice = '';
+    }
 
-      return updated;
-    });
-  };
+    return updated;
+  });
+};
+
 
   const handleSaveProduct = async () => {
     try {
@@ -92,6 +113,8 @@ const AddProduct: React.FC = () => {
           poDisc: '',
           poTotalPrice: '',
         });
+
+        setIsDirty(false);
       } else {
         toast.current?.show({
           severity: 'warn',
@@ -115,73 +138,78 @@ const AddProduct: React.FC = () => {
     <div className="p-4">
       <Toast ref={toast} />
       <h2 className="text-xl font-semibold mb-4">Add New Product</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
- 
-  <FloatLabel className="always-float">
-    <InputText
-      id="poName"
-      value={product.poName}
-      onChange={(e) => handleChange('poName', e.target.value)}
-      className="w-full"
-    />
-    <label htmlFor="poName">Product Name</label>
-  </FloatLabel>
 
-  <FloatLabel className="always-float">
-    <InputText
-      id="poHSN"
-      value={product.poHSN}
-      onChange={(e) => handleChange('poHSN', e.target.value)}
-      className="w-full"
-    />
-    <label htmlFor="poHSN">HSN</label>
-  </FloatLabel>
-  <FloatLabel className="always-float">
-    <InputText
-      id="poQuantity"
-      value={product.poQuantity}
-      onChange={(e) => handleChange('poQuantity', e.target.value)}
-      className="w-full"
-    />
-    <label htmlFor="poQuantity">Quantity</label>
-  </FloatLabel>
-  <FloatLabel className="always-float">
-    <InputText
-      id="poPrice"
-      value={product.poPrice}
-      onChange={(e) => handleChange('poPrice', e.target.value)}
-      className="w-full"
-    />
-    <label htmlFor="poPrice">Price</label>
-  </FloatLabel>
-  <FloatLabel className="always-float">
-    <InputText
-      id="poDiscPercent"
-      value={product.poDiscPercent}
-      onChange={(e) => handleChange('poDiscPercent', e.target.value)}
-      className="w-full"
-    />
-    <label htmlFor="poDiscPercent">Discount %</label>
-  </FloatLabel>
-  <FloatLabel className="always-float">
-    <InputText
-      id="poDisc"
-      value={product.poDisc}
-      disabled
-      className="w-full"
-    />
-    <label htmlFor="poDisc">Discount Value</label>
-  </FloatLabel>
-  <FloatLabel className="always-float">
-    <InputText
-      id="poTotalPrice"
-      value={product.poTotalPrice}
-      disabled
-      className="w-full"
-    />
-    <label htmlFor="poTotalPrice">Total Price</label>
-  </FloatLabel>
-</div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+        <FloatLabel className="always-float">
+          <InputText
+            id="poName"
+            value={product.poName}
+            onChange={(e) => handleChange('poName', e.target.value)}
+            className="w-full"
+          />
+          <label htmlFor="poName">Product Name</label>
+        </FloatLabel>
+
+        <FloatLabel className="always-float">
+          <InputText
+            id="poHSN"
+            value={product.poHSN}
+            onChange={(e) => handleChange('poHSN', e.target.value)}
+            className="w-full"
+          />
+          <label htmlFor="poHSN">HSN</label>
+        </FloatLabel>
+
+        <FloatLabel className="always-float">
+          <InputText
+            id="poQuantity"
+            value={product.poQuantity}
+            onChange={(e) => handleChange('poQuantity', e.target.value)}
+            className="w-full"
+          />
+          <label htmlFor="poQuantity">Quantity</label>
+        </FloatLabel>
+
+        <FloatLabel className="always-float">
+          <InputText
+            id="poPrice"
+            value={product.poPrice}
+            onChange={(e) => handleChange('poPrice', e.target.value)}
+            className="w-full"
+          />
+          <label htmlFor="poPrice">Price</label>
+        </FloatLabel>
+
+        <FloatLabel className="always-float">
+          <InputText
+            id="poDiscPercent"
+            value={product.poDiscPercent}
+            onChange={(e) => handleChange('poDiscPercent', e.target.value)}
+            className="w-full"
+          />
+          <label htmlFor="poDiscPercent">Discount %</label>
+        </FloatLabel>
+
+        <FloatLabel className="always-float">
+          <InputText
+            id="poDisc"
+            value={product.poDisc}
+            disabled
+            className="w-full"
+          />
+          <label htmlFor="poDisc">Discount Value</label>
+        </FloatLabel>
+
+        <FloatLabel className="always-float">
+          <InputText
+            id="poTotalPrice"
+            value={product.poTotalPrice}
+            disabled
+            className="w-full"
+          />
+          <label htmlFor="poTotalPrice">Total Price</label>
+        </FloatLabel>
+      </div>
 
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
         <Editor
@@ -194,11 +222,12 @@ const AddProduct: React.FC = () => {
         />
       </div>
 
-      <div className="text-right mt-6 ">
+      <div className="text-right mt-6">
         <Button
           label="Save Product"
           icon="pi pi-check"
           onClick={handleSaveProduct}
+          disabled={!isDirty}
         />
       </div>
     </div>
@@ -206,6 +235,7 @@ const AddProduct: React.FC = () => {
 };
 
 export default AddProduct;
+
 
 
 
