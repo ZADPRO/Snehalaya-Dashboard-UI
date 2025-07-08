@@ -1,58 +1,30 @@
-import axios from 'axios'
+import React, { useEffect, useRef, useState } from 'react'
+import { Toast } from 'primereact/toast'
+import { InputText } from 'primereact/inputtext'
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown'
 import { FloatLabel } from 'primereact/floatlabel'
-import { InputText } from 'primereact/inputtext'
-import { Toast } from 'primereact/toast'
-import React, { useEffect, useRef, useState } from 'react'
+import { Button } from 'primereact/button'
+import { State, City } from 'country-state-city'
 
-interface StatusOption {
-  name: string
-  isActive: boolean
-}
-
-interface EmployeeFormData {
-  firstName: string
-  lastName: string
-  designation: string
-  roleTypeId: number | null
-  refUserStatus: StatusOption | null
-  branchId: string
-  username: string
-  mobile: string
-  email: string
-  doorNumber: string
-  streetName: string
-  city: string
-  state: string
-}
-
-interface RoleTypeProps {
-  refRTId: number
-  refRTName: string
-}
-
-interface BranchTypeProps {
-  createdAt: string
-  createdBy: string
-  isActive: boolean
-  isDelete: boolean
-  isMainBranch: boolean
-  refBTId: number
-  refBranchCode: string
-  refBranchId: number
-  refBranchName: string
-  refEmail: string
-  refLocation: string
-  refMobile: string
-  updatedAt: string
-  updatedBy: string
-}
+import {
+  BranchTypeProps,
+  CityType,
+  EmployeeFormData,
+  RoleTypeProps,
+  StateType,
+  StatusOption
+} from './SettingsAddEmployees.types'
+import { getEmployeeRoleType, getBranchDetails } from './SettingsAddEmployees.api'
 
 const SettingsAddEmployees: React.FC = () => {
   const toast = useRef<Toast>(null)
 
-  const [roleType, setRoleType] = useState<RoleTypeProps[] | []>([])
-  const [branchDetails, setBranchDetails] = useState<BranchTypeProps[] | []>([])
+  const [roleType, setRoleType] = useState<RoleTypeProps[]>([])
+  const [branchDetails, setBranchDetails] = useState<BranchTypeProps[]>([])
+  const [states, setStates] = useState<StateType[]>([])
+  const [cities, setCities] = useState<CityType[]>([])
+
+  const [errors, setErrors] = useState<{ email?: string; mobile?: string }>({})
 
   const [formData, setFormData] = useState<EmployeeFormData>({
     firstName: '',
@@ -67,74 +39,106 @@ const SettingsAddEmployees: React.FC = () => {
     doorNumber: '',
     streetName: '',
     city: '',
-    state: ''
+    state: 'Tamil Nadu'
   })
-
-  const handleChange = (
-    field: keyof EmployeeFormData,
-    value: string | boolean | StatusOption | null
-  ) => {
-    console.log('value', value)
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value as any
-    }))
-  }
 
   const statusOptions: StatusOption[] = [
     { name: 'Active', isActive: true },
     { name: 'In Active', isActive: false }
   ]
 
-  const getEmployeeRoleType = async () => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/admin/settings/employeeRoleType`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: sessionStorage.getItem('token')
-          }
-        }
-      )
-      console.log('\n\nresponse for employee role type', response)
-      if (response.status) {
-        setRoleType(response.data.roles)
+  const handleChange = (
+    field: keyof EmployeeFormData,
+    value: string | number | StatusOption | null
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value as any
+    }))
+
+    // Perform validations
+    if (field === 'email') {
+      const error = validateEmail(value as string)
+      setErrors((prev) => ({ ...prev, email: error }))
+    }
+
+    if (field === 'mobile') {
+      const error = validateMobile(value as string)
+      setErrors((prev) => ({ ...prev, mobile: error }))
+    }
+
+    if (field === 'state' && typeof value === 'string') {
+      const selectedState = states.find((s) => s.name === value)
+      if (selectedState) {
+        const stateCities = City.getCitiesOfState('IN', selectedState.isoCode)
+        setCities(stateCities)
       }
-    } catch (error) {
-      console.log(error)
     }
   }
 
-  const getBranchDetails = async () => {
-    try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/admin/settings/branches`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: sessionStorage.getItem('token')
-        }
-      })
-      console.log('\n\nresponse for branch details', response)
-      if (response.status) {
-        setBranchDetails(response.data.data)
-      }
-    } catch (error) {
-      console.log(error)
-    }
+  const validateEmail = (email: string): string | undefined => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!email.trim()) return 'Email is required'
+    if (!emailRegex.test(email)) return 'Enter a valid email address'
+    return undefined
+  }
+
+  const validateMobile = (mobile: string): string | undefined => {
+    const mobileRegex = /^[6-9]\d{9}$/
+    if (!mobile.trim()) return 'Mobile number is required'
+    if (!mobileRegex.test(mobile)) return 'Enter a valid 10-digit mobile number'
+    return undefined
+  }
+
+  const isFormValid = (): boolean => {
+    const f = formData
+    return (
+      f.firstName.trim() !== '' &&
+      f.lastName.trim() !== '' &&
+      f.designation.trim() !== '' &&
+      f.username.trim() !== '' &&
+      f.email.trim() !== '' &&
+      f.mobile.trim() !== '' &&
+      f.doorNumber.trim() !== '' &&
+      f.streetName.trim() !== '' &&
+      f.city.trim() !== '' &&
+      f.state.trim() !== '' &&
+      f.roleTypeId !== null &&
+      f.refUserStatus !== null &&
+      f.branchId !== ''
+    )
+  }
+
+  const handleSubmit = () => {
+    console.log('Submitted Payload:', {
+      ...formData,
+      refUserStatus: formData.refUserStatus?.isActive
+    })
+    toast.current?.show({ severity: 'success', summary: 'Submitted', detail: 'Employee added.' })
   }
 
   useEffect(() => {
-    getEmployeeRoleType()
-    getBranchDetails()
+    getEmployeeRoleType().then(setRoleType).catch(console.log)
+    getBranchDetails().then(setBranchDetails).catch(console.log)
+
+    const indianStates = State.getStatesOfCountry('IN')
+    setStates(indianStates)
+
+    const defaultState = indianStates.find((s) => s.name === 'Tamil Nadu')
+    if (defaultState) {
+      const cities = City.getCitiesOfState('IN', defaultState.isoCode)
+      setCities(cities)
+    }
   }, [])
+
   return (
     <div className="p-1 pb-20 relative">
       <Toast ref={toast} />
-      <p className="text-xl font-semibold mb-4">Add New Employee</p>
+      <p className="text-xl font-bold mb-4 uppercase">Add New Employee</p>
       <div className="flex flex-column">
         {/* BASIC DETAILS */}
         <div>
-          <p className="font-semibold text-lg mb-3">Basic Details</p>
+          <p className="font-semibold text-lg mb-3 underline uppercase">Basic Details</p>
           <div className="flex gap-4 align-items-center mb-3">
             <div className="flex-1">
               <FloatLabel className="always-float">
@@ -164,17 +168,6 @@ const SettingsAddEmployees: React.FC = () => {
             <div className="flex-1">
               <FloatLabel className="always-float">
                 <InputText
-                  id="designation"
-                  value={formData.designation}
-                  className="w-full"
-                  onChange={(e) => handleChange('designation', e.target.value)}
-                />
-                <label htmlFor="designation">Designation</label>
-              </FloatLabel>
-            </div>
-            <div className="flex-1">
-              <FloatLabel className="always-float">
-                <InputText
                   id="username"
                   value={formData.username}
                   className="w-full"
@@ -183,34 +176,62 @@ const SettingsAddEmployees: React.FC = () => {
                 <label htmlFor="username">Username</label>
               </FloatLabel>
             </div>
+            <div className="flex-1">
+              <FloatLabel className="always-float">
+                <InputText
+                  id="designation"
+                  value={formData.designation}
+                  className="w-full"
+                  onChange={(e) => handleChange('designation', e.target.value)}
+                />
+                <label htmlFor="designation">Designation</label>
+              </FloatLabel>
+            </div>
           </div>
         </div>
 
         {/* COMMUNICATION DETAILS */}
         <div>
-          <p className="font-semibold text-lg mb-3">Communication Details</p>
+          <p className="font-semibold text-lg mb-3 underline uppercase">Communication Details</p>
           <div className="flex gap-4 align-items-center mb-3">
             <div className="flex-1">
               <FloatLabel className="always-float">
                 <InputText
                   id="email"
                   value={formData.email}
-                  className="w-full"
+                  className={`w-full ${errors.email ? 'p-invalid' : ''}`}
                   onChange={(e) => handleChange('email', e.target.value)}
                 />
                 <label htmlFor="email">Email</label>
               </FloatLabel>
+              {errors.email && (
+                <small id="email-help" className="p-error block mt-1">
+                  {errors.email}
+                </small>
+              )}
             </div>
+
             <div className="flex-1">
               <FloatLabel className="always-float">
                 <InputText
                   id="mobile"
                   value={formData.mobile}
-                  className="w-full"
-                  onChange={(e) => handleChange('mobile', e.target.value)}
+                  className={`w-full ${errors.mobile ? 'p-invalid' : ''}`}
+                  keyfilter="pint"
+                  onChange={(e) => {
+                    const input = e.target.value
+                    if (/^\d{0,10}$/.test(input)) {
+                      handleChange('mobile', input)
+                    }
+                  }}
                 />
                 <label htmlFor="mobile">Mobile</label>
               </FloatLabel>
+              {errors.mobile && (
+                <small id="mobile-help" className="p-error block mt-1">
+                  {errors.mobile}
+                </small>
+              )}
             </div>
           </div>
 
@@ -242,24 +263,31 @@ const SettingsAddEmployees: React.FC = () => {
           <div className="flex gap-4 align-items-center mb-3">
             <div className="flex-1">
               <FloatLabel className="always-float">
-                <InputText
-                  id="city"
-                  value={formData.city}
-                  className="w-full"
-                  onChange={(e) => handleChange('city', e.target.value)}
-                />
-                <label htmlFor="city">City</label>
-              </FloatLabel>
-            </div>
-            <div className="flex-1">
-              <FloatLabel className="always-float">
-                <InputText
+                <Dropdown
                   id="state"
+                  filter
                   value={formData.state}
+                  options={states.map((s) => ({ label: s.name, value: s.name }))}
+                  onChange={(e: DropdownChangeEvent) => handleChange('state', e.value)}
                   className="w-full"
-                  onChange={(e) => handleChange('state', e.target.value)}
+                  placeholder="Select State"
                 />
                 <label htmlFor="state">State</label>
+              </FloatLabel>
+            </div>
+
+            <div className="flex-1">
+              <FloatLabel className="always-float">
+                <Dropdown
+                  id="city"
+                  filter
+                  value={formData.city}
+                  options={cities.map((c) => ({ label: c.name, value: c.name }))}
+                  onChange={(e: DropdownChangeEvent) => handleChange('city', e.value)}
+                  className="w-full"
+                  placeholder="Select City"
+                />
+                <label htmlFor="city">City</label>
               </FloatLabel>
             </div>
           </div>
@@ -267,7 +295,7 @@ const SettingsAddEmployees: React.FC = () => {
 
         {/* CONFIGURATION */}
         <div>
-          <p className="font-semibold text-lg mb-3">Configuration</p>
+          <p className="font-semibold text-lg mb-3 uppercase underline">Configuration</p>
           <div className="flex gap-4 align-items-center mb-3">
             <div className="flex-1">
               <FloatLabel className="always-float">
@@ -305,6 +333,7 @@ const SettingsAddEmployees: React.FC = () => {
               <FloatLabel className="always-float">
                 <Dropdown
                   id="branchId"
+                  filter
                   value={formData.branchId}
                   onChange={(e: DropdownChangeEvent) => handleChange('branchId', e.value)}
                   options={branchDetails}
@@ -319,6 +348,16 @@ const SettingsAddEmployees: React.FC = () => {
             <div className="flex-1"></div>
           </div>
         </div>
+      </div>
+
+      <div className="fixed bottom-0 left-0 w-full shadow-md p-4 text-right">
+        <Button
+          label="Save"
+          icon="pi pi-check"
+          className="bg-[#8e5ea8] border-none gap-2"
+          onClick={handleSubmit}
+          disabled={!isFormValid()}
+        />
       </div>
     </div>
   )
