@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
+import { Editor, EditorTextChangeEvent } from 'primereact/editor';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import axios from 'axios';
-
+import { FloatLabel } from 'primereact/floatlabel'
 interface ProductPayload {
   poName: string;
   poDescription: string;
@@ -41,13 +41,12 @@ const AddProduct: React.FC = () => {
     ];
 
     if (numericFields.includes(field)) {
-      if (!/^\d*\.?\d*$/.test(value)) return; // block invalid numeric input
+      if (!/^\d*\.?\d*$/.test(value)) return; 
     }
 
     setProduct((prev) => {
       const updated = { ...prev, [field]: value };
 
-      // Auto-calculate discount and total price
       const price = parseFloat(updated.poPrice);
       const percent = parseFloat(updated.poDiscPercent);
 
@@ -116,56 +115,86 @@ const AddProduct: React.FC = () => {
     <div className="p-4">
       <Toast ref={toast} />
       <h2 className="text-xl font-semibold mb-4">Add New Product</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+ 
+  <FloatLabel className="always-float">
+    <InputText
+      id="poName"
+      value={product.poName}
+      onChange={(e) => handleChange('poName', e.target.value)}
+      className="w-full"
+    />
+    <label htmlFor="poName">Product Name</label>
+  </FloatLabel>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <InputText
-          placeholder="Product Name"
-          value={product.poName}
-          onChange={(e) => handleChange('poName', e.target.value)}
-        />
-        <InputText
-          placeholder="HSN"
-          value={product.poHSN}
-          onChange={(e) => handleChange('poHSN', e.target.value)}
-        />
-        <InputText
-          placeholder="Quantity"
-          value={product.poQuantity}
-          onChange={(e) => handleChange('poQuantity', e.target.value)}
-        />
-        <InputText
-          placeholder="Price"
-          value={product.poPrice}
-          onChange={(e) => handleChange('poPrice', e.target.value)}
-        />
-        <InputText
-          placeholder="Discount %"
-          value={product.poDiscPercent}
-          onChange={(e) => handleChange('poDiscPercent', e.target.value)}
-        />
-        <InputText
-          placeholder="Discount Value"
-          value={product.poDisc}
-          disabled
-        />
-        <InputText
-          placeholder="Total Price"
-          value={product.poTotalPrice}
-          disabled
-        />
-      </div>
+  <FloatLabel className="always-float">
+    <InputText
+      id="poHSN"
+      value={product.poHSN}
+      onChange={(e) => handleChange('poHSN', e.target.value)}
+      className="w-full"
+    />
+    <label htmlFor="poHSN">HSN</label>
+  </FloatLabel>
+  <FloatLabel className="always-float">
+    <InputText
+      id="poQuantity"
+      value={product.poQuantity}
+      onChange={(e) => handleChange('poQuantity', e.target.value)}
+      className="w-full"
+    />
+    <label htmlFor="poQuantity">Quantity</label>
+  </FloatLabel>
+  <FloatLabel className="always-float">
+    <InputText
+      id="poPrice"
+      value={product.poPrice}
+      onChange={(e) => handleChange('poPrice', e.target.value)}
+      className="w-full"
+    />
+    <label htmlFor="poPrice">Price</label>
+  </FloatLabel>
+  <FloatLabel className="always-float">
+    <InputText
+      id="poDiscPercent"
+      value={product.poDiscPercent}
+      onChange={(e) => handleChange('poDiscPercent', e.target.value)}
+      className="w-full"
+    />
+    <label htmlFor="poDiscPercent">Discount %</label>
+  </FloatLabel>
+  <FloatLabel className="always-float">
+    <InputText
+      id="poDisc"
+      value={product.poDisc}
+      disabled
+      className="w-full"
+    />
+    <label htmlFor="poDisc">Discount Value</label>
+  </FloatLabel>
+  <FloatLabel className="always-float">
+    <InputText
+      id="poTotalPrice"
+      value={product.poTotalPrice}
+      disabled
+      className="w-full"
+    />
+    <label htmlFor="poTotalPrice">Total Price</label>
+  </FloatLabel>
+</div>
 
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <InputTextarea
-          rows={4}
-          className="w-full"
-          placeholder="Product Description"
+        <Editor
           value={product.poDescription}
-          onChange={(e) => handleChange('poDescription', e.target.value)}
+          onTextChange={(e: EditorTextChangeEvent) =>
+            handleChange('poDescription', e.htmlValue || '')
+          }
+          style={{ height: '220px' }}
+          className="w-full"
         />
       </div>
 
-      <div className="text-right mt-6">
+      <div className="text-right mt-6 ">
         <Button
           label="Save Product"
           icon="pi pi-check"
@@ -177,6 +206,7 @@ const AddProduct: React.FC = () => {
 };
 
 export default AddProduct;
+
 
 
 

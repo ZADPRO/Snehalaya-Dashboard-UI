@@ -1,11 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import axios from 'axios';
+import { FloatLabel } from 'primereact/floatlabel'
 import { Product } from '../../components/POMgmtViewPurchase/Product';
-
+import { generateInvoicePDF} from "../../components/POMgmtCreatePurchase/InvoicePdf"
 const AddNewPurchase: React.FC = () => {
   const toast = useRef<Toast>(null);
 
@@ -23,6 +23,7 @@ const AddNewPurchase: React.FC = () => {
     createdAt: new Date().toISOString().split('T')[0],
   });
 
+
   const handleChange = (field: keyof Product, value: string | number | boolean) => {
     setProduct(prev => ({ ...prev, [field]: value }));
 
@@ -31,10 +32,18 @@ const AddNewPurchase: React.FC = () => {
       const mrp = parseFloat(field === 'refPMRP' ? value.toString() : product.refPMRP?.toString() || '0');
       setProduct(prev => ({
         ...prev,
-        refPCost: price, // or use your own logic
+        refPCost: price, 
       }));
     }
   };
+
+
+ const handlePrintInvoice = async () => {
+  const { saveAs } = await import('file-saver');
+  const blob = new Blob(['Test Invoice PDF Content'], { type: 'application/pdf' });
+  saveAs(blob, 'test-invoice.pdf');
+};
+
 
   const handleSave = async () => {
     try {
@@ -93,48 +102,91 @@ const AddNewPurchase: React.FC = () => {
       <Toast ref={toast} />
       <h2 className="text-xl font-semibold mb-4">Add New Purchase</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <InputText
-          placeholder="Product Name"
-          value={product.refPName}
-          onChange={(e) => handleChange('refPName', e.target.value)}
-        />
-        <InputText
-          placeholder="SKU"
-          value={product.refPSKU}
-          onChange={(e) => handleChange('refPSKU', e.target.value)}
-        />
-        <InputText
-          placeholder="Brand"
-          value={product.refPBrand}
-          onChange={(e) => handleChange('refPBrand', e.target.value)}
-        />
-        <InputText
-          placeholder="Price"
-          value={product.refPPrice?.toString() || ''}
-          onChange={(e) => handleChange('refPPrice', e.target.value)}
-        />
-        <InputText
-          placeholder="MRP"
-          value={product.refPMRP?.toString() || ''}
-          onChange={(e) => handleChange('refPMRP', e.target.value)}
-        />
-        {/* <InputText
-          placeholder="Cost"
-          value={product.refPCost?.toString() || ''}
-          onChange={(e) => handleChange('refPCost', e.target.value)}
-        /> */}
-        <InputText
-          placeholder="Created By"
-          value={product.createdBy}
-          onChange={(e) => handleChange('createdBy', e.target.value)}
-        />
-        <InputText
-          placeholder="Created At"
-          value={product.createdAt}
-          onChange={(e) => handleChange('createdAt', e.target.value)}
-        />
-      </div>
+     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <FloatLabel className="always-float">
+    <InputText
+      id="refPName"
+      value={product.refPName}
+      onChange={(e) => handleChange('refPName', e.target.value)}
+      className="w-full"
+    />
+    <label htmlFor="refPName">Product Name</label>
+  </FloatLabel>
+
+  <FloatLabel className="always-float">
+    <InputText
+      id="refPSKU"
+      value={product.refPSKU}
+      onChange={(e) => handleChange('refPSKU', e.target.value)}
+      className="w-full"
+    />
+    <label htmlFor="refPSKU">SKU</label>
+  </FloatLabel>
+
+  <FloatLabel className="always-float">
+    <InputText
+      id="refPBrand"
+      value={product.refPBrand}
+      onChange={(e) => handleChange('refPBrand', e.target.value)}
+      className="w-full"
+    />
+    <label htmlFor="refPBrand">Brand</label>
+  </FloatLabel>
+
+  <FloatLabel className="always-float">
+    <InputText
+      id="refPPrice"
+      value={product.refPPrice?.toString() || ''}
+      onChange={(e) => handleChange('refPPrice', e.target.value)}
+      className="w-full"
+    />
+    <label htmlFor="refPPrice">Price</label>
+  </FloatLabel>
+
+  <FloatLabel className="always-float">
+    <InputText
+      id="refPMRP"
+      value={product.refPMRP?.toString() || ''}
+      onChange={(e) => handleChange('refPMRP', e.target.value)}
+      className="w-full"
+    />
+    <label htmlFor="refPMRP">MRP</label>
+  </FloatLabel>
+
+  {/* Uncomment if you want to show Cost */}
+  {/* 
+  <FloatLabel className="always-float">
+    <InputText
+      id="refPCost"
+      value={product.refPCost?.toString() || ''}
+      onChange={(e) => handleChange('refPCost', e.target.value)}
+      className="w-full"
+    />
+    <label htmlFor="refPCost">Cost</label>
+  </FloatLabel>
+  */}
+
+  <FloatLabel className="always-float">
+    <InputText
+      id="createdBy"
+      value={product.createdBy}
+      onChange={(e) => handleChange('createdBy', e.target.value)}
+      className="w-full"
+    />
+    <label htmlFor="createdBy">Created By</label>
+  </FloatLabel>
+
+  <FloatLabel className="always-float">
+    <InputText
+      id="createdAt"
+      value={product.createdAt}
+      onChange={(e) => handleChange('createdAt', e.target.value)}
+      className="w-full"
+    />
+    <label htmlFor="createdAt">Created At</label>
+  </FloatLabel>
+</div>
+
 
       {/* <div className="mt-4 grid grid-cols-1 gap-4">
         <InputTextarea
@@ -152,6 +204,16 @@ const AddNewPurchase: React.FC = () => {
           className="w-full"
         />
       </div> */}
+        <div className="text-right mr-3 mt-15 mb-9">
+        {/* <Button label="Save Purchase" icon="pi pi-check" onClick={handleSave} /> */}
+        <Button
+          label="Print Invoice"
+          icon="pi pi-print"
+          className="ml-2 mt-[1] mb-4"
+          severity="secondary"
+          onClick={handlePrintInvoice}
+        />
+      </div>
 
       <div className="text-right mt-6">
         <Button label="Save Purchase" icon="pi pi-check" onClick={handleSave} />

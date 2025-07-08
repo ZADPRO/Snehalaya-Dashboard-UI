@@ -1,7 +1,7 @@
 import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
 import POCreateProducts from '@renderer/components/POCreateProducts/POCreateProducts'
 import POMgmtCreatePurchase from '@renderer/components/POMgmtCreatePurchase/POMgmtCreatePurchase'
-// import POMgmtOverview from '@renderer/components/POMgmtOverview/POMgmtOverview'
+import POMgmtOverview from '@renderer/components/POMgmtOverview/POMgmtOverview'
 import POMgmtViewPurchase from '@renderer/components/POMgmtViewPurchase/POMgmtViewPurchase'
 import POProducts from '@renderer/components/POProducts/POProducts'
 import {
@@ -19,12 +19,12 @@ import React, { useState } from 'react'
 
 // Sidebar items config
 const sidebarItems = [
-  // {
-  //   key: 'overview',
-  //   label: 'Overview',
-  //   icon: <Blocks />,
-  //   component: <POMgmtOverview />
-  // },
+  {
+    key: 'overview',
+    label: 'Overview',
+    icon: <Blocks />,
+    component: <POMgmtOverview />
+  },
   {
     key: 'list',
     label: 'Purchase Order',

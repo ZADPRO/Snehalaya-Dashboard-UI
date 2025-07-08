@@ -2,14 +2,14 @@ import React from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Product } from '../../components/POMgmtViewPurchase/Product';
-
+import { FloatLabel } from 'primereact/floatlabel'
 interface Props {
   data: Product | null;
   onBack: () => void;
   onSave: (updatedProduct: Product) => void;
 }
 
-const POMgmtEditPurchase: React.FC<Props> = ({ data, onBack, onSave }) => {
+const POMgmtEditPurchase: React.FC<Props> = ({ data,  onSave }) => {
   const [formData, setFormData] = React.useState<Product | null>(data);
 
   if (!formData) return <div>No data to edit</div>;
@@ -25,80 +25,104 @@ const POMgmtEditPurchase: React.FC<Props> = ({ data, onBack, onSave }) => {
   return (
     <div className="p-1">
       <h2 className="mb-3">Edit Product</h2>
+<div className="formgrid grid">
+  <div className="field col-12 md:col-6">
+    <FloatLabel className="always-float">
+      <InputText
+        id="refPName"
+        value={formData.refPName}
+        onChange={(e) => handleChange('refPName', e.target.value)}
+        className="w-full"
+      />
+      <label htmlFor="refPName">Product Name</label>
+    </FloatLabel>
+  </div>
 
-      <div className="formgrid grid">
-        <div className="field col-12 md:col-6">
-          <label>Product Name</label>
-          <InputText
-            value={formData.refPName}
-            onChange={(e) => handleChange('refPName', e.target.value)}
-            className="w-full"
-          />
-        </div>
+  <div className="field col-12 md:col-6">
+    <FloatLabel className="always-float">
+      <InputText
+        id="refPSKU"
+        value={formData.refPSKU}
+        onChange={(e) => handleChange('refPSKU', e.target.value)}
+        className="w-full"
+      />
+      <label htmlFor="refPSKU">SKU</label>
+    </FloatLabel>
+  </div>
 
-        <div className="field col-12 md:col-6">
-          <label>SKU</label>
-          <InputText
-            value={formData.refPSKU}
-            onChange={(e) => handleChange('refPSKU', e.target.value)}
-            className="w-full"
-          />
-        </div>
+  <div className="field col-12 md:col-6">
+    <FloatLabel className="always-float">
+      <InputText
+        id="refPBrand"
+        value={formData.refPBrand}
+        onChange={(e) => handleChange('refPBrand', e.target.value)}
+        className="w-full"
+      />
+      <label htmlFor="refPBrand">Brand</label>
+    </FloatLabel>
+  </div>
 
-        <div className="field col-12 md:col-6">
-          <label>Brand</label>
-          <InputText
-            value={formData.refPBrand}
-            onChange={(e) => handleChange('refPBrand', e.target.value)}
-            className="w-full"
-          />
-        </div>
+  <div className="field col-12 md:col-6">
+    <FloatLabel className="always-float">
+      <InputText
+        id="refPStatus"
+        value={formData.refPStatus ? 'Active' : 'Inactive'}
+        onChange={(e) => handleChange('refPStatus', e.target.value === 'Active')}
+        className="w-full"
+      />
+      <label htmlFor="refPStatus">Status</label>
+    </FloatLabel>
+  </div>
 
-        <div className="field col-12 md:col-6">
-          <label>Status</label>
-          <InputText
-            value={formData.refPStatus ? 'Active' : 'Inactive'}
-            onChange={(e) => handleChange('refPStatus', e.target.value === 'Active')}
-            className="w-full"
-          />
-        </div>
+  <div className="field col-12 md:col-6">
+    <FloatLabel className="always-float">
+      <InputText
+        id="refPPrice"
+        value={formData.refPPrice?.toString() || ''}
+        onChange={(e) => handleChange('refPPrice', parseFloat(e.target.value))}
+        className="w-full"
+      />
+      <label htmlFor="refPPrice">Price</label>
+    </FloatLabel>
+  </div>
 
-        <div className="field col-12 md:col-6">
-          <label>Price</label>
-          <InputText
-            value={formData.refPPrice}
-            onChange={(e) => handleChange('refPPrice', parseFloat(e.target.value))}
-            className="w-full"
-          />
-        </div>
+  <div className="field col-12 md:col-6">
+    <FloatLabel className="always-float">
+      <InputText
+        id="refPMRP"
+         value={formData.refPMRP?.toString() || ''}
+        onChange={(e) => handleChange('refPMRP', parseFloat(e.target.value))}
+        className="w-full"
+      />
+      <label htmlFor="refPMRP">MRP</label>
+    </FloatLabel>
+  </div>
 
-        <div className="field col-12 md:col-6">
-          <label>MRP</label>
-          <InputText
-            value={formData.refPMRP}
-            onChange={(e) => handleChange('refPMRP', parseFloat(e.target.value))}
-            className="w-full"
-          />
-        </div>
+  <div className="field col-12 md:col-6">
+    <FloatLabel className="always-float">
+      <InputText
+        id="createdBy"
+        value={formData.createdBy}
+        onChange={(e) => handleChange('createdBy', e.target.value)}
+        className="w-full"
+      />
+      <label htmlFor="createdBy">Created By</label>
+    </FloatLabel>
+  </div>
 
-        <div className="field col-12 md:col-6">
-          <label>Created By</label>
-          <InputText
-            value={formData.createdBy}
-            onChange={(e) => handleChange('createdBy', e.target.value)}
-            className="w-full"
-          />
-        </div>
+  <div className="field col-12 md:col-6">
+    <FloatLabel className="always-float">
+      <InputText
+        id="createdAt"
+        value={formData.createdAt}
+        onChange={(e) => handleChange('createdAt', e.target.value)}
+        className="w-full"
+      />
+      <label htmlFor="createdAt">Created At</label>
+    </FloatLabel>
+  </div>
+</div>
 
-        <div className="field col-12 md:col-6">
-          <label>Created At</label>
-          <InputText
-            value={formData.createdAt}
-            onChange={(e) => handleChange('createdAt', e.target.value)}
-            className="w-full"
-          />
-        </div>
-      </div>
 
       <div className="flex justify-content-between pt-4">
         {/* <Button label="Back" icon="pi pi-arrow-left" onClick={onBack} className="p-button-secondary" /> */}

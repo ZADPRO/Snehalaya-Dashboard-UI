@@ -9,7 +9,8 @@ import { Button } from 'primereact/button';
 import axios from 'axios';
 import { IconField } from 'primereact/iconfield';
 import { InputIcon } from 'primereact/inputicon';
-
+import { FloatLabel } from 'primereact/floatlabel'
+import parse from 'html-react-parser';
 interface Product {
   poId: number;
   poName: string;
@@ -178,7 +179,12 @@ const Products: React.FC = () => {
       >
         <Column header="Id" body={(_, { rowIndex }) => rowIndex + 1} />
         {/* <Column field="poName" header="Name" sortable /> */}
-        <Column field="poDescription" header="Description" sortable />
+        <Column
+  field="poDescription"
+  header="Description"
+  sortable
+  body={(rowData) => <div>{parse(rowData.poDescription)}</div>}
+/>
         <Column field="poHSN" header="HSN" sortable />
         <Column field="poQuantity" header="Qty" sortable />
         <Column field="poPrice" header="Price" sortable />
@@ -198,79 +204,104 @@ const Products: React.FC = () => {
     <div className="p-4">
       <h2 className="mb-6 ">Edit Product</h2>
 
-      <div className="formgrid grid">
-        <div className="field col-12 md:col-6">
-          <label>Product Name</label>
-          <InputText
-            value={editData.poName}
-            onChange={(e) => setEditData({ ...editData, poName: e.target.value })}
-            className="w-full"
-          />
-        </div>
+     <div className="formgrid grid">
+  <div className="field col-12 md:col-6">
+    <FloatLabel className="always-float">
+      <InputText
+        id="poName"
+        value={editData.poName}
+        onChange={(e) => setEditData({ ...editData, poName: e.target.value })}
+        className="w-full"
+      />
+      <label htmlFor="poName">Product Name</label>
+    </FloatLabel>
+  </div>
 
-        <div className="field col-12 md:col-6">
-          <label>Description</label>
-          <InputText
-            value={editData.poDescription}
-            onChange={(e) => setEditData({ ...editData, poDescription: e.target.value })}
-            className="w-full"
-          />
-        </div>
+  <div className="field col-12 md:col-6">
+    <FloatLabel className="always-float">
+      <InputText
+        id="poDescription"
+        value={editData.poDescription}
+        onChange={(e) => setEditData({ ...editData, poDescription: e.target.value })}
+        className="w-full"
+      />
+      <label htmlFor="poDescription">Description</label>
+    </FloatLabel>
+  </div>
 
-        <div className="field col-12 md:col-6">
-          <label>HSN</label>
-          <InputText
-            value={editData.poHSN}
-            onChange={(e) => setEditData({ ...editData, poHSN: e.target.value })}
-            className="w-full"
-          />
-        </div>
+  <div className="field col-12 md:col-6">
+    <FloatLabel className="always-float">
+      <InputText
+        id="poHSN"
+        value={editData.poHSN}
+        onChange={(e) => setEditData({ ...editData, poHSN: e.target.value })}
+        className="w-full"
+      />
+      <label htmlFor="poHSN">HSN</label>
+    </FloatLabel>
+  </div>
 
-        <div className="field col-12 md:col-6">
-          <label>Quantity</label>
-          <InputText
-            value={editData.poQuantity}
-            onChange={(e) => setEditData({ ...editData, poQuantity: e.target.value })}
-            className="w-full"
-          />
-        </div>
+  <div className="field col-12 md:col-6">
+    <FloatLabel className="always-float">
+      <InputText
+        id="poQuantity"
+        value={editData.poQuantity}
+        onChange={(e) => setEditData({ ...editData, poQuantity: e.target.value })}
+        className="w-full"
+      />
+      <label htmlFor="poQuantity">Quantity</label>
+    </FloatLabel>
+  </div>
 
-        <div className="field col-12 md:col-6">
-          <label>Price</label>
-          <InputText
-            value={editData.poPrice}
-            onChange={(e) => setEditData({ ...editData, poPrice: e.target.value })}
-            className="w-full"
-          />
-        </div>
+  <div className="field col-12 md:col-6">
+    <FloatLabel className="always-float">
+      <InputText
+        id="poPrice"
+        value={editData.poPrice}
+        onChange={(e) => setEditData({ ...editData, poPrice: e.target.value })}
+        className="w-full"
+      />
+      <label htmlFor="poPrice">Price</label>
+    </FloatLabel>
+  </div>
 
-        <div className="field col-12 md:col-6">
-          <label>Discount %</label>
-          <InputText
-            value={editData.poDiscPercent}
-            onChange={(e) => setEditData({ ...editData, poDiscPercent: e.target.value })}
-            className="w-full"
-          />
-        </div>
+  <div className="field col-12 md:col-6">
+    <FloatLabel className="always-float">
+      <InputText
+        id="poDiscPercent"
+        value={editData.poDiscPercent}
+        onChange={(e) => setEditData({ ...editData, poDiscPercent: e.target.value })}
+        className="w-full"
+      />
+      <label htmlFor="poDiscPercent">Discount %</label>
+    </FloatLabel>
+  </div>
 
-        <div className="field col-12 md:col-6">
-          <label>Discount Amount</label>
-          <InputText
-            value={editData.poDisc}
-            onChange={(e) => setEditData({ ...editData, poDisc: e.target.value })}
-            className="w-full"
-          />
-        </div>
+  <div className="field col-12 md:col-6">
+    <FloatLabel className="always-float">
+      <InputText
+        id="poDisc"
+        value={editData.poDisc}
+        onChange={(e) => setEditData({ ...editData, poDisc: e.target.value })}
+        className="w-full"
+      />
+      <label htmlFor="poDisc">Discount Amount</label>
+    </FloatLabel>
+  </div>
 
-        <div className="field col-12 md:col-6">
-          <label>Total Price</label>
-          <InputText
-            value={editData.poTotalPrice}
-            onChange={(e) => setEditData({ ...editData, poTotalPrice: e.target.value })}
-            className="w-full"
-          />
-        </div>
-      </div>
+  <div className="field col-12 md:col-6">
+    <FloatLabel className="always-float">
+      <InputText
+        id="poTotalPrice"
+        value={editData.poTotalPrice}
+        onChange={(e) => setEditData({ ...editData, poTotalPrice: e.target.value })}
+        className="w-full"
+      />
+      <label htmlFor="poTotalPrice">Total Price</label>
+    </FloatLabel>
+  </div>
+</div>
+
 
       <div className="text-right pt-3">
         <Button
