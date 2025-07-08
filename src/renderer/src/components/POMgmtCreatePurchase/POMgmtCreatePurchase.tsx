@@ -5,7 +5,7 @@ import { Toast } from 'primereact/toast';
 import axios from 'axios';
 import { FloatLabel } from 'primereact/floatlabel'
 import { Product } from '../../components/POMgmtViewPurchase/Product';
-import { generateInvoicePDF} from "../../components/POMgmtCreatePurchase/InvoicePdf"
+
 const AddNewPurchase: React.FC = () => {
   const toast = useRef<Toast>(null);
 
@@ -29,7 +29,7 @@ const AddNewPurchase: React.FC = () => {
 
     if (field === 'refPPrice' || field === 'refPMRP') {
       const price = parseFloat(field === 'refPPrice' ? value.toString() : product.refPPrice?.toString() || '0');
-      const mrp = parseFloat(field === 'refPMRP' ? value.toString() : product.refPMRP?.toString() || '0');
+      // const mrp = parseFloat(field === 'refPMRP' ? value.toString() : product.refPMRP?.toString() || '0');
       setProduct(prev => ({
         ...prev,
         refPCost: price, 
