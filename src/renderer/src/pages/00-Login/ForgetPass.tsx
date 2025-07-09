@@ -7,6 +7,7 @@ import { Toast } from 'primereact/toast';
 import { Mail, Lock, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Divider } from 'primereact/divider';
+import axios from 'axios';
 import './Login.css';
 
 import carousel1 from '../../assets/login/carousel1.png';
@@ -27,6 +28,8 @@ const ForgotPassword: React.FC = () => {
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
 
+  const BASE_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCarouselIndex((prev) => (prev + 1) % images.length);
@@ -34,94 +37,80 @@ const ForgotPassword: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const isValidEmail = (email: string) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isValidOtp = (otp: string) => /^\d{4}$/.test(otp);
-
   const isStrongPassword = (password: string) =>
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
 
-  const handleSendOtp = () => {
+  const handleSendOtp = async () => {
     if (!email || !isValidEmail(email)) {
-      toast.current?.show({
-        severity: 'warn',
-        summary: 'Invalid Email',
-        detail: 'Please enter a valid email (e.g. abc@example.com)',
-        life: 2000
-      });
+      toast.current?.show({ severity: 'warn', summary: 'Invalid Email', detail: 'Enter a valid email.', life: 2000 });
       return;
     }
 
-    setStep(2);
-    toast.current?.show({
-      severity: 'info',
-      summary: 'OTP Sent',
-      detail: `OTP has been sent to ${email}`,
-      life: 2000
-    });
+    console.log('Sending OTP to:', email);
+    console.log('POST:', `${BASE_URL}/admin/forgot-password`);
+
+    try {
+      const res = await axios.post(`${BASE_URL}/admin/forgot-password`, { email }, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      toast.current?.show({ severity: 'success', summary: 'OTP Sent', detail: res.data.message || 'OTP sent.', life: 2000 });
+      setStep(2);
+    } catch (err: any) {
+      toast.current?.show({ severity: 'error', summary: 'Error', detail: err?.response?.data?.message || 'Failed to send OTP.', life: 3000 });
+    }
   };
 
-  const handleVerifyOtp = () => {
+  const handleVerifyOtp = async () => {
     if (!otp || !isValidOtp(otp)) {
-      toast.current?.show({
-        severity: 'warn',
-        summary: 'Invalid OTP',
-        detail: 'Please enter a valid 4-digit numeric OTP.',
-        life: 2000
-      });
+      toast.current?.show({ severity: 'warn', summary: 'Invalid OTP', detail: 'Enter a 4-digit numeric OTP.', life: 2000 });
       return;
     }
 
-    setStep(3);
+    console.log('Verifying OTP for:', email, 'OTP:', otp);
+
+    try {
+      const res = await axios.post(`${BASE_URL}/admin/verify-otp`, { email, otp }, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      toast.current?.show({ severity: 'success', summary: 'OTP Verified', detail: res.data.message || 'OTP verified.', life: 2000 });
+      setStep(3);
+    } catch (err: any) {
+      toast.current?.show({ severity: 'error', summary: 'Verification Failed', detail: err?.response?.data?.message || 'Invalid OTP.', life: 3000 });
+    }
   };
 
-  const handleResetPassword = () => {
+  const handleResetPassword = async () => {
     if (!newPassword || !confirmPassword) {
-      toast.current?.show({
-        severity: 'warn',
-        summary: 'Missing Fields',
-        detail: 'Please enter both password fields.',
-        life: 2000
-      });
+      toast.current?.show({ severity: 'warn', summary: 'Missing Fields', detail: 'Enter both passwords.', life: 2000 });
       return;
     }
-
     if (!isStrongPassword(newPassword)) {
-      toast.current?.show({
-        severity: 'warn',
-        summary: 'Weak Password',
-        detail:
-          'Password must include uppercase, lowercase, number, and special character (min 8 chars).',
-        life: 3000
-      });
+      toast.current?.show({ severity: 'warn', summary: 'Weak Password', detail: 'Password must meet complexity requirements.', life: 3000 });
       return;
     }
-
     if (newPassword !== confirmPassword) {
-      toast.current?.show({
-        severity: 'warn',
-        summary: 'Mismatch',
-        detail: 'Passwords do not match!',
-        life: 2000
-      });
+      toast.current?.show({ severity: 'warn', summary: 'Mismatch', detail: 'Passwords do not match.', life: 2000 });
       return;
     }
 
-    toast.current?.show({
-      severity: 'success',
-      summary: 'Success',
-      detail: 'Password reset successfully!',
-      life: 2000
-    });
+    console.log('Resetting password for:', email);
 
-    setTimeout(() => navigate('/login', { replace: true }), 2000);
+    try {
+      const res = await axios.post(`${BASE_URL}/admin/reset-password`, { email, newPassword }, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      toast.current?.show({ severity: 'success', summary: 'Success', detail: res.data.message || 'Password reset successful.', life: 2000 });
+      setTimeout(() => navigate('/login', { replace: true }), 2000);
+    } catch (err: any) {
+      toast.current?.show({ severity: 'error', summary: 'Reset Failed', detail: err?.response?.data?.message || 'Could not reset password.', life: 3000 });
+    }
   };
 
   return (
     <div className="login-wrapper flex justify-content-between gap-3 px-5">
       <Toast ref={toast} />
-
       <div className="carousel-box flex-3">
         <img src={images[carouselIndex]} alt="Slide" className="slide-image" />
         <div className="overlay">
@@ -143,68 +132,29 @@ const ForgotPassword: React.FC = () => {
           <>
             <div className="input-group mt-4">
               <Mail className="icon" />
-              <InputText
-                placeholder="Enter your registered email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <InputText placeholder="Enter your registered email" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
-            <Button
-              label="Send OTP"
-              className="login-button mt-3 uppercase"
-              onClick={handleSendOtp}
-            />
-            <Button
-              label="Back to Login"
-              icon={<ArrowLeft size={16} />}
-              className="mt-2"
-              text
-              style={{ color: '#f5f5f5' }}
-              onClick={() => navigate('/login')}
-            />
+            <Button label="Send OTP" className="login-button mt-3 uppercase" onClick={handleSendOtp} />
+            <Button label="Back to Login" icon={<ArrowLeft size={16} />} className="mt-2" text style={{ color: '#f5f5f5' }} onClick={() => navigate('/login')} />
           </>
         )}
 
         {step === 2 && (
           <>
             <div className="otp-wrapper mt-4 flex flex-column align-items-center gap-2">
-              <InputOtp
-                className="custom-otp-input"
-                value={otp}
-                onChange={(e) => setOtp(typeof e.value === 'string' ? e.value : '')}
-                integerOnly
-                length={4}
-              />
+              <InputOtp className="custom-otp-input" value={otp} onChange={(e) => setOtp(typeof e.value === 'string' ? e.value : '')} integerOnly length={4} />
             </div>
-            <Button
-              label="Verify OTP"
-              className="login-button mt-4 uppercase"
-              onClick={handleVerifyOtp}
-            />
-            <Button
-              label="Back to Email"
-              icon={<ArrowLeft size={16} />}
-              className="mt-2"
-              text
-              style={{ color: '#f5f5f5' }}
-              onClick={() => setStep(1)}
-            />
+            <Button label="Verify OTP" className="login-button mt-4 uppercase" onClick={handleVerifyOtp} />
+            <Button label="Back to Email" icon={<ArrowLeft size={16} />} className="mt-2" text style={{ color: '#f5f5f5' }} onClick={() => setStep(1)} />
           </>
         )}
 
         {step === 3 && (
           <>
-            {/* New Password */}
             <div className="input-group mt-4">
               <Lock className="icon" />
-              <Password
-                placeholder="New Password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                toggleMask
-                className="w-full"
-                feedback={true}
-                footer={
+              <Password placeholder="New Password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} toggleMask className="w-full"
+                feedback footer={(
                   <>
                     <Divider />
                     <ul className="pl-2 ml-2 mt-0 line-height-3 text-sm">
@@ -215,53 +165,22 @@ const ForgotPassword: React.FC = () => {
                       <li>✔ Minimum 8 characters</li>
                     </ul>
                   </>
-                }
+                )}
               />
             </div>
-
             <div className="input-group mt-3">
               <Lock className="icon" />
-               <div className="w-full">
-              <Password
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                toggleMask
-                className="w-full"
-                feedback={false}/>
-  
-                 { confirmPassword.length > 0 && (
-                    <div className="text-sm mt-2"
-                         style={{
-                         color: newPassword === confirmPassword ? '#22c55e' : '#ef4444',
-                          fontWeight: 500,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                        }}>
-                      
-                        {newPassword === confirmPassword
-                          ? '✅ Password match'
-                          : '❌ Password do not match'}
-                      
-                    </div>
-                  )}
-             </div>
+              <div className="w-full">
+                <Password placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} toggleMask className="w-full" feedback={false} />
+                {confirmPassword.length > 0 && (
+                  <div className="text-sm mt-2" style={{ color: newPassword === confirmPassword ? '#22c55e' : '#ef4444', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    {newPassword === confirmPassword ? '✅ Password match' : '❌ Password do not match'}
+                  </div>
+                )}
+              </div>
             </div>
-
-            <Button
-              label="Reset Password"
-              className="login-button mt-4 uppercase"
-              onClick={handleResetPassword}
-            />
-            <Button
-              label="Back to OTP"
-              icon={<ArrowLeft size={16} />}
-              className="mt-2"
-              text
-              style={{ color: '#f5f5f5' }}
-              onClick={() => setStep(2)}
-            />
+            <Button label="Reset Password" className="login-button mt-4 uppercase" onClick={handleResetPassword} />
+            <Button label="Back to OTP" icon={<ArrowLeft size={16} />} className="mt-2" text style={{ color: '#f5f5f5' }} onClick={() => setStep(2)} />
           </>
         )}
       </div>
