@@ -83,7 +83,7 @@ const SettingsUsers: React.FC = () => {
       <div className="card">
         <Toast ref={toast} />
 
-        <Toolbar className="mb-4" left={rightHeader} right={leftHeader} />
+        <Toolbar className="mb-4"  left={rightHeader} right={leftHeader} />
 
         <DataTable
           ref={dtRef}
