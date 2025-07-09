@@ -72,3 +72,8 @@
   width: 100% !important;
   outline: none;
 }
+
+.p-error {
+  color: #f44336;
+  font-size: 0.75rem;
+}

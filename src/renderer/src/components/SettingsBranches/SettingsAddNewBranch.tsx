@@ -152,7 +152,7 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
         {mode === 'add' ? 'Add New Branch' : 'Edit Branch'}
       </p>
 
-      <div className="flex flex-column gap-4 mt-5">
+      <div className="flex flex-column gap-3">
         {/* Row 1 */}
         <div className="flex gap-4 align-items-center">
           <div className="flex-1">
