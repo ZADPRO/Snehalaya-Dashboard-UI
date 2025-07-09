@@ -80,7 +80,7 @@ const Dashboard: React.FC = () => {
         return (
           <div
             key={`col1-${i + idx}`}
-            className="flex-1 flex flex-column cardBgSection shadow-2 border-round-md px-3 py-2 gap-1"
+            className="flex-1 flex flex-column shadow-2 border-round-md px-3 py-2 gap-1"
             style={{
               border: '1px solid #e39b9e'
             }}
@@ -130,7 +130,7 @@ const Dashboard: React.FC = () => {
         return (
           <div
             key={`col2-${i + 2 + idx}`}
-            className="flex-1 flex flex-column cardBgSection shadow-2 border-round-md px-3 py-2 gap-1"
+            className="flex-1 flex flex-column shadow-2 border-round-md px-3 py-2 gap-1"
             style={{
               border: '1px solid #8cc472'
             }}

@@ -1,64 +1,92 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { Button } from 'primereact/button'
 import { InputSwitch } from 'primereact/inputswitch'
-import { Dialog } from 'primereact/dialog'
-import { InputText } from 'primereact/inputtext'
 import { Toolbar } from 'primereact/toolbar'
 import { Toast } from 'primereact/toast'
-import { FloatLabel } from 'primereact/floatlabel'
+import axios from 'axios'
+import { Sidebar } from 'primereact/sidebar'
+import SettingsAddNewAttributes from './SettingsAddNewAttributes'
 
 interface Attribute {
   name: string
   visible: boolean
+  category?: any
+  subCategory?: any
+  description?: string
+}
+
+interface Category {
+  refCategoryId: number
+  categoryName: string
+}
+
+interface SubCategory {
+  refSubCategoryId: number
+  subCategoryName: string
+  refCategoryId: number
 }
 
 const SettingsAttributes: React.FC = () => {
   const [attributes, setAttributes] = useState<Attribute[]>([])
+  const [sidebarVisible, setSidebarVisible] = useState(false)
+
+  // Fields
   const [attributeName, setAttributeName] = useState('')
   const [visible, setVisible] = useState(true)
-  const [dialogVisible, setDialogVisible] = useState(false)
+  const [category, setCategory] = useState<Category | null>(null)
+  const [subCategory, setSubCategory] = useState<SubCategory | null>(null)
+  const [description, setDescription] = useState('')
+
+  // Master Lists
+  const [categories, setCategories] = useState<Category[]>([])
+  const [subCategories, setSubCategories] = useState<SubCategory[]>([])
+
   const [editIndex, setEditIndex] = useState<number | null>(null)
-  const toast = React.useRef<Toast>(null)
 
-  const openNewDialog = () => {
-    setAttributeName('')
-    setVisible(true)
-    setEditIndex(null)
-    setDialogVisible(true)
-  }
+  const toast = useRef<Toast>(null)
 
-  const saveAttribute = () => {
-    if (!attributeName.trim()) return
-
-    const updatedList = [...attributes]
-    if (editIndex !== null) {
-      updatedList[editIndex] = { name: attributeName.trim(), visible }
-      toast.current?.show({
-        severity: 'success',
-        summary: 'Updated',
-        detail: 'Attribute updated successfully'
-      })
-    } else {
-      updatedList.push({ name: attributeName.trim(), visible })
-      toast.current?.show({
-        severity: 'success',
-        summary: 'Added',
-        detail: 'Attribute added successfully',
-        life: 10000
-      })
+  // Fetch categories and subcategories on mount
+  useEffect(() => {
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: sessionStorage.getItem('token') || ''
     }
 
-    setAttributes(updatedList)
-    setDialogVisible(false)
+    axios
+      .get('http://localhost:8080/api/v1/admin/settings/categories', { headers })
+      .then((res) => {
+        setCategories(res.data.data)
+      })
+      .catch((err) => console.error('Failed to fetch categories', err))
+
+    axios
+      .get('http://localhost:8080/api/v1/admin/settings/subcategories', { headers })
+      .then((res) => {
+        setSubCategories(res.data.data)
+      })
+      .catch((err) => console.error('Failed to fetch subcategories', err))
+  }, [])
+
+  const openNewSidebar = () => {
+    setAttributeName('')
+    setVisible(true)
+    setCategory(null)
+    setSubCategory(null)
+    setDescription('')
+    setEditIndex(null)
+    setSidebarVisible(true)
   }
 
   const editAttribute = (rowData: Attribute, index: number) => {
     setAttributeName(rowData.name)
     setVisible(rowData.visible)
+    setCategory(rowData.category || null)
+    setSubCategory(rowData.subCategory || null)
+    setDescription(rowData.description || '')
     setEditIndex(index)
-    setDialogVisible(true)
+    setSidebarVisible(true)
   }
 
   const deleteAttribute = (index: number) => {
@@ -69,7 +97,7 @@ const SettingsAttributes: React.FC = () => {
       severity: 'warn',
       summary: 'Deleted',
       detail: 'Attribute removed',
-      life: 10000
+      life: 5000
     })
   }
 
@@ -105,8 +133,8 @@ const SettingsAttributes: React.FC = () => {
     <Button
       label="Add Attribute"
       icon="pi pi-plus"
-      className="p-button-success"
-      onClick={openNewDialog}
+      className="p-button-success gap-2"
+      onClick={openNewSidebar}
     />
   )
 
@@ -124,52 +152,52 @@ const SettingsAttributes: React.FC = () => {
         showGridlines
       >
         <Column field="name" header="Attribute Name" />
+        <Column field="category.categoryName" header="Category" />
+        <Column field="subCategory.subCategoryName" header="Sub Category" />
         <Column header="Visible" body={visibleTemplate} />
         <Column header="Actions" body={actionBodyTemplate} style={{ width: '10rem' }} />
       </DataTable>
 
-      <Dialog
-        header={editIndex !== null ? 'Edit Attribute' : 'New Attribute'}
-        visible={dialogVisible}
-        style={{ width: '30vw' }}
-        modal
-        onHide={() => setDialogVisible(false)}
-        footer={
-          <div className="flex justify-content-end">
-            <Button
-              label="Cancel"
-              icon="pi pi-times"
-              onClick={() => setDialogVisible(false)}
-              className="p-button-text gap-2"
-            />
-            <Button
-              className="gap-2"
-              label="Save"
-              icon="pi pi-check"
-              onClick={saveAttribute}
-              autoFocus
-            />
-          </div>
-        }
+      <Sidebar
+        visible={sidebarVisible}
+        position="right"
+        onHide={() => setSidebarVisible(false)}
+        style={{ width: '50vw' }}
       >
-        <div className="field mb-3 mt-3">
-          <FloatLabel className="flex-1 always-float">
-            <InputText
-              id="attrName"
-              value={attributeName}
-              onChange={(e) => setAttributeName(e.target.value)}
-              className="w-full"
-            />
-
-            <label htmlFor="attrName">Attribute Name</label>
-          </FloatLabel>
-        </div>
-
-        <div className="flex gap-2 align-items-center">
-          <p>Visible</p>
-          <InputSwitch id="visible" checked={visible} onChange={(e) => setVisible(e.value)} />
-        </div>
-      </Dialog>
+        <SettingsAddNewAttributes
+          isEdit={editIndex !== null}
+          attribute={{
+            name: attributeName,
+            visible,
+            category,
+            subCategory,
+            description
+          }}
+          categories={categories}
+          subCategories={subCategories}
+          onSave={(data) => {
+            const updatedList = [...attributes]
+            if (editIndex !== null) {
+              updatedList[editIndex] = data
+              toast.current?.show({
+                severity: 'success',
+                summary: 'Updated',
+                detail: 'Attribute updated'
+              })
+            } else {
+              updatedList.push(data)
+              toast.current?.show({
+                severity: 'success',
+                summary: 'Added',
+                detail: 'Attribute added'
+              })
+            }
+            setAttributes(updatedList)
+            setSidebarVisible(false)
+          }}
+          onCancel={() => setSidebarVisible(false)}
+        />
+      </Sidebar>
     </div>
   )
 }

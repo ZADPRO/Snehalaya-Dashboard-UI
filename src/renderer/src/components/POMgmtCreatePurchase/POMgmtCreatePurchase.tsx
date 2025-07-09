@@ -1,24 +1,24 @@
-import React, { useState, useRef } from 'react';
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import { Toast } from 'primereact/toast';
-import axios from 'axios';
-import { FloatLabel } from 'primereact/floatlabel';
-import { generateInvoicePDF } from '../../components/POMgmtCreatePurchase/InvoicePdf';
+import React, { useState, useRef } from 'react'
+import { InputText } from 'primereact/inputtext'
+import { Button } from 'primereact/button'
+import { Toast } from 'primereact/toast'
+import axios from 'axios'
+import { FloatLabel } from 'primereact/floatlabel'
+import { generateInvoicePDF } from '../../components/POMgmtCreatePurchase/InvoicePdf'
 
 export interface Product {
-  refPName?: string;
-  refPSKU?: string;
-  refPBrand?: string;
-  refPStatus?: boolean;
-  refPPrice?: number;
-  refPMRP?: number;
-  createdBy?: string;
-  createdAt?: string;
+  refPName?: string
+  refPSKU?: string
+  refPBrand?: string
+  refPStatus?: boolean
+  refPPrice?: number
+  refPMRP?: number
+  createdBy?: string
+  createdAt?: string
 }
 
 const AddNewPurchase: React.FC = () => {
-  const toast = useRef<Toast>(null);
+  const toast = useRef<Toast>(null)
 
   const [product, setProduct] = useState<Partial<Product>>({
     refPName: '',
@@ -28,12 +28,12 @@ const AddNewPurchase: React.FC = () => {
     refPPrice: 0,
     refPMRP: 0,
     createdBy: 'Admin',
-    createdAt: new Date().toLocaleString(),
-  });
+    createdAt: new Date().toLocaleString()
+  })
 
   const handleChange = (field: keyof Product, value: string | number | boolean) => {
-    setProduct((prev) => ({ ...prev, [field]: value }));
-  };
+    setProduct((prev) => ({ ...prev, [field]: value }))
+  }
 
   const handleSave = async () => {
     try {
@@ -43,18 +43,18 @@ const AddNewPurchase: React.FC = () => {
         {
           headers: {
             'Content-Type': 'application/json',
-            Authorization: sessionStorage.getItem('token') || '',
-          },
+            Authorization: sessionStorage.getItem('token') || ''
+          }
         }
-      );
+      )
 
       if (response.data?.status) {
         toast.current?.show({
           severity: 'success',
           summary: 'Success',
           detail: 'Product added successfully',
-          life: 3000,
-        });
+          life: 3000
+        })
 
         setProduct({
           refPName: '',
@@ -64,36 +64,36 @@ const AddNewPurchase: React.FC = () => {
           refPPrice: 0,
           refPMRP: 0,
           createdBy: 'Admin',
-          createdAt: new Date().toLocaleString(),
-        });
+          createdAt: new Date().toLocaleString()
+        })
       } else {
         toast.current?.show({
           severity: 'warn',
           summary: 'Warning',
           detail: response.data.message || 'Product not added',
-          life: 3000,
-        });
+          life: 3000
+        })
       }
     } catch (error: any) {
       toast.current?.show({
         severity: 'error',
         summary: 'Error',
         detail: error?.response?.data?.message || 'Failed to save product',
-        life: 3000,
-      });
+        life: 3000
+      })
     }
-  };
+  }
 
   const handlePrintInvoice = async () => {
-    await generateInvoicePDF();
-  };
+    await generateInvoicePDF()
+  }
 
   const isSaveDisabled =
     !product.refPName ||
     !product.refPSKU ||
     !product.refPBrand ||
     !product.refPPrice ||
-    !product.refPMRP;
+    !product.refPMRP
 
   return (
     <div className="p-4">
@@ -106,7 +106,7 @@ const AddNewPurchase: React.FC = () => {
           { id: 'refPSKU', label: 'SKU' },
           { id: 'refPBrand', label: 'Brand' },
           { id: 'refPPrice', label: 'Price', type: 'number' },
-          { id: 'refPMRP', label: 'MRP', type: 'number' },
+          { id: 'refPMRP', label: 'MRP', type: 'number' }
         ].map(({ id, label, type }) => (
           <FloatLabel className="always-float" key={id}>
             <InputText
@@ -142,7 +142,7 @@ const AddNewPurchase: React.FC = () => {
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AddNewPurchase;
+export default AddNewPurchase

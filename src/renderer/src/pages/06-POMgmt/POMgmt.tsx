@@ -1,5 +1,6 @@
 import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
 import POCreateProducts from '@renderer/components/POCreateProducts/POCreateProducts'
+import POCreateNewPurchase from '@renderer/components/POMgmtCreatePurchase/POCreateNewPurchase'
 import POMgmtCreatePurchase from '@renderer/components/POMgmtCreatePurchase/POMgmtCreatePurchase'
 import POMgmtOverview from '@renderer/components/POMgmtOverview/POMgmtOverview'
 import POMgmtViewPurchase from '@renderer/components/POMgmtViewPurchase/POMgmtViewPurchase'
@@ -35,7 +36,7 @@ const sidebarItems = [
     key: 'create',
     label: 'Create Purchase',
     icon: <SquarePlus />,
-    component: <POMgmtCreatePurchase />
+    component: <POCreateNewPurchase />
   },
   {
     key: 'products',
@@ -70,7 +71,7 @@ const sidebarItems = [
 ]
 
 const POMgmt: React.FC = () => {
-  const [activeKey, setActiveKey] = useState('overview')
+  const [activeKey, setActiveKey] = useState('create')
 
   return (
     <div className="h-full flex flex-column">

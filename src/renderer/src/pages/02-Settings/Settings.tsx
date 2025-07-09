@@ -7,8 +7,8 @@ import {
   PackageSearch,
   UsersRound,
   BadgeInfo,
-  Banknote,
-  PanelsTopLeft,
+  // Banknote,
+  // PanelsTopLeft,
   SlidersVertical
 } from 'lucide-react'
 import { Divider } from 'primereact/divider'
@@ -18,20 +18,20 @@ import SettingsBranches from '@renderer/components/SettingsBranches/SettingsBran
 import SettingsSuppliers from '@renderer/components/SettingsSuppliers/SettingsSuppliers'
 import SettingsUsers from '@renderer/components/SettingsUsers/SettingsUsers'
 import SettingsEmployees from '@renderer/components/SettingsEmployees/SettingsEmployees'
-import SettingsBank from '@renderer/components/SettingsBank/SettingsBank'
-import SettingsOverview from '@renderer/components/SettingsOverview/SettingsOverview'
+// import SettingsBank from '@renderer/components/SettingsBank/SettingsBank'
+// import SettingsOverview from '@renderer/components/SettingsOverview/SettingsOverview'
 import SettingsAttributes from '@renderer/components/SettingsAttributes/SettingsAttributes'
 
 import './Settings.css'
 
 // Sidebar items config
 const sidebarItems = [
-  {
-    key: 'overview',
-    label: 'Overview',
-    icon: <PanelsTopLeft />,
-    component: <SettingsOverview />
-  },
+  // {
+  //   key: 'overview',
+  //   label: 'Overview',
+  //   icon: <PanelsTopLeft />,
+  //   component: <SettingsOverview />
+  // },
   {
     key: 'categories',
     label: 'Categories',
@@ -58,12 +58,12 @@ const sidebarItems = [
     icon: <SlidersVertical />,
     component: <SettingsAttributes />
   },
-  { key: 'employees', label: 'Employees', icon: <BadgeInfo />, component: <SettingsEmployees /> },
-  { key: 'bank', label: 'Bank', icon: <Banknote />, component: <SettingsBank /> }
+  { key: 'employees', label: 'Employees', icon: <BadgeInfo />, component: <SettingsEmployees /> }
+  // { key: 'bank', label: 'Bank', icon: <Banknote />, component: <SettingsBank /> }
 ]
 
 const Settings: React.FC = () => {
-  const [activeKey, setActiveKey] = useState('attributes')
+  const [activeKey, setActiveKey] = useState('categories')
 
   return (
     <div className="h-full flex flex-column">
