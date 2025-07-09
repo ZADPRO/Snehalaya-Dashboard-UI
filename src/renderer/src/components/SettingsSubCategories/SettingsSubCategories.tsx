@@ -36,8 +36,10 @@ const SettingsSubCategories: React.FC = () => {
   const [subCategories, setSubCategories] = useState<SubCategory[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [globalFilter, setGlobalFilter] = useState('')
-  const [categoryCodeOptions, setCategoryCodeOptions] = useState<{ label: string; value: string }[]>([]);
-  const [selectedCategoryCodes, setSelectedCategoryCodes] = useState<string[]>([]);
+  const [categoryCodeOptions, setCategoryCodeOptions] = useState<
+    { label: string; value: string }[]
+  >([])
+  const [selectedCategoryCodes, setSelectedCategoryCodes] = useState<string[]>([])
   const [visibleRight, setVisibleRight] = useState(false)
   const [editData, setEditData] = useState<SubCategory | null>(null)
   const [mode, setMode] = useState<'add' | 'edit'>('add')
@@ -53,13 +55,13 @@ const SettingsSubCategories: React.FC = () => {
   // Update category options when categories change
   useEffect(() => {
     if (categories.length > 0) {
-      const options = categories.map(category => ({
+      const options = categories.map((category) => ({
         label: category.categoryName,
         value: category.categoryCode
-      }));
-      setCategoryCodeOptions(options);
+      }))
+      setCategoryCodeOptions(options)
     }
-  }, [categories]);
+  }, [categories])
 
   const fetchCategories = async () => {
     try {
@@ -121,8 +123,7 @@ const SettingsSubCategories: React.FC = () => {
     <div className="flex gap-2">
       <Button
         icon="pi pi-pencil"
-        outlined
-        severity="info"
+        text
         onClick={() => {
           setEditData(rowData)
           setMode('edit')
@@ -131,7 +132,7 @@ const SettingsSubCategories: React.FC = () => {
       />
       <Button
         icon="pi pi-trash"
-        outlined
+        text
         severity="danger"
         onClick={() => handleDelete(rowData.refSubCategoryId)}
       />
@@ -303,23 +304,21 @@ const SettingsSubCategories: React.FC = () => {
         display="chip"
       />
     </div>
-  );
+  )
 
   const filteredSubCategories = subCategories.filter((subCat) => {
-    const category = categories.find((cat) => cat.refCategoryId === subCat.refCategoryId);
+    const category = categories.find((cat) => cat.refCategoryId === subCat.refCategoryId)
     const matchesCode =
       selectedCategoryCodes.length === 0 ||
-      (category && selectedCategoryCodes.includes(category.categoryCode));
+      (category && selectedCategoryCodes.includes(category.categoryCode))
     const matchesSearch =
       globalFilter === '' ||
       subCat.subCategoryName.toLowerCase().includes(globalFilter.toLowerCase()) ||
       subCat.subCategoryCode.toLowerCase().includes(globalFilter.toLowerCase()) ||
-      (category && category.categoryName.toLowerCase().includes(globalFilter.toLowerCase()));
+      (category && category.categoryName.toLowerCase().includes(globalFilter.toLowerCase()))
 
-    return matchesCode && matchesSearch;
-  });
-
-
+    return matchesCode && matchesSearch
+  })
 
   return (
     <div className="card">
@@ -359,7 +358,6 @@ const SettingsSubCategories: React.FC = () => {
         <Column header="Actions" body={actionBody} />
       </DataTable>
 
-
       <Sidebar
         visible={visibleRight}
         position="right"
@@ -384,9 +382,3 @@ const SettingsSubCategories: React.FC = () => {
 }
 
 export default SettingsSubCategories
-
-
-
-
-
-

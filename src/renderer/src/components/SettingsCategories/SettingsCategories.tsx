@@ -98,9 +98,7 @@ const SettingsCategories: React.FC = () => {
     <div className="flex gap-2">
       <Button
         icon="pi pi-pencil"
-        rounded
         text
-        severity="info"
         onClick={() => {
           setEditData(rowData)
           setMode('edit')
@@ -109,7 +107,6 @@ const SettingsCategories: React.FC = () => {
       />
       <Button
         icon="pi pi-trash"
-        rounded
         text
         severity="danger"
         onClick={() => handleDelete(rowData.refCategoryId)}

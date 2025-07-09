@@ -209,16 +209,82 @@ const SettingsAddNewSidebar: React.FC = () => {
     })
   }
 
+  // Handle checkbox changes for subModules
+  const handleSubModuleCheckboxChange = (
+    moduleId: number,
+    subModuleIndex: number,
+    field: keyof SubModulePermission,
+    checked: boolean
+  ) => {
+    setPermissions((prevPermissions) => {
+      const updatedPermissions = prevPermissions.map((module) => {
+        if (module.id === moduleId && module.subModules) {
+          const updatedSubModules = module.subModules.map((subModule, index) => {
+            if (index === subModuleIndex) {
+              const updatedSubModule = { ...subModule, [field]: checked }
+
+              if (field === 'canEdit' && checked) {
+                updatedSubModule.canView = true
+              }
+
+              if (field === 'canView' && !checked && subModule.canEdit) {
+                updatedSubModule.canEdit = false
+              }
+
+              return updatedSubModule
+            }
+            return subModule
+          })
+
+          return { ...module, subModules: updatedSubModules }
+        }
+        return module
+      })
+
+      // ✅ Preserve expanded rows using object format
+      setExpandedRows((prevExpanded) => {
+        if (!prevExpanded || typeof prevExpanded !== 'object') return prevExpanded
+
+        return {
+          ...prevExpanded,
+          [moduleId]: true
+        }
+      })
+
+      return updatedPermissions
+    })
+  }
+
+  // Updated rowExpansionTemplate
   const rowExpansionTemplate = (data: ModulePermission) => {
     return (
       <div className="p-1">
         <DataTable value={data.subModules}>
           <Column field="name" header="Sub Module" />
-          <Column field="canView" header="Can View" body={(row) => (row.canView ? 'Yes' : 'No')} />
           <Column
-            field="canEdit"
+            header="Can View"
+            body={(_, options) => (
+              <Checkbox
+                checked={data.subModules?.[options.rowIndex]?.canView || false}
+                onChange={(e) =>
+                  handleSubModuleCheckboxChange(data.id, options.rowIndex, 'canView', e.checked!)
+                }
+              />
+            )}
+            style={{ textAlign: 'center' }}
+          />
+          <Column
             header="Can Edit"
-            body={(row) => (row.canEdit !== undefined ? (row.canEdit ? 'Yes' : 'No') : '-')}
+            body={(_, options) => (
+              <Checkbox
+                checked={data.subModules?.[options.rowIndex]?.canEdit || false}
+                onChange={(e) =>
+                  handleSubModuleCheckboxChange(data.id, options.rowIndex, 'canEdit', e.checked!)
+                }
+                disabled={!data.subModules?.[options.rowIndex]?.canView}
+              />
+            )}
+            style={{ textAlign: 'center' }}
           />
         </DataTable>
       </div>
@@ -247,6 +313,7 @@ const SettingsAddNewSidebar: React.FC = () => {
         value={permissions}
         className="p-datatable-sm"
         showGridlines
+        dataKey="id"
         expandedRows={expandedRows}
         onRowToggle={(e) => setExpandedRows(e.data)}
         onRowExpand={onRowExpand}

@@ -200,7 +200,3 @@ const SettingsAddNewSubCategories: React.FC<Props> = ({
 }
 
 export default SettingsAddNewSubCategories
-
-
-
-

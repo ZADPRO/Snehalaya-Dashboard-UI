@@ -106,7 +106,6 @@ const SettingsBranches: React.FC = () => {
         icon="pi pi-pencil"
         rounded
         text
-        severity="info"
         onClick={() => {
           setEditData(rowData)
           setMode('edit')

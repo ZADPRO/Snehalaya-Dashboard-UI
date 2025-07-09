@@ -116,7 +116,9 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
     setTimeout(() => onClose(), 1000)
   }
 
-  const isSaveDisabled = !formData.categoryName.trim() || !formData.categoryCode.trim() ||
+  const isSaveDisabled =
+    !formData.categoryName.trim() ||
+    !formData.categoryCode.trim() ||
     formData.profitMargin === '' ||
     isNaN(Number(formData.profitMargin))
 
@@ -130,7 +132,7 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
 
       <div className="flex mt-5 gap-3">
         <div className="flex-1">
-          <FloatLabel>
+          <FloatLabel className="always-float">
             <InputText
               id="categoryName"
               value={formData.categoryName}
@@ -142,7 +144,7 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
         </div>
 
         <div className="flex-1">
-          <FloatLabel>
+          <FloatLabel className="always-float">
             <InputText
               id="categoryCode"
               value={formData.categoryCode}
@@ -154,9 +156,8 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
         </div>
       </div>
       <div className="flex mt-5 gap-3">
-
         <div className="flex-1">
-          <FloatLabel>
+          <FloatLabel className="always-float">
             <Dropdown
               id="status"
               value={formData.selectedStatus}
@@ -170,7 +171,7 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
         </div>
 
         <div className="flex-1">
-          <FloatLabel>
+          <FloatLabel className="always-float">
             <InputText
               id="profitMargin"
               keyfilter="num"
@@ -182,9 +183,6 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
           </FloatLabel>
         </div>
       </div>
-
-
-
 
       <div className="fixed bottom-0 left-0 w-full shadow-md p-4 text-right">
         <Button

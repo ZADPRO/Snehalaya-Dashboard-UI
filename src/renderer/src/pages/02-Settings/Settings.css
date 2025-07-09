@@ -77,3 +77,7 @@
   color: #f44336;
   font-size: 0.75rem;
 }
+
+.p-toast-message-content {
+  gap: 10px;
+}
