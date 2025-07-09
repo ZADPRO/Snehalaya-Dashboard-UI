@@ -132,7 +132,7 @@ const SettingsAddEmployees: React.FC = () => {
   }, [])
 
   return (
-    <div className="p-1 pb-20 relative">
+    <div className="p-1 pb-20 relative" style={{ marginBottom: '40px' }}>
       <Toast ref={toast} />
       <p className="text-xl font-bold mb-4 uppercase">Add New Employee</p>
       <div className="flex flex-column">
