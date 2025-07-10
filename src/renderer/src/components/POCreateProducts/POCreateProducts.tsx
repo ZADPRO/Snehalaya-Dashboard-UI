@@ -37,7 +37,8 @@ const AddProduct: React.FC = () => {
 
     if (currentValue === value) return
 
-    setIsDirty(true) // Now this only triggers when value truly changes
+  setIsDirty(true); 
+
 
     const numericFields: (keyof ProductPayload)[] = [
       'poHSN',
@@ -134,7 +135,7 @@ const AddProduct: React.FC = () => {
 
   return (
     <div className="p-4">
-      <Toast ref={toast} />
+      <Toast ref={toast}   pt={{ icon: { className: 'mr-3' }  }} />
       <h2 className="text-xl font-semibold mb-4">Add New Product</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">

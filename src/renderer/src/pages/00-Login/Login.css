@@ -208,3 +208,8 @@
   outline: none;
   box-shadow: 0 0 10px #9a5ec7;
 }
+
+
+.p-toast .p-toast-message-content {
+  border-left: none !important;
+}
