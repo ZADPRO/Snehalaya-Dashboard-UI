@@ -147,7 +147,7 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onClose, onSa
 
   return (
     <div className="p-4 pb-20">
-      <Toast ref={toast} />
+      <Toast ref={toast}   pt={{ icon: { className: 'mr-3' }  }} />
       <p className="text-xl font-semibold mb-4">{mode === 'add' ? 'Add New Supplier' : 'Edit Supplier'}</p>
 
       <p className="font-medium text-sm mt-4 mb-2">Basic Details</p>

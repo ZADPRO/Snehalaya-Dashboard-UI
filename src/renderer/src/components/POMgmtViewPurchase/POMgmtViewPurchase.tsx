@@ -26,10 +26,10 @@ const POMgmtViewPurchase: React.FC = () => {
     setProducts([
       {
         refProductId: 1,
-        refPName: 'Laptop',
+        refPName: 'Kanchivaram ',
         refPSKU: 'LTP123',
         refPStatus: true,
-        refPBrand: 'Dell',
+        refPBrand: 'cotton saree',
         refPPrice: 800,
         refPMRP: 1000,
         createdAt: '2025-07-01',
@@ -37,10 +37,10 @@ const POMgmtViewPurchase: React.FC = () => {
       },
       {
         refProductId: 2,
-        refPName: 'Smartphone',
+        refPName: 'Pattu',
         refPSKU: 'SPH456',
         refPStatus: false,
-        refPBrand: 'Samsung',
+        refPBrand: 'Manipuanam',
         refPPrice: 500,
         refPMRP: 650,
         createdAt: '2025-06-20',

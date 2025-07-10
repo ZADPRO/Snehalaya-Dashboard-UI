@@ -60,9 +60,9 @@ import 'primereact/resources/themes/saga-purple/theme.css'
 // import 'primereact/resources/themes/arya-purple/theme.css'
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  // <StrictMode>
     <PrimeReactProvider>
       <App />
-    </PrimeReactProvider>{' '}
-  </StrictMode>
+    </PrimeReactProvider>
+  // </StrictMode>
 )

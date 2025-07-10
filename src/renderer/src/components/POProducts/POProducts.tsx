@@ -177,7 +177,7 @@ const Products: React.FC = () => {
 
   return (
     <div className="card">
-      <Toast ref={toast} />
+      <Toast ref={toast}   pt={{ icon: { className: 'mr-3' }  }} />
       <Toolbar className="mb-4" right={leftHeader} />
       <DataTable
         value={products}

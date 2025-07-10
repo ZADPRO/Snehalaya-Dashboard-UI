@@ -2,8 +2,7 @@ import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown'
 import { FloatLabel } from 'primereact/floatlabel'
 import { InputText } from 'primereact/inputtext'
 import { Button } from 'primereact/button'
-import { Toast } from 'primereact/toast'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 interface CategoryStatusOptions {
   name: string
@@ -44,7 +43,7 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
   onUpdate,
   onClose
 }) => {
-  const toast = useRef<Toast>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [formData, setFormData] = useState<CategoryFormData>({
     categoryName: '',
@@ -83,6 +82,10 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
   }
 
   const handleSubmit = () => {
+    if (isSubmitting) return
+
+    setIsSubmitting(true)
+
     const category: Category = {
       refCategoryId: editData?.refCategoryId ?? Date.now(),
       categoryName: formData.categoryName.trim(),
@@ -97,33 +100,24 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
 
     if (mode === 'add') {
       onSave(category)
-      toast.current?.show({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Category added successfully!',
-        life: 3000
-      })
     } else {
       onUpdate(category)
-      toast.current?.show({
-        severity: 'success',
-        summary: 'Updated',
-        detail: 'Category updated successfully!',
-        life: 3000
-      })
     }
 
-    setTimeout(() => onClose(), 1000)
+    setTimeout(() => {
+      setIsSubmitting(false)
+      onClose()
+    }, 1000)
   }
 
-  const isSaveDisabled = !formData.categoryName.trim() || !formData.categoryCode.trim() ||
+  const isSaveDisabled =
+    !formData.categoryName.trim() ||
+    !formData.categoryCode.trim() ||
     formData.profitMargin === '' ||
     isNaN(Number(formData.profitMargin))
 
   return (
     <div className="p-4 pb-20 relative">
-      <Toast ref={toast} />
-
       <p className="text-xl font-semibold mb-4">
         {mode === 'add' ? 'Add New Category' : 'Edit Category'}
       </p>
@@ -135,7 +129,9 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
               id="categoryName"
               value={formData.categoryName}
               className="w-full"
-              onChange={(e) => handleInputChange('categoryName', e.target.value)}
+              onChange={(e) =>
+                handleInputChange('categoryName', e.target.value)
+              }
             />
             <label htmlFor="categoryName">Category Name</label>
           </FloatLabel>
@@ -147,20 +143,24 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
               id="categoryCode"
               value={formData.categoryCode}
               className="w-full"
-              onChange={(e) => handleInputChange('categoryCode', e.target.value)}
+              onChange={(e) =>
+                handleInputChange('categoryCode', e.target.value)
+              }
             />
             <label htmlFor="categoryCode">Category Code</label>
           </FloatLabel>
         </div>
       </div>
-      <div className="flex mt-5 gap-3">
 
+      <div className="flex mt-5 gap-3">
         <div className="flex-1">
           <FloatLabel>
             <Dropdown
               id="status"
               value={formData.selectedStatus}
-              onChange={(e: DropdownChangeEvent) => handleInputChange('selectedStatus', e.value)}
+              onChange={(e: DropdownChangeEvent) =>
+                handleInputChange('selectedStatus', e.value)
+              }
               options={statusOptions}
               optionLabel="name"
               className="w-full"
@@ -176,15 +176,14 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
               keyfilter="num"
               value={formData.profitMargin}
               className="w-full"
-              onChange={(e) => handleInputChange('profitMargin', e.target.value)}
+              onChange={(e) =>
+                handleInputChange('profitMargin', e.target.value)
+              }
             />
             <label htmlFor="profitMargin">Profit Margin (%)</label>
           </FloatLabel>
         </div>
       </div>
-
-
-
 
       <div className="fixed bottom-0 left-0 w-full shadow-md p-4 text-right">
         <Button
@@ -192,7 +191,7 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
           icon="pi pi-check"
           className="bg-[#8e5ea8] border-none gap-2"
           onClick={handleSubmit}
-          disabled={isSaveDisabled}
+          disabled={isSaveDisabled || isSubmitting}
         />
       </div>
     </div>
@@ -200,3 +199,27 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
 }
 
 export default SettingsAddNewCategories
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

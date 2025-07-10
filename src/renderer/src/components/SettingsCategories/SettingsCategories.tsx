@@ -234,7 +234,7 @@ const SettingsCategories: React.FC = () => {
 
   return (
     <div className="card">
-      <Toast ref={toast} />
+      <Toast ref={toast}   pt={{ icon: { className: 'mr-3' }  }} />
 
       <Toolbar className="mb-4" left={rightHeader} right={leftHeader} />
 

@@ -1,176 +1,136 @@
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-import { saveAs } from 'file-saver';
-import logo from '../../assets/logo/icon.png';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import logo from '../../assets/logo/invoice.png';
 
-interface ProductRow {
-  slNo: number;
-  product:string;
-  description: string;
-  sku: string;
-  hsn: string;
-  qty: number;
-  price: number;
-  total: number;
+interface Supplier {
+  id: number;
+  supplierName: string;
 }
 
-export const generateInvoicePDF = async () => {
-  const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([595, 842]); // A4 size
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+interface Branch {
+  refBranchId: number;
+  refBranchName: string;
+  refBranchCode: string;
+}
 
-  let y = 800;
+interface Product {
+  poId: number;
+  poName: string;
+  poDescription: string;
+  poHSN: string;
+  poQuantity: string;
+  poPrice: string;
+  poDiscPercent: string;
+  poDisc: string;
+  poTotalPrice: string;
+}
 
-  const drawText = (
-    text: string,
-    x: number,
-    y: number,
-    size = 10,
-    fontType = font,
-    color = rgb(0, 0, 0)
-  ) => {
-    page.drawText(text, { x, y, size, font: fontType, color });
+export const generateInvoice = (
+  supplier: Supplier | null,
+  branch: Branch | null,
+  products: Product[]
+) => {
+  const doc = new jsPDF();
+  const img = new Image();
+  img.src = logo;
+
+  img.onload = () => {
+    doc.addImage(img, 'PNG', 12, 5, 50, 35);
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('SNEHALAYAA SILKS', 14, 40);
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text('SVAP TEXTILES LLP', 14, 45);
+    doc.text('No.23, Venkatanarayana Road, T.Nagar,', 14, 50);
+    doc.text('Chennai, Tamil Nadu, India - 600017', 14, 55);
+    doc.text('GST No: 33AFDFS4445R1ZG', 14, 60);
+    doc.text('Supplier Ref: 287', 14, 65);
+
+    // Invoice Info
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Purchase/PO-${Date.now()}`, 145, 15);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Created On: ${new Date().toLocaleString()}`, 145, 20);
+    doc.text('Due On: --', 145, 25);
+
+    // Dispatch From
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Dispatched From:', 14, 75);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text('SVAP TEXTILES LLP Warehouse', 14, 80);
+    doc.text('Chennai Industrial Estate', 14, 85);
+    doc.text('Tamil Nadu, India - 600058', 14, 90);
+
+    // Dispatch To
+    doc.setFont('helvetica', 'bold');
+    doc.text('Dispatched To:', 135, 75);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text('NO:37,1ST FLOOR, RAMNNAPET,', 135, 80);
+    doc.text('BANGALORE, Karnataka, India - 560002', 135, 85);
+    doc.text('Contact: +91 XXXXXXXX', 135, 90);
+
+    // Supplier Info
+    doc.setFont('helvetica', 'bold');
+    doc.text('Supplier Detail', 127, 35);
+    doc.setFont('helvetica', 'normal');
+    doc.text(supplier?.supplierName || 'Not Selected', 130, 40);
+    doc.text('Membership Number:', 130, 45);
+    doc.text('NO:37,1ST FLOOR, RAMNNAPET,', 130, 50);
+    doc.text('BANGALORE, Karnataka, India - 560002', 130, 55);
+    doc.text('Tax Number: XX9999999XX', 130, 60);
+    doc.text('Mobile: +91 XXXXXXXX', 130, 65);
+
+    // Table columns and data
+    const columns = [
+      { header: 'SL.NO', dataKey: 'slno' },
+      { header: 'Product Description', dataKey: 'description' },
+      { header: 'HSN/SAC', dataKey: 'hsn' },
+      { header: 'Quantity', dataKey: 'qty' },
+      { header: 'Price', dataKey: 'price' },
+      { header: 'Disc%', dataKey: 'disc' },
+      { header: 'Discount', dataKey: 'discount' },
+      { header: 'Total Price', dataKey: 'total' },
+    ];
+
+    const data = products.map((p, index) => ({
+      slno: index + 1,
+      description: `${p.poName} - ${p.poDescription}`,
+      hsn: p.poHSN,
+      qty: p.poQuantity,
+      price: p.poPrice,
+      disc: p.poDiscPercent,
+      discount: p.poDisc,
+      total: p.poTotalPrice,
+    }));
+
+    autoTable(doc, {
+      startY: 100,
+      columns,
+      body: data,
+      styles: { fontSize: 8, textColor: '#000000' },
+      headStyles: {
+        fontStyle: 'bold',
+        fillColor: false,
+        textColor: '#000000',
+      },
+      didDrawPage: (data) => {
+       
+        const pageCount = doc.getNumberOfPages();
+        const pageSize = doc.internal.pageSize;
+        const pageHeight = pageSize.height || pageSize.getHeight();
+        doc.setFontSize(9);
+        doc.text(`Page ${doc.getCurrentPageInfo().pageNumber} of ${pageCount}`, pageSize.width - 40, pageHeight - 10);
+      },
+    });
+
+    doc.save('invoice.pdf');
   };
-
-  // =====================
-  // LOGO + BACKGROUND
-  // =====================
-  const logoX = 30;
-  const logoY = y - 60;
-  const bgWidth = 140;
-  const bgHeight = 70;
-
-  page.drawRectangle({
-    x: logoX,
-    y: logoY,
-    width: bgWidth,
-    height: bgHeight,
-    color: rgb(0.5, 0, 0.5),
-  });
-
-  const logoBytes = await fetch(logo).then((res) => res.arrayBuffer());
-  const logoImage = await pdfDoc.embedPng(logoBytes);
-
-  const padding = 10;
-  const maxLogoWidth = bgWidth - 2 * padding;
-  const maxLogoHeight = bgHeight - 2 * padding;
-
-  const widthScale = maxLogoWidth / logoImage.width;
-  const heightScale = maxLogoHeight / logoImage.height;
-  const scale = Math.min(widthScale, heightScale);
-
-  const logoDrawWidth = logoImage.width * scale;
-  const logoDrawHeight = logoImage.height * scale;
-
-  const logoDrawX = logoX + (bgWidth - logoDrawWidth) / 2;
-  const logoDrawY = logoY + (bgHeight - logoDrawHeight) / 2;
-
-  page.drawImage(logoImage, {
-    x: logoDrawX,
-    y: logoDrawY,
-    width: logoDrawWidth,
-    height: logoDrawHeight,
-  });
-
-  // =====================
-  // COMPANY DETAILS (LEFT)
-  // =====================
-  y = logoY - 15;
-  drawText('SNEHALAYA SILKS', 30, y, 14, fontBold);
-  y -= 15;
-  drawText('SVAP TEXTILES LLP', 30, y);
-  y -= 13;
-  drawText('No.23, Venkatanarayana Road,', 30, y);
-  y -= 13;
-  drawText('T.Nagar, Chennai, India,', 30, y);
-  y -= 13;
-  drawText('Tamil Nadu, 600017', 30, y);
-  y -= 13;
-  drawText('GST No: 33AAFDS5445R1ZG', 30, y);
-
-  // =====================
-  // RIGHT SIDE: PURCHASE + SUPPLIER
-  // =====================
-  let yRight = 800;
-  drawText('Purchase/POINVC-259-2526-WH', 350, yRight, 12, fontBold, rgb(0.2, 0.2, 0.6));
-  yRight -= 13;
-  drawText('Created On: 31 May 2025 05:48:26 PM', 350, yRight);
-  yRight -= 13;
-  drawText('Due On: 15 Jul 2025', 350, yRight);
-
-  yRight -= 28;
-  drawText('Supplier Detail:', 350, yRight, 10, fontBold);
-  yRight -= 13;
-  drawText('SABOO SEIDE', 350, yRight);
-  yRight -= 13;
-  drawText('NO.37, 1ST FLOOR, RAMNNAPET, BANGALORE', 350, yRight);
-  yRight -= 13;
-  drawText('Tax Number: 29AADFS0737J1ZU', 350, yRight);
-  yRight -= 13;
-  drawText('Mobile: +91 8088362436', 350, yRight);
-
-  // =====================
-  // PRODUCT TABLE HEADER
-  // =====================
-  y = Math.min(y, yRight) - 25;
-  const colWidths = [30, 70,90, 80, 60, 50, 50, 50, 60];
-  const headers = ['SL.NO', 'Product', 'Description', 'SKU', 'HSN/SAC', 'Qty', 'Price', 'Disc%', 'Total'];
-  let x = 30;
-
-  headers.forEach((header, i) => {
-    drawText(header, x, y, 9, fontBold);
-    x += colWidths[i];
-  });
-
-  // =====================
-  // PRODUCT ROWS
-  // =====================
-  const rows: ProductRow[] = Array.from({ length: 15 }, (_, i) => ({
-    slNo: i + 1,
-    product:'Saree',
-    description: i < 7 ? 'FANCY D SAREES 27014' : i < 13 ? 'FANCY D SAREES 2957' : 'FANCY D SAREES 22129',
-    sku: `SS0720${39 + i}`,
-    hsn: '54078112',
-    qty: 1,
-    price: 775,
-    total: 775,
-  }));
-
-  y -= 20;
-
-  const cellPadding = 4;
-
-rows.forEach((row) => {
-  x = 30;
-  const values = [
-    row.slNo.toString(),
-    'Saree',
-    row.description,
-    row.sku,
-    row.hsn,
-    row.qty.toString(),
-    `Rs. ${row.price.toFixed(2)}`,
-    '0%',
-    `Rs. ${row.total.toFixed(2)}`,
-  ];
-
-  values.forEach((val, i) => {
-    drawText(val, x + cellPadding, y, 7);
-    x += colWidths[i];
-  });
-
-  y -= 20; // More row spacing
-});
-
-
-  // =====================
-  // PAGE NUMBER
-  // =====================
-  drawText('Page: 1/1', 500, 20, 9, fontBold);
-
-  // =====================
-  // SAVE PDF
-  // =====================
-  const pdfBytes = await pdfDoc.save();
-  saveAs(new Blob([pdfBytes], { type: 'application/pdf' }), 'static-invoice.pdf');
 };

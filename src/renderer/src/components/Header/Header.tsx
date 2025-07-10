@@ -137,16 +137,20 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
                 {bottomRoutes.map((route) =>
                   route.name === 'Logout' ? (
                     <NavLink
-                      to="#"
-                      key={route.name}
-                      className="link"
-                      onClick={handleLogout}
-                      data-pr-tooltip={!isOpen ? route.name : undefined}
-                      data-pr-position="right"
-                    >
-                      <div className="icon">{route.icon}</div>
-                      {isOpen && <span className="link_text">{route.name}</span>}
-                    </NavLink>
+                        to="/logout" 
+                        key={route.name}
+                        className={({ }) => `link ${location.pathname === '/logout' ? 'active' : ''}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleLogout(e);
+                        }}
+                        data-pr-tooltip={!isOpen ? route.name : undefined}
+                        data-pr-position="right"
+                      >
+                        <div className="icon">{route.icon}</div>
+                        {isOpen && <span className="link_text">{route.name}</span>}
+                      </NavLink>
+
                   ) : (
                     <NavLink
                       to={route.path}
