@@ -7,11 +7,11 @@ interface Supplier {
   supplierName: string;
 }
 
-interface Branch {
-  refBranchId: number;
-  refBranchName: string;
-  refBranchCode: string;
-}
+// interface Branch {
+//   refBranchId: number;
+//   refBranchName: string;
+//   refBranchCode: string;
+// }
 
 interface Product {
   poId: number;
@@ -122,7 +122,7 @@ export const generateInvoice = (
         textColor: '#000000',
       },
       didDrawPage: () => {
-       
+
         const pageCount = doc.getNumberOfPages();
         const pageSize = doc.internal.pageSize;
         const pageHeight = pageSize.height || pageSize.getHeight();

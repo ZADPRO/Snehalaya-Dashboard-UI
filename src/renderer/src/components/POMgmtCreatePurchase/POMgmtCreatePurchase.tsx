@@ -117,7 +117,7 @@ Tamil Nadu, 600017`;
     const productsOne: Product[] = Array.from({ length: 140 }, (_, i) => {
       const quantity = Math.floor(Math.random() * 10 + 1);
       const price = Math.floor(Math.random() * 500 + 100);
-      const discPercent = Math.floor(Math.random() * 30); 
+      const discPercent = Math.floor(Math.random() * 30);
       const discount = (price * discPercent) / 100;
       const totalPrice = (price - discount) * quantity;
 
@@ -137,7 +137,7 @@ Tamil Nadu, 600017`;
     console.log(products);
 
 
-    generateInvoice(selectedSupplier, selectedBranch, productsOne);
+    generateInvoice(selectedSupplier, productsOne);
   };
 
 

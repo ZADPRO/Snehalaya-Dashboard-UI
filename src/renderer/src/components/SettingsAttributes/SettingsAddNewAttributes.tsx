@@ -2,7 +2,7 @@ import { Button } from 'primereact/button'
 import { Dropdown } from 'primereact/dropdown'
 import { Editor } from 'primereact/editor'
 import { FloatLabel } from 'primereact/floatlabel'
-import { InputSwitch } from 'primereact/inputswitch'
+// import { InputSwitch } from 'primereact/inputswitch'
 import { InputText } from 'primereact/inputtext'
 import React, { useState } from 'react'
 
@@ -52,6 +52,7 @@ const SettingsAddNewAttributes: React.FC<Props> = ({
     ? subCategories.filter((sc) => sc.refCategoryId === category.refCategoryId)
     : []
 
+  setVisible(true)
   const handleSubmit = () => {
     if (!name.trim()) return
     onSave({
@@ -120,7 +121,7 @@ const SettingsAddNewAttributes: React.FC<Props> = ({
         </div>
         <div className="field flex gap-2 align-items-center">
           <p>Visible</p>
-          <InputSwitch checked={visible} onChange={(e) => setVisible(e.value)} />
+          {/* <InputSwitch checked={visible} onChange={(e) => setVisible(e.value)} /> */}
         </div>
         <div className="fixed bottom-0 left-0 w-full shadow-md p-4 text-right gap-3">
           <Button
