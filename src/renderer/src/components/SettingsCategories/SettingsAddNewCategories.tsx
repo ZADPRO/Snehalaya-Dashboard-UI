@@ -124,7 +124,7 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
 
       <div className="flex mt-5 gap-3">
         <div className="flex-1">
-          <FloatLabel>
+          <FloatLabel className="always-float">
             <InputText
               id="categoryName"
               value={formData.categoryName}
@@ -138,7 +138,7 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
         </div>
 
         <div className="flex-1">
-          <FloatLabel>
+          <FloatLabel className="always-float">
             <InputText
               id="categoryCode"
               value={formData.categoryCode}
@@ -154,7 +154,7 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
 
       <div className="flex mt-5 gap-3">
         <div className="flex-1">
-          <FloatLabel>
+          <FloatLabel className="always-float">
             <Dropdown
               id="status"
               value={formData.selectedStatus}
@@ -170,7 +170,7 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
         </div>
 
         <div className="flex-1">
-          <FloatLabel>
+          <FloatLabel className="always-float">
             <InputText
               id="profitMargin"
               keyfilter="num"

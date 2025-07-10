@@ -98,7 +98,6 @@ const SettingsBranches: React.FC = () => {
         onChange={(e) => setGlobalFilter(e.target.value)}
       />
     </IconField>
-    
   )
 
   const actionBody = (rowData: Branch) => (
@@ -107,7 +106,6 @@ const SettingsBranches: React.FC = () => {
         icon="pi pi-pencil"
         rounded
         text
-        severity="info"
         onClick={() => {
           setEditData(rowData)
           setMode('edit')

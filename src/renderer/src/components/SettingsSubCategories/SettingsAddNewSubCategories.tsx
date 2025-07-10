@@ -240,7 +240,3 @@ const handleSubmit = () => {
 }
 
 export default SettingsAddNewSubCategories
-
-
-
-

@@ -49,6 +49,7 @@ Tamil Nadu, 600017`;
     fetchProducts();
   }, []);
 
+
   const fetchBranches = async () => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/settings/branches`, {
@@ -59,6 +60,7 @@ Tamil Nadu, 600017`;
       console.error('Error fetching branches:', err);
     }
   };
+
 
   const fetchSuppliers = async () => {
     try {
@@ -102,8 +104,9 @@ Tamil Nadu, 600017`;
       }
     } catch {
       toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to fetch products' });
+
     }
-  };
+  }
 
   const handleDownloadPDF = () => {
     if (!selectedSupplier || !selectedBranch || products.length === 0) {
@@ -187,6 +190,7 @@ Tamil Nadu, 600017`;
           <br />
           {dispatchedFrom}
         </div>
+
       </div>
 
       <DataTable value={products} showGridlines emptyMessage="No products found">
@@ -204,22 +208,7 @@ Tamil Nadu, 600017`;
         <Button label="Print Invoice" icon="pi pi-download" className="p-button-outlined p-button-success" onClick={handleDownloadPDF} />
       </div>
     </div>
-  );
-};
+  )
+}
 
 export default AddNewPurchase;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
