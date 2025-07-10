@@ -82,7 +82,7 @@ const POMgmt: React.FC = () => {
       >
         <div
           className="flex flex-column px-3 my-3 border-round-md overflow-auto"
-          style={{ width: '20%' }}
+          style={{ width: '15%' }}
         >
           <div className="sidebarContainer flex flex-column gap-2">
             {sidebarItems.map((item) => {
@@ -109,7 +109,7 @@ const POMgmt: React.FC = () => {
 
         <div
           className="flex flex-column border-round-md p-3 overflow-auto"
-          style={{ width: '80%' }}
+          style={{ width: '85%' }}
         >
           {sidebarItems.find((item) => item.key === activeKey)?.component}
         </div>

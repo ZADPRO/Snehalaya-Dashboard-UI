@@ -9,7 +9,7 @@ import {
   BadgeInfo,
   // Banknote,
   // PanelsTopLeft,
-  SlidersVertical
+  // SlidersVertical
 } from 'lucide-react'
 import { Divider } from 'primereact/divider'
 import SettingsCategories from '@renderer/components/SettingsCategories/SettingsCategories'
@@ -20,7 +20,7 @@ import SettingsUsers from '@renderer/components/SettingsUsers/SettingsUsers'
 import SettingsEmployees from '@renderer/components/SettingsEmployees/SettingsEmployees'
 // import SettingsBank from '@renderer/components/SettingsBank/SettingsBank'
 // import SettingsOverview from '@renderer/components/SettingsOverview/SettingsOverview'
-import SettingsAttributes from '@renderer/components/SettingsAttributes/SettingsAttributes'
+// import SettingsAttributes from '@renderer/components/SettingsAttributes/SettingsAttributes'
 
 import './Settings.css'
 
@@ -52,12 +52,12 @@ const sidebarItems = [
     component: <SettingsSuppliers />
   },
   { key: 'users', label: 'Users Roles', icon: <UsersRound />, component: <SettingsUsers /> },
-  {
-    key: 'attributes',
-    label: 'Attributes',
-    icon: <SlidersVertical />,
-    component: <SettingsAttributes />
-  },
+  // {
+  //   key: 'attributes',
+  //   label: 'Attributes',
+  //   icon: <SlidersVertical />,
+  //   component: <SettingsAttributes />
+  // },
   { key: 'employees', label: 'Employees', icon: <BadgeInfo />, component: <SettingsEmployees /> }
   // { key: 'bank', label: 'Bank', icon: <Banknote />, component: <SettingsBank /> }
 ]

@@ -16,13 +16,13 @@ const MainRoutes: React.FC = () => {
 
   const isAuthRoute = location.pathname === '/login' || location.pathname === '/forgetpass'
 
-  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token')
 
   useEffect(() => {
     if (!token && !isAuthRoute) {
-      navigate('/login', { replace: true });
+      navigate('/login', { replace: true })
     }
-  }, [location.pathname]);
+  }, [location.pathname])
 
   return (
     <div>
