@@ -148,7 +148,35 @@ const AddNewPurchase: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
+          <label className="block mb-1 font-semibold">Supplier Name</label>
+          <Dropdown
+            value={selectedSupplier}
+            onChange={(e) => setSelectedSupplier(e.value)}
+            options={suppliers}
+            optionLabel="supplierName"
+            placeholder="Select Supplier"
+            className="w-full"
+          />
+        </div>
 
+         <div>
+          <label className="block mb-1 font-semibold">Product Name</label>
+          <Dropdown
+            value={selectedProduct}
+            onChange={(e) => setSelectedProduct(e.value)}
+            options={products}
+            optionLabel="poName"
+            placeholder="Select Product"
+            className="w-full"
+          />
+        </div>
+      </div>
+
+      <div className="text-right mb-4">
+        <div className="inline-block text-right p-4 border rounded-md bg-gray-50 whitespace-pre-line">
+          <strong>Despatched From:</strong>
+          <br />
+          {dispatchedFrom}
         </div>
 
         <div>

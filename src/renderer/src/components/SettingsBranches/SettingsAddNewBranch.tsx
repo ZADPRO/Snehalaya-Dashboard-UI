@@ -146,13 +146,13 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
 
   return (
     <div className="p-4 pb-20 relative">
-      <Toast ref={toast} />
+      <Toast ref={toast}   pt={{ icon: { className: 'mr-3' }  }} />
 
       <p className="text-xl font-semibold mb-4">
         {mode === 'add' ? 'Add New Branch' : 'Edit Branch'}
       </p>
 
-      <div className="flex flex-column gap-4 mt-5">
+      <div className="flex flex-column gap-3">
         {/* Row 1 */}
         <div className="flex gap-4 align-items-center">
           <div className="flex-1">

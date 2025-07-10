@@ -1,6 +1,6 @@
 import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
 import POCreateProducts from '@renderer/components/POCreateProducts/POCreateProducts'
-import POMgmtCreatePurchase from '@renderer/components/POMgmtCreatePurchase/POMgmtCreatePurchase'
+import POCreateNewPurchase from '@renderer/components/POMgmtCreatePurchase/POCreateNewPurchase'
 import POMgmtOverview from '@renderer/components/POMgmtOverview/POMgmtOverview'
 import POMgmtViewPurchase from '@renderer/components/POMgmtViewPurchase/POMgmtViewPurchase'
 import POProducts from '@renderer/components/POProducts/POProducts'
@@ -35,7 +35,7 @@ const sidebarItems = [
     key: 'create',
     label: 'Create Purchase',
     icon: <SquarePlus />,
-    component: <POMgmtCreatePurchase />
+    component: <POCreateNewPurchase />
   },
   {
     key: 'products',
@@ -70,7 +70,7 @@ const sidebarItems = [
 ]
 
 const POMgmt: React.FC = () => {
-  const [activeKey, setActiveKey] = useState('overview')
+  const [activeKey, setActiveKey] = useState('create')
 
   return (
     <div className="h-full flex flex-column">
@@ -81,7 +81,7 @@ const POMgmt: React.FC = () => {
       >
         <div
           className="flex flex-column px-3 my-3 border-round-md overflow-auto"
-          style={{ width: '20%' }}
+          style={{ width: '15%' }}
         >
           <div className="sidebarContainer flex flex-column gap-2">
             {sidebarItems.map((item) => {
@@ -108,7 +108,7 @@ const POMgmt: React.FC = () => {
 
         <div
           className="flex flex-column border-round-md p-3 overflow-auto"
-          style={{ width: '80%' }}
+          style={{ width: '85%' }}
         >
           {sidebarItems.find((item) => item.key === activeKey)?.component}
         </div>

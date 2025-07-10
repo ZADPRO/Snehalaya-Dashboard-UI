@@ -7,9 +7,9 @@ import {
   PackageSearch,
   UsersRound,
   BadgeInfo,
-  Banknote,
-  PanelsTopLeft,
-  SlidersVertical
+  // Banknote,
+  // PanelsTopLeft,
+  // SlidersVertical
 } from 'lucide-react'
 import { Divider } from 'primereact/divider'
 import SettingsCategories from '@renderer/components/SettingsCategories/SettingsCategories'
@@ -18,20 +18,20 @@ import SettingsBranches from '@renderer/components/SettingsBranches/SettingsBran
 import SettingsSuppliers from '@renderer/components/SettingsSuppliers/SettingsSuppliers'
 import SettingsUsers from '@renderer/components/SettingsUsers/SettingsUsers'
 import SettingsEmployees from '@renderer/components/SettingsEmployees/SettingsEmployees'
-import SettingsBank from '@renderer/components/SettingsBank/SettingsBank'
-import SettingsOverview from '@renderer/components/SettingsOverview/SettingsOverview'
-import SettingsAttributes from '@renderer/components/SettingsAttributes/SettingsAttributes'
+// import SettingsBank from '@renderer/components/SettingsBank/SettingsBank'
+// import SettingsOverview from '@renderer/components/SettingsOverview/SettingsOverview'
+// import SettingsAttributes from '@renderer/components/SettingsAttributes/SettingsAttributes'
 
 import './Settings.css'
 
 // Sidebar items config
 const sidebarItems = [
-  {
-    key: 'overview',
-    label: 'Overview',
-    icon: <PanelsTopLeft />,
-    component: <SettingsOverview />
-  },
+  // {
+  //   key: 'overview',
+  //   label: 'Overview',
+  //   icon: <PanelsTopLeft />,
+  //   component: <SettingsOverview />
+  // },
   {
     key: 'categories',
     label: 'Categories',
@@ -52,14 +52,14 @@ const sidebarItems = [
     component: <SettingsSuppliers />
   },
   { key: 'users', label: 'Users Roles', icon: <UsersRound />, component: <SettingsUsers /> },
-  {
-    key: 'attributes',
-    label: 'Attributes',
-    icon: <SlidersVertical />,
-    component: <SettingsAttributes />
-  },
-  { key: 'employees', label: 'Employees', icon: <BadgeInfo />, component: <SettingsEmployees /> },
-  { key: 'bank', label: 'Bank', icon: <Banknote />, component: <SettingsBank /> }
+  // {
+  //   key: 'attributes',
+  //   label: 'Attributes',
+  //   icon: <SlidersVertical />,
+  //   component: <SettingsAttributes />
+  // },
+  { key: 'employees', label: 'Employees', icon: <BadgeInfo />, component: <SettingsEmployees /> }
+  // { key: 'bank', label: 'Bank', icon: <Banknote />, component: <SettingsBank /> }
 ]
 
 const Settings: React.FC = () => {
@@ -69,11 +69,11 @@ const Settings: React.FC = () => {
     <div className="h-full flex flex-column">
       <IndivHeader title="Settings" subtitle="Monday, Jun 15, 2025" />
       <div
-        className="flex flex-1 m-3 border-round-md shadow-1"
+        className="flex flex-1 m-1 border-round-md shadow-1"
         style={{ height: 'calc(100% - 80px)' }}
       >
         <div
-          className="flex flex-column px-3 my-3 border-round-md overflow-auto"
+          className="flex flex-column px-2 my-2 border-round-md overflow-auto"
           style={{ width: '20%' }}
         >
           <div className="sidebarContainer flex flex-column gap-2">
@@ -100,7 +100,7 @@ const Settings: React.FC = () => {
         <Divider layout="vertical" />
 
         <div
-          className="flex flex-column border-round-md p-3 overflow-auto"
+          className="flex flex-column border-round-md p-2 overflow-auto"
           style={{ width: '80%' }}
         >
           {sidebarItems.find((item) => item.key === activeKey)?.component}

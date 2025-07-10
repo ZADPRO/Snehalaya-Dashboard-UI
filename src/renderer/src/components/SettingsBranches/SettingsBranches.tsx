@@ -98,7 +98,6 @@ const SettingsBranches: React.FC = () => {
         onChange={(e) => setGlobalFilter(e.target.value)}
       />
     </IconField>
-    
   )
 
   const actionBody = (rowData: Branch) => (
@@ -107,7 +106,6 @@ const SettingsBranches: React.FC = () => {
         icon="pi pi-pencil"
         rounded
         text
-        severity="info"
         onClick={() => {
           setEditData(rowData)
           setMode('edit')
@@ -256,10 +254,8 @@ const SettingsBranches: React.FC = () => {
 
   return (
     <div className="card">
-      <Toast ref={toast} />
-
+      <Toast ref={toast}   pt={{ icon: { className: 'mr-3' }  }}  />
       <Toolbar className="mb-4" left={rightHeader} right={leftHeader} />
-
       <DataTable
         ref={dtRef}
         value={categories}

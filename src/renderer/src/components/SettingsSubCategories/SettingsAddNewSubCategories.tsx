@@ -59,6 +59,7 @@ const SettingsAddNewSubCategories: React.FC<Props> = ({
     subCategoryCode: '',
     selectedStatus: { name: 'Active', isActive: true }
   })
+const [isSubmitting, setIsSubmitting] = useState(false);
 
   const statusOptions: SubCategoryStatusOptions[] = [
     { name: 'Active', isActive: true },
@@ -87,46 +88,85 @@ const SettingsAddNewSubCategories: React.FC<Props> = ({
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleSubmit = () => {
-    const subCategory: SubCategory = {
-      refSubCategoryId: editData?.refSubCategoryId ?? Date.now(),
-      refCategoryId: formData.parentCategory?.refCategoryId ?? 0,
-      subCategoryName: formData.subCategoryName.trim(),
-      subCategoryCode: formData.subCategoryCode.trim(),
-      isActive: formData.selectedStatus?.isActive ?? true,
-      createdAt: editData?.createdAt ?? new Date().toISOString(),
-      createdBy: 'Admin',
-      updatedAt: new Date().toISOString(),
-      updatedBy: 'Admin'
-    }
+  // const handleSubmit = () => {
+  //   const subCategory: SubCategory = {
+  //     refSubCategoryId: editData?.refSubCategoryId ?? Date.now(),
+  //     refCategoryId: formData.parentCategory?.refCategoryId ?? 0,
+  //     subCategoryName: formData.subCategoryName.trim(),
+  //     subCategoryCode: formData.subCategoryCode.trim(),
+  //     isActive: formData.selectedStatus?.isActive ?? true,
+  //     createdAt: editData?.createdAt ?? new Date().toISOString(),
+  //     createdBy: 'Admin',
+  //     updatedAt: new Date().toISOString(),
+  //     updatedBy: 'Admin'
+  //   }
 
-    if (mode === 'add') {
-      onSave(subCategory)
-      toast.current?.show({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Sub-category added successfully!',
-        life: 3000
-      })
-    } else {
-      onUpdate(subCategory)
-      toast.current?.show({
-        severity: 'success',
-        summary: 'Updated',
-        detail: 'Sub-category updated successfully!',
-        life: 3000
-      })
-    }
+  //   if (mode === 'add') {
+  //     onSave(subCategory)
+  //     toast.current?.show({
+  //       severity: 'success',
+  //       summary: 'Success',
+  //       detail: 'Sub-category added successfully!',
+  //       life: 3000
+  //     })
+  //   } else {
+  //     onUpdate(subCategory)
+  //     toast.current?.show({
+  //       severity: 'success',
+  //       summary: 'Updated',
+  //       detail: 'Sub-category updated successfully!',
+  //       life: 3000
+  //     })
+  //   }
 
-    setTimeout(() => onClose(), 1000)
+  //   setTimeout(() => onClose(), 1000)
+  // }
+const handleSubmit = () => {
+  if (isSubmitting) return;
+  setIsSubmitting(true);
+
+  const subCategory: SubCategory = {
+    refSubCategoryId: editData?.refSubCategoryId ?? Date.now(),
+    refCategoryId: formData.parentCategory?.refCategoryId ?? 0,
+    subCategoryName: formData.subCategoryName.trim(),
+    subCategoryCode: formData.subCategoryCode.trim(),
+    isActive: formData.selectedStatus?.isActive ?? true,
+    createdAt: editData?.createdAt ?? new Date().toISOString(),
+    createdBy: 'Admin',
+    updatedAt: new Date().toISOString(),
+    updatedBy: 'Admin',
+  };
+
+  if (mode === 'add') {
+    onSave(subCategory);
+    toast.current?.show({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Sub-category added successfully!',
+      life: 3000,
+    });
+  } else {
+    onUpdate(subCategory);
+    toast.current?.show({
+      severity: 'success',
+      summary: 'Updated',
+      detail: 'Sub-category updated successfully!',
+      life: 3000,
+    });
   }
+
+  setTimeout(() => {
+    setIsSubmitting(false);
+    onClose();
+  }, 1000);
+};
 
   const isDisabled =
     !formData.parentCategory || !formData.subCategoryName.trim() || !formData.subCategoryCode.trim()
 
   return (
     <div className="p-4 pb-20 relative">
-      <Toast ref={toast} />
+      <Toast ref={toast}   pt={{ icon: { className: 'mr-3' }  }} />
       <p className="text-xl font-semibold mb-4">
         {mode === 'add' ? 'Add New Sub-Category' : 'Edit Sub-Category'}
       </p>
