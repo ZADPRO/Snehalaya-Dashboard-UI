@@ -200,3 +200,26 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
 }
 
 export default SettingsAddNewCategories
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
