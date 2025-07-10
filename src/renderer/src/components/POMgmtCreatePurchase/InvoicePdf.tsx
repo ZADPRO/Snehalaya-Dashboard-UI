@@ -27,7 +27,7 @@ interface Product {
 
 export const generateInvoice = (
   supplier: Supplier | null,
-  branch: Branch | null,
+  // branch: Branch | null,
   products: Product[]
 ) => {
   const doc = new jsPDF();
@@ -121,7 +121,7 @@ export const generateInvoice = (
         fillColor: false,
         textColor: '#000000',
       },
-      didDrawPage: (data) => {
+      didDrawPage: () => {
        
         const pageCount = doc.getNumberOfPages();
         const pageSize = doc.internal.pageSize;
