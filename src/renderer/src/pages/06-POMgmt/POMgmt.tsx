@@ -1,12 +1,13 @@
 import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
 import POCreateProducts from '@renderer/components/POCreateProducts/POCreateProducts'
-import POCreateNewPurchase from '@renderer/components/POMgmtCreatePurchase1/POCreateNewPurchase'
+import POMgmtCreatePurchase from '@renderer/components/POMgmtCreatePurchase/POCreateNewPurchase'
 import POMgmtOverview from '@renderer/components/POMgmtOverview/POMgmtOverview'
 import POMgmtViewPurchase from '@renderer/components/POMgmtViewPurchase/POMgmtViewPurchase'
 import POProducts from '@renderer/components/POProducts/POProducts'
 import POGoodsReturned from '../../components/POGoodsReturned/POGoodsReturned'
 // import POGoodsReceived from '../../components/POGoodsReceived/POGoodsReceived'
 import {
+  Barcode,
   Blocks,
   PackageCheck,
   PackageMinus,
@@ -18,6 +19,7 @@ import {
 } from 'lucide-react'
 import { Divider } from 'primereact/divider'
 import React, { useState } from 'react'
+import BarcodePrint from '@renderer/components/BarcodePrint/parentBarcode'
 
 // Sidebar items config
 const sidebarItems = [
@@ -33,12 +35,12 @@ const sidebarItems = [
     icon: <ShoppingBag />,
     component: <POMgmtViewPurchase />
   },
-  // {
-  //   key: 'create',
-  //   label: 'Create Purchase',
-  //   icon: <SquarePlus />,
-  //   component: <POMgmtCreatePurchase1 />
-  // },
+  {
+    key: 'create',
+    label: 'Create Purchase',
+    icon: <SquarePlus />,
+    component: <POMgmtCreatePurchase />
+  },
   {
     key: 'products',
     label: 'Products',
@@ -68,6 +70,12 @@ const sidebarItems = [
     label: 'Goods Returned',
     icon: <PackageX />,
     component: <POGoodsReturned />
+  },
+   {
+    key: 'barcode',
+    label: 'BarcodePrint',
+    icon: <PackageX />,
+    component: <BarcodePrint />
   }
 ]
 
