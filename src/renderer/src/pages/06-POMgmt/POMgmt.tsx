@@ -1,9 +1,11 @@
 import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
 import POCreateProducts from '@renderer/components/POCreateProducts/POCreateProducts'
-import POCreateNewPurchase from '@renderer/components/POMgmtCreatePurchase/POCreateNewPurchase'
+import POCreateNewPurchase from '@renderer/components/POMgmtCreatePurchase1/POCreateNewPurchase'
 import POMgmtOverview from '@renderer/components/POMgmtOverview/POMgmtOverview'
 import POMgmtViewPurchase from '@renderer/components/POMgmtViewPurchase/POMgmtViewPurchase'
 import POProducts from '@renderer/components/POProducts/POProducts'
+import POGoodsReturned from '../../components/POGoodsReturned/POGoodsReturned'
+// import POGoodsReceived from '../../components/POGoodsReceived/POGoodsReceived'
 import {
   Blocks,
   PackageCheck,
@@ -31,12 +33,12 @@ const sidebarItems = [
     icon: <ShoppingBag />,
     component: <POMgmtViewPurchase />
   },
-  {
-    key: 'create',
-    label: 'Create Purchase',
-    icon: <SquarePlus />,
-    component: <POCreateNewPurchase />
-  },
+  // {
+  //   key: 'create',
+  //   label: 'Create Purchase',
+  //   icon: <SquarePlus />,
+  //   component: <POMgmtCreatePurchase1 />
+  // },
   {
     key: 'products',
     label: 'Products',
@@ -49,12 +51,12 @@ const sidebarItems = [
     icon: <PackagePlus />,
     component: <POCreateProducts />
   },
-  {
-    key: 'goodsReceived',
-    label: 'Goods Received',
-    icon: <PackageCheck />,
-    component: <POCreateProducts />
-  },
+  // {
+  //   key: 'goodsReceived',
+  //   label: 'Goods Received',
+  //   icon: <PackageCheck />,
+  //   component: <POGoodsReceived />
+  // },
   {
     key: 'goodsHold',
     label: 'Goods Hold',
@@ -65,7 +67,7 @@ const sidebarItems = [
     key: 'returnedGoods',
     label: 'Goods Returned',
     icon: <PackageX />,
-    component: <POCreateProducts />
+    component: <POGoodsReturned />
   }
 ]
 

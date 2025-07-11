@@ -218,6 +218,7 @@ const AddProduct: React.FC = () => {
           className=" gap-2"
           onClick={handleSaveProduct}
           disabled={!isDirty}
+          
         />
       </div>
     </div>
