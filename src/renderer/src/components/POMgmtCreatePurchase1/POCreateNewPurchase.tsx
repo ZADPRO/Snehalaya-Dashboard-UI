@@ -253,6 +253,10 @@ const POCreateNewPurchase: React.FC = () => {
                 onChange={(e) => setTransport(e.target.value)}
                 className="w-full"
               />
+               <div className="flex justify-content-between mb-2">
+            <span>Total Paid</span>
+            <span>₹{totalPaid.toFixed(2)}</span>
+          </div>
               <label htmlFor="transport">Transport</label>
             </span>
           </div>
