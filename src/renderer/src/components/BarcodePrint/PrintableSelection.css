@@ -1,0 +1,58 @@
+.print-area {
+  padding: 1cm;
+  width: 100%;
+  display: block;
+}
+
+.barcode-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1cm;
+}
+
+.barcode-item {
+  width: calc(50% - 0.5cm); 
+  border: 1px solid #aaa;
+  padding: 0.5cm;
+  font-size: 12px;
+  text-align: center;
+  box-sizing: border-box;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+@page {
+  size: A4;
+  margin: 1cm;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+
+  .print-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+
+  .barcode-item {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  html::after {
+    content: "Page " counter(page);
+    position: fixed;
+    bottom: 1cm;
+    right: 1cm;
+    font-size: 10px;
+  }
+}
