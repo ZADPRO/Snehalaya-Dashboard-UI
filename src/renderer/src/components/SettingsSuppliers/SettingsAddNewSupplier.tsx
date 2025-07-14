@@ -81,51 +81,83 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onClose, onSa
   }, [mode, editData])
 
   const handleChange = (field: keyof Supplier, value: string | boolean | null) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value as any
-    }))
+    setFormData((prev) => ({ ...prev, [field]: value as any }))
   }
 
-  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  const showToast = (detail: string) => {
+    toast.current?.show({
+      severity: 'warn',
+      summary: 'Error',
+      detail,
+      life: 3000
+    })
+  }
 
   const validateForm = () => {
-    if (!formData.supplierName?.trim()) {
-      toast.current?.show({
-        severity: 'warn',
-        summary: 'Validation',
-        detail: 'Supplier Name is required',
-        life: 3000
-      })
+    const requiredFields = [
+      { field: 'supplierName', label: 'Supplier Name' },
+      { field: 'supplierCompanyName', label: 'Company Name' },
+      { field: 'supplierCode', label: 'Supplier Code' },
+      { field: 'supplierEmail', label: 'Email' },
+      { field: 'supplierContactNumber', label: 'Contact Number' },
+      { field: 'supplierDoorNumber', label: 'Door Number' },
+      { field: 'supplierStreet', label: 'Street' },
+      { field: 'supplierCity', label: 'City' },
+      { field: 'supplierState', label: 'State' },
+      { field: 'supplierCountry', label: 'Country' },
+      { field: 'supplierBankName', label: 'Bank Name' },
+      { field: 'supplierBankACNumber', label: 'Account Number' },
+      { field: 'supplierIFSC', label: 'IFSC' },
+      { field: 'supplierGSTNumber', label: 'GST Number' },
+      { field: 'supplierUPI', label: 'UPI' },
+      { field: 'supplierPaymentTerms', label: 'Payment Terms' },
+      { field: 'emergencyContactName', label: 'Emergency Contact Name' },
+      { field: 'emergencyContactNumber', label: 'Emergency Contact Number' }
+    ]
+
+    for (const { field, label } of requiredFields) {
+      if (!formData[field as keyof Supplier]?.toString().trim()) {
+        showToast(`${label} is required`)
+        return false
+      }
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const mobileRegex = /^[6-9]\d{9}$/
+    const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/
+    const upiRegex = /^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$/
+    const accountNumberRegex = /^\d{9,18}$/
+
+    if (!emailRegex.test(formData.supplierEmail || '')) {
+      showToast('Invalid email format')
       return false
     }
-    if (!formData.supplierCompanyName?.trim()) {
-      toast.current?.show({
-        severity: 'warn',
-        summary: 'Validation',
-        detail: 'Company Name is required',
-        life: 3000
-      })
+
+    if (!mobileRegex.test(formData.supplierContactNumber || '')) {
+      showToast('Invalid mobile number (10 digits starting with 6-9)')
       return false
     }
-    if (!formData.supplierCode?.trim()) {
-      toast.current?.show({
-        severity: 'warn',
-        summary: 'Validation',
-        detail: 'Supplier Code is required',
-        life: 3000
-      })
+
+    if (!mobileRegex.test(formData.emergencyContactNumber || '')) {
+      showToast('Invalid emergency contact number')
       return false
     }
-    if (formData.supplierEmail && !validateEmail(formData.supplierEmail)) {
-      toast.current?.show({
-        severity: 'warn',
-        summary: 'Validation',
-        detail: 'Invalid Email format',
-        life: 3000
-      })
+
+    if (!accountNumberRegex.test(formData.supplierBankACNumber || '')) {
+      showToast('Invalid bank account number')
       return false
     }
+
+    if (!ifscRegex.test(formData.supplierIFSC || '')) {
+      showToast('Invalid IFSC code format ( contain 4 Alphabets & 6 numbers )')
+      return false
+    }
+
+    if (!upiRegex.test(formData.supplierUPI || '')) {
+      showToast('Invalid UPI ID format (example@bank)')
+      return false
+    }
+
     return true
   }
 
@@ -157,43 +189,37 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onClose, onSa
       })
 
       setTimeout(() => onClose(), 1000)
-    } catch (error) {
+    } catch (error: any) {
       toast.current?.show({
         severity: 'error',
         summary: 'API Error',
-        detail: 'An unexpected error occurred',
+        detail: error.response?.data?.message || 'An unexpected error occurred',
         life: 3000
       })
     }
   }
 
+  const renderInput = (field: keyof Supplier, label: string, type: 'text' = 'text') => (
+    <FloatLabel className="flex-1 always-float">
+      <InputText
+        id={field}
+        value={formData[field] as string}
+        className="w-full"
+        onChange={(e) => handleChange(field, e.target.value)}
+        type={type}
+      />
+      <label htmlFor={field}>{label}</label>
+    </FloatLabel>
+  )
+
   return (
     <div className="p-4 pb-20">
-      <Toast ref={toast}   pt={{ icon: { className: 'mr-3' }  }} />
+      <Toast ref={toast} pt={{ icon: { className: 'mr-3' } }} />
       <p className="text-xl font-semibold mb-4">{mode === 'add' ? 'Add New Supplier' : 'Edit Supplier'}</p>
 
       <p className="font-medium text-sm mt-4 mb-2">Basic Details</p>
-      <div className="flex gap-4">
-        <InputText
-          className="flex-1"
-          placeholder="Supplier Name*"
-          value={formData.supplierName}
-          onChange={(e) => handleChange('supplierName', e.target.value)}
-        />
-        <InputText
-          className="flex-1"
-          placeholder="Company Name*"
-          value={formData.supplierCompanyName}
-          onChange={(e) => handleChange('supplierCompanyName', e.target.value)}
-        />
-      </div>
-      <div className="flex gap-4 mt-3">
-        <InputText
-          className="flex-1"
-          placeholder="Supplier Code*"
-          value={formData.supplierCode}
-          onChange={(e) => handleChange('supplierCode', e.target.value)}
-        />
+      <div className="flex gap-4">{renderInput('supplierName', 'Supplier Name*')}{renderInput('supplierCompanyName', 'Company Name*')}</div>
+      <div className="flex gap-4 mt-3">{renderInput('supplierCode', 'Supplier Code*')}
         <FloatLabel className="flex-1 always-float">
           <Dropdown
             id="status"
@@ -202,7 +228,6 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onClose, onSa
             options={statusOptions}
             optionLabel="name"
             optionValue="value"
-            placeholder="Select Status"
             className="w-full"
           />
           <label htmlFor="status">Status</label>
@@ -210,123 +235,21 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onClose, onSa
       </div>
 
       <p className="font-medium text-sm mt-5 mb-2">Communication Details</p>
-      <div className="flex gap-4">
-        <InputText
-          className="flex-1"
-          placeholder="Email"
-          value={formData.supplierEmail}
-          onChange={(e) => handleChange('supplierEmail', e.target.value)}
-        />
-        <InputText
-          className="flex-1"
-          placeholder="Contact Number"
-          value={formData.supplierContactNumber}
-          onChange={(e) => handleChange('supplierContactNumber', e.target.value)}
-        />
-      </div>
-      <div className="flex gap-4 mt-3">
-        <InputText
-          className="flex-1"
-          placeholder="Door Number"
-          value={formData.supplierDoorNumber}
-          onChange={(e) => handleChange('supplierDoorNumber', e.target.value)}
-        />
-        <InputText
-          className="flex-1"
-          placeholder="Street"
-          value={formData.supplierStreet}
-          onChange={(e) => handleChange('supplierStreet', e.target.value)}
-        />
-      </div>
-      <div className="flex gap-4 mt-3">
-        <InputText
-          className="flex-1"
-          placeholder="City"
-          value={formData.supplierCity}
-          onChange={(e) => handleChange('supplierCity', e.target.value)}
-        />
-        <InputText
-          className="flex-1"
-          placeholder="State"
-          value={formData.supplierState}
-          onChange={(e) => handleChange('supplierState', e.target.value)}
-        />
-      </div>
-      <div className="flex gap-4 mt-3">
-        <InputText
-          className="flex-1"
-          placeholder="Country"
-          value={formData.supplierCountry}
-          onChange={(e) => handleChange('supplierCountry', e.target.value)}
-        />
-      </div>
+      <div className="flex gap-4">{renderInput('supplierEmail', 'Email*')}{renderInput('supplierContactNumber', 'Contact Number*')}</div>
+      <div className="flex gap-4 mt-3">{renderInput('supplierDoorNumber', 'Door Number*')}{renderInput('supplierStreet', 'Street*')}</div>
+      <div className="flex gap-4 mt-3">{renderInput('supplierCity', 'City*')}{renderInput('supplierState', 'State*')}</div>
+      <div className="flex gap-4 mt-3">{renderInput('supplierCountry', 'Country*')}</div>
 
       <p className="font-medium text-sm mt-5 mb-2">Bank Details</p>
-      <div className="flex gap-4">
-        <InputText
-          className="flex-1"
-          placeholder="Account Holder Name"
-          value={formData.supplierBankName}
-          onChange={(e) => handleChange('supplierBankName', e.target.value)}
-        />
-        <InputText
-          className="flex-1"
-          placeholder="Account Number"
-          value={formData.supplierBankACNumber}
-          onChange={(e) => handleChange('supplierBankACNumber', e.target.value)}
-        />
-      </div>
-      <div className="flex gap-4 mt-3">
-        <InputText
-          className="flex-1"
-          placeholder="IFSC Code"
-          value={formData.supplierIFSC}
-          onChange={(e) => handleChange('supplierIFSC', e.target.value)}
-        />
-        <InputText
-          className="flex-1"
-          placeholder="GST Number"
-          value={formData.supplierGSTNumber}
-          onChange={(e) => handleChange('supplierGSTNumber', e.target.value)}
-        />
-      </div>
-      <div className="flex gap-4 mt-3">
-        <InputText
-          className="flex-1"
-          placeholder="UPI ID"
-          value={formData.supplierUPI}
-          onChange={(e) => handleChange('supplierUPI', e.target.value)}
-        />
-        <InputText
-          className="flex-1"
-          placeholder="Payment Terms"
-          value={formData.supplierPaymentTerms}
-          onChange={(e) => handleChange('supplierPaymentTerms', e.target.value)}
-        />
-      </div>
+      <div className="flex gap-4">{renderInput('supplierBankName', 'Account Holder Name*')}{renderInput('supplierBankACNumber', 'Account Number*')}</div>
+      <div className="flex gap-4 mt-3">{renderInput('supplierIFSC', 'IFSC Code*')}{renderInput('supplierGSTNumber', 'GST Number*')}</div>
+      <div className="flex gap-4 mt-3">{renderInput('supplierUPI', 'UPI ID*')}{renderInput('supplierPaymentTerms', 'Payment Terms*')}</div>
 
       <p className="font-medium text-sm mt-5 mb-2">Emergency Contact</p>
-      <div className="flex gap-4">
-        <InputText
-          className="flex-1"
-          placeholder="Emergency Contact Name"
-          value={formData.emergencyContactName}
-          onChange={(e) => handleChange('emergencyContactName', e.target.value)}
-        />
-        <InputText
-          className="flex-1"
-          placeholder="Emergency Contact Number"
-          value={formData.emergencyContactNumber}
-          onChange={(e) => handleChange('emergencyContactNumber', e.target.value)}
-        />
-      </div>
+      <div className="flex gap-4">{renderInput('emergencyContactName', 'Emergency Contact Name*')}{renderInput('emergencyContactNumber', 'Emergency Contact Number*')}</div>
 
       <div className="text-right pt-6">
-        <Button
-          label={mode === 'edit' ? 'Update' : 'Save'}
-          icon="pi pi-check"
-          onClick={handleSubmit}
-        />
+        <Button label={mode === 'edit' ? 'Update' : 'Save'} icon="pi pi-check" onClick={handleSubmit} />
       </div>
     </div>
   )

@@ -139,43 +139,62 @@ const SettingsSubCategories: React.FC = () => {
     </div>
   )
 
-  const handleDelete = async (id: number) => {
-    try {
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/admin/settings/subcategories/${id}`,
-        {
-          headers: {
-            Authorization: sessionStorage.getItem('token')
-          }
-        }
-      )
-
-      if (response.data?.status) {
-        fetchSubCategories()
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Deleted',
-          detail: 'Sub-category deleted successfully',
-          life: 2000
-        })
-      } else {
-        toast.current?.show({
-          severity: 'warn',
-          summary: 'Warning',
-          detail: response.data?.message || 'Unable to delete sub-category',
-          life: 3000
-        })
+const handleDelete = async (id: number, confirmed = false) => {
+  try {
+    const response = await axios.delete(
+      `${import.meta.env.VITE_API_URL}/admin/settings/subcategories/${id}`,
+      {
+        headers: {
+          Authorization: sessionStorage.getItem('token')
+        },
+        params: confirmed ? { force: true } : {}
       }
-    } catch (error) {
-      console.error(error)
+    )
+
+    const { message, status } = response.data
+
+    if (status) {
+      fetchSubCategories()
       toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to delete sub-category',
+        severity: 'success',
+        summary: 'Deleted',
+        detail: message || 'Sub-category deleted successfully',
         life: 2000
       })
+    } else if (
+      message?.toLowerCase().includes('are you sure want to delete')
+    ) {
+      // Show browser confirm dialog
+      if (window.confirm(message)) {
+        // Retry with confirmation
+        handleDelete(id, true)
+      } else {
+        toast.current?.show({
+          severity: 'info',
+          summary: 'Cancelled',
+          detail: 'Deletion cancelled by user.',
+          life: 2000
+        })
+      }
+    } else {
+      toast.current?.show({
+        severity: 'warn',
+        summary: 'Warning',
+        detail: message || 'Unable to delete sub-category',
+        life: 3000
+      })
     }
+  } catch (error) {
+    console.error(error)
+    toast.current?.show({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to delete sub-category',
+      life: 2000
+    })
   }
+}
+
 
   const handleSave = async (newSubCategory: SubCategory) => {
     try {
@@ -197,28 +216,14 @@ const SettingsSubCategories: React.FC = () => {
 
       if (response.data?.status) {
         fetchSubCategories()
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Sub-category created successfully',
-          life: 2000
-        })
-      } else {
-        toast.current?.show({
-          severity: 'warn',
-          summary: 'Warning',
-          detail: response.data?.message || 'Unable to create sub-category',
-          life: 3000
-        })
       }
+       
+      
+      
     } catch (error) {
       console.error(error)
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to create sub-category',
-        life: 2000
-      })
+      
+   
     }
   }
 
@@ -243,28 +248,12 @@ const SettingsSubCategories: React.FC = () => {
 
       if (response.data?.status) {
         fetchSubCategories()
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Updated',
-          detail: 'Sub-category updated successfully',
-          life: 2000
-        })
-      } else {
-        toast.current?.show({
-          severity: 'warn',
-          summary: 'Warning',
-          detail: response.data?.message || 'Unable to update sub-category',
-          life: 3000
-        })
+       
+        
       }
     } catch (error) {
-      console.error(error)
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to update sub-category',
-        life: 2000
-      })
+     
+    console.log(error)
     }
   }
 
@@ -323,7 +312,7 @@ const SettingsSubCategories: React.FC = () => {
   return (
     <div className="card">
       {/* <Toast ref={toast}   pt={{ icon: { className: 'mr-3' }  }}  /> */}
-
+      <Toast ref={toast} />
       <Toolbar className="mb-4" left={rightHeader} right={leftHeader} />
 
       <DataTable

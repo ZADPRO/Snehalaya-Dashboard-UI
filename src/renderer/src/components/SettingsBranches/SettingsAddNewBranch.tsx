@@ -44,6 +44,7 @@ interface SettingsAddNewBranchProps {
   onSave: (newBranch: Branch) => void
   onUpdate: (updatedBranch: Branch) => void
   onClose: () => void
+  existingBranches?: Branch[]
 }
 
 const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
@@ -51,7 +52,8 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
   editData,
   onSave,
   onUpdate,
-  onClose
+  onClose,
+  existingBranches = [] 
 }) => {
   const toast = useRef<Toast>(null)
 
@@ -97,7 +99,50 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
     }))
   }
 
+  const validateForm = (): string | null => {
+    const { refBranchName, refBranchCode, refLocation, refMobile, refEmail } = formData
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const mobileRegex = /^[6-9]\d{9}$/
+
+    if (!refBranchName.trim()) return 'Branch Name is required.'
+    if (!refBranchCode.trim()) return 'Branch Code is required.'
+    if (!refLocation.trim()) return 'Location is required.'
+    if (!refMobile.trim()) return 'Mobile number is required.'
+    if (!mobileRegex.test(refMobile)) return 'Invalid mobile number format.'
+    if (!refEmail.trim()) return 'Email is required.'
+    if (!emailRegex.test(refEmail)) return 'Invalid email format.'
+
+    const isDuplicateName = existingBranches.some(
+      (branch) =>
+        branch.refBranchName.toLowerCase() === refBranchName.trim().toLowerCase() &&
+        branch.refBranchId !== editData?.refBranchId
+    )
+    if (isDuplicateName) return 'Branch Name already exists.'
+
+    const isDuplicateCode = existingBranches.some(
+      (branch) =>
+        branch.refBranchCode.toLowerCase() === refBranchCode.trim().toLowerCase() &&
+        branch.refBranchId !== editData?.refBranchId
+    )
+    if (isDuplicateCode) return 'Branch Code already exists.'
+
+    return null
+  }
+
   const handleSubmit = () => {
+    const error = validateForm()
+
+    if (error) {
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Important Error',
+        detail: error,
+        life: 3000
+      })
+      return
+    }
+
     const branch: Branch = {
       refBranchId: editData?.refBranchId ?? Date.now(),
       refBranchName: formData.refBranchName.trim(),
@@ -107,7 +152,7 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
       refEmail: formData.refEmail.trim(),
       isMainBranch: formData.isMainBranch,
       isActive: formData.selectedStatus?.isActive ?? true,
-      refBTId: 1, // Hardcoded for now; make dynamic if needed
+      refBTId: 1,
       createdAt: editData?.createdAt ?? new Date().toISOString(),
       createdBy: 'Admin',
       updatedAt: new Date().toISOString(),
@@ -117,7 +162,6 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
 
     if (mode === 'add') {
       onSave(branch)
-      console.log('branch', branch)
       toast.current?.show({
         severity: 'success',
         summary: 'Success',
@@ -146,14 +190,13 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
 
   return (
     <div className="p-4 pb-20 relative">
-      <Toast ref={toast}   pt={{ icon: { className: 'mr-3' }  }} />
+      <Toast ref={toast} pt={{ icon: { className: 'mr-3' } }} />
 
       <p className="text-xl font-semibold mb-4">
         {mode === 'add' ? 'Add New Branch' : 'Edit Branch'}
       </p>
 
       <div className="flex flex-column gap-3">
-        {/* Row 1 */}
         <div className="flex gap-4 align-items-center">
           <div className="flex-1">
             <FloatLabel className="flex-1 always-float">
@@ -180,7 +223,6 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
           </div>
         </div>
 
-        {/* Row 2 */}
         <div className="flex gap-4 align-items-center">
           <div className="flex-1">
             <FloatLabel className="flex-1 always-float">
@@ -207,7 +249,6 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
           </div>
         </div>
 
-        {/* Row 3 */}
         <div className="flex gap-4 align-items-center">
           <div className="flex-1">
             <FloatLabel className="flex-1 always-float">
@@ -233,7 +274,6 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
           </div>
         </div>
 
-        {/* Row 4 */}
         <div className="flex gap-4 align-items-center">
           <div className="flex-1">
             <FloatLabel className="flex-1 always-float">
@@ -248,7 +288,7 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
               <label htmlFor="status">Status</label>
             </FloatLabel>
           </div>
-          <div className="flex-1"></div> {/* Empty to align */}
+          <div className="flex-1"></div>
         </div>
       </div>
 

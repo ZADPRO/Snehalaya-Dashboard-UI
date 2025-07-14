@@ -2,7 +2,8 @@ import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown'
 import { FloatLabel } from 'primereact/floatlabel'
 import { InputText } from 'primereact/inputtext'
 import { Button } from 'primereact/button'
-import React, { useEffect, useState } from 'react'
+import { Toast } from 'primereact/toast'
+import React, { useEffect, useRef,useState } from 'react'
 
 interface CategoryStatusOptions {
   name: string
@@ -44,7 +45,7 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
   onClose
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
-
+  const toast = useRef<Toast>(null)
   const [formData, setFormData] = useState<CategoryFormData>({
     categoryName: '',
     categoryCode: '',
@@ -99,9 +100,21 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
     }
 
     if (mode === 'add') {
-      onSave(category)
+      onSave(category);
+      toast.current?.show({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'category added successfully!',
+      life: 3000,
+    });
     } else {
-      onUpdate(category)
+      onUpdate(category);
+       toast.current?.show({
+      severity: 'success',
+      summary: 'Updated',
+      detail: 'category updated successfully!',
+      life: 3000,
+    });
     }
 
     setTimeout(() => {
@@ -118,6 +131,7 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
 
   return (
     <div className="p-4 pb-20 relative">
+        <Toast ref={toast}   pt={{ icon: { className: 'mr-3' }  }} />
       <p className="text-xl font-semibold mb-4">
         {mode === 'add' ? 'Add New Category' : 'Edit Category'}
       </p>

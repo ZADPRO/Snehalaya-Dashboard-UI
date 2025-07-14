@@ -11,6 +11,7 @@ import { Sidebar } from 'primereact/sidebar'
 import SettingsAddNewCategories from './SettingsAddNewCategories'
 import { Toast } from 'primereact/toast'
 import axios from 'axios'
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog'
 
 interface Category {
   refCategoryId: number
@@ -49,15 +50,9 @@ const SettingsCategories: React.FC = () => {
           }
         }
       )
-      console.log('response', response)
       if (response.status) {
         setCategories(response.data.data)
       }
-
-      // if(response.message === "Invalid Token"){
-      //   localStorage.clear();
-      //   navigator("/")
-      // }
     } catch (error) {
       console.log(error)
     }
@@ -114,45 +109,65 @@ const SettingsCategories: React.FC = () => {
     </div>
   )
 
-  const handleDelete = async (id: number) => {
-    try {
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/admin/settings/categories/${id}`,
-        {
-          headers: {
-            Authorization: sessionStorage.getItem('token')
-          }
-        }
-      )
-
-      const data = response.data
-
-      if (data.confirmationNeeded) {
-        toast.current?.show({
-          severity: 'warn',
-          summary: 'Confirmation Needed',
-          detail: `${data.message}. Contains ${data.subcategories.length} subcategories.`,
-          life: 5000
-        })
-      } else if (data.status) {
-        fetchData()
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Deleted',
-          detail: 'Category deleted successfully',
-          life: 2000
-        })
+  const handleDelete = async (id: number, forceDelete: boolean = false) => {
+  try {
+    const response = await axios.delete(
+      `${import.meta.env.VITE_API_URL}/admin/settings/categories/${id}`,
+      {
+        headers: {
+          Authorization: sessionStorage.getItem('token')
+        },
+        params: forceDelete ? { force: true } : {}
       }
-    } catch (error) {
-      console.error(error)
+    )
+
+    const data = response.data
+
+    if (data.confirmationNeeded) {
+      confirmDialog({
+        message: data.message || 'This category contains subcategories. Are you sure you want to delete it?',
+        header: 'Confirmation Required',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Yes, Delete',
+        rejectLabel: 'Cancel',
+        accept: () => handleDelete(id, true),  // <-- Retry with forceDelete
+        reject: () => {
+          toast.current?.show({
+            severity: 'info',
+            summary: 'Cancelled',
+            detail: 'Category deletion cancelled.',
+            life: 2000
+          })
+        }
+      })
+    } else if (data.status) {
+      fetchData()
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Deleted',
+        detail: data.message || 'Category deleted successfully',
+        life: 2000
+      })
+    } else {
       toast.current?.show({
         severity: 'error',
         summary: 'Error',
-        detail: 'Failed to delete category',
-        life: 2000
+        detail: data.message || 'Failed to delete category',
+        life: 3000
       })
     }
+  } catch (error: any) {
+    console.error(error)
+    toast.current?.show({
+      severity: 'error',
+      summary: 'Error',
+      detail:
+        error?.response?.data?.message ||
+        'An unexpected error occurred while deleting the category.',
+      life: 3000
+    })
   }
+}
 
   const handleSave = async (newCategory: Category) => {
     try {
@@ -173,21 +188,9 @@ const SettingsCategories: React.FC = () => {
 
       if (response.data?.status) {
         fetchData()
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Category created successfully',
-          life: 2000
-        })
       }
     } catch (error) {
       console.log(error)
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to create category',
-        life: 2000
-      })
     }
   }
 
@@ -211,28 +214,16 @@ const SettingsCategories: React.FC = () => {
 
       if (response.data?.status) {
         fetchData()
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Updated',
-          detail: 'Category updated successfully',
-          life: 2000
-        })
       }
     } catch (error) {
       console.log(error)
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to update category',
-        life: 2000
-      })
     }
   }
 
   return (
     <div className="card">
-      <Toast ref={toast}   pt={{ icon: { className: 'mr-3' }  }} />
-
+      <Toast ref={toast} />
+       <ConfirmDialog />
       <Toolbar className="mb-4" left={rightHeader} right={leftHeader} />
 
       <DataTable

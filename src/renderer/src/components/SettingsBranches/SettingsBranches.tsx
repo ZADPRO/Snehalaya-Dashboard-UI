@@ -174,7 +174,7 @@ const SettingsBranches: React.FC = () => {
           refEmail: newCategory.refEmail.trim(),
           isMainBranch: newCategory.isMainBranch,
           isActive: newCategory?.isActive ?? true,
-          refBTId: 1, // Hardcoded for now; make dynamic if needed
+          refBTId: 1, 
           createdAt: newCategory?.createdAt ?? new Date().toISOString(),
           createdBy: 'Admin',
           updatedAt: new Date().toISOString(),
@@ -191,21 +191,11 @@ const SettingsBranches: React.FC = () => {
 
       if (response.data?.status) {
         fetchData()
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Category created successfully',
-          life: 2000
-        })
+      
       }
     } catch (error) {
       console.log(error)
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to create category',
-        life: 2000
-      })
+      
     }
   }
 
@@ -234,21 +224,12 @@ const SettingsBranches: React.FC = () => {
 
       if (response.data?.status) {
         fetchData()
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Updated',
-          detail: 'Category updated successfully',
-          life: 2000
-        })
+        
+     
       }
     } catch (error) {
       console.log(error)
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to update category',
-        life: 2000
-      })
+     
     }
   }
 
