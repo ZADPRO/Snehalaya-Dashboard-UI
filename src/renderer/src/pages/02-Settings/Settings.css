@@ -22,6 +22,36 @@
   padding-top: 10px !important;
 }
 
+/* FLOAT LABEL COLORING */
+.p-float-label input:focus + label,
+.p-float-label input.p-filled + label {
+  color: #9c27b0;
+}
+
+.p-float-label .p-dropdown.p-focus + label,
+.p-float-label .p-dropdown.p-filled + label {
+  color: #9c27b0;
+}
+
+.p-float-label .p-multiselect.p-focus + label,
+.p-float-label .p-multiselect.p-filled + label {
+  color: #9c27b0;
+}
+
+.p-float-label .p-autocomplete.p-focus + label,
+.p-float-label .p-autocomplete.p-filled + label {
+  color: #9c27b0;
+}
+
+.p-float-label .p-calendar.p-focus + label,
+.p-float-label .p-calendar.p-filled + label {
+  color: #9c27b0;
+}
+
+.p-float-label label {
+  transition: all 0.2s ease;
+}
+
 .p-inputtext:enabled:focus {
   box-shadow: none;
 }

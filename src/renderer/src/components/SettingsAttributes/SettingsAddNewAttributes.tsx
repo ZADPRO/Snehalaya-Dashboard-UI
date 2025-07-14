@@ -52,17 +52,17 @@ const SettingsAddNewAttributes: React.FC<Props> = ({
     ? subCategories.filter((sc) => sc.refCategoryId === category.refCategoryId)
     : []
 
-  setVisible(true)
-  const handleSubmit = () => {
-    if (!name.trim()) return
-    onSave({
-      name: name.trim(),
-      visible,
-      category,
-      subCategory,
-      description
-    })
-  }
+  // setVisible(true)
+  // const handleSubmit = () => {
+  //   if (!name.trim()) return
+  //   onSave({
+  //     name: name.trim(),
+  //     visible,
+  //     category,
+  //     subCategory,
+  //     description
+  //   })
+  // }
   return (
     <div>
       <div className="p-4">
@@ -134,7 +134,7 @@ const SettingsAddNewAttributes: React.FC<Props> = ({
             label="Save"
             icon="pi pi-check"
             className="p-button-success gap-2"
-            onClick={handleSubmit}
+            // onClick={handleSubmit}
           />
         </div>
       </div>
