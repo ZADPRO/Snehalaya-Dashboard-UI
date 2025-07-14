@@ -134,7 +134,7 @@ const SettingsCategories: React.FC = () => {
         headers: {
           Authorization: sessionStorage.getItem('token') || '',
         },
-        params: forceDelete ? { forceDelete: true } : {}, // ✅ Correct key!
+        params: forceDelete ? { forceDelete: true } : {}, 
       }
     );
 

@@ -105,7 +105,6 @@ export const debitInvoice1 = async ({
   doc.text('Supplier Ref: 287', 14, 75);
   doc.text(`Created On: ${new Date().toLocaleString()}`, 190, 20, { align: 'right' });
 
-  // Supplier Details
   doc.setFont('helvetica', 'bold');
   doc.text('Supplier Detail', 130, 35);
   doc.setFont('helvetica', 'normal');
@@ -117,7 +116,7 @@ export const debitInvoice1 = async ({
   doc.text(`Mobile: ${supplier.supplierContactNumber}`, 130, 60);
   doc.text(`Supplier Code: ${supplier.supplierCode}`, 130, 65);
 
-  // Dispatch Info
+ 
   doc.setFont('helvetica', 'bold');
   doc.text('Dispatched From:', 14, 85);
   doc.setFont('helvetica', 'normal');
@@ -134,7 +133,6 @@ export const debitInvoice1 = async ({
   doc.text(`Mobile: ${branch.refMobile}`, 135, 95);
   doc.text(`Expected Date: ${creditedDate}`, 135, 100);
 
-  // Product Table
   const columns = [
     { header: 'S.No', dataKey: 'slno' },
     { header: 'Description', dataKey: 'poName' },
@@ -160,7 +158,6 @@ export const debitInvoice1 = async ({
     headStyles: { fillColor: [0, 0, 0], textColor: [255, 255, 255] }
   });
 
-  // Summary Table (instead of separate tax summary)
   let currentY = doc.lastAutoTable?.finalY ?? 130;
   const summaryRows = [
     ['Sub Total', `₹${subTotal.toFixed(2)}`],
@@ -209,7 +206,7 @@ autoTable(doc, {
   }
 });
 
-  // Page numbers
+ 
   const pageCount = (doc as any).internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);

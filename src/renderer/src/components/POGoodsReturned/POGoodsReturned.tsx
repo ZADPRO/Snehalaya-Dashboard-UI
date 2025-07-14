@@ -290,7 +290,7 @@ const pendingPayment = total - totalPaid
 
           <Divider layout="vertical" />
 
-          {/* Right Section - Preview */}
+         
           <div className="flex flex-column gap-3 p-4 border-gray-300" style={{ width: '70%' }}>
             <h4>Preview</h4>
 
@@ -415,7 +415,7 @@ const pendingPayment = total - totalPaid
       </div>
 
       <Divider layout="vertical" />
-      {/* Right Sidebar Buttons */}
+  
       <div className="creationCard flex flex-column justify-content-between" style={{ width: '20%' }}>
         <div className="buttons p-3 flex flex-column gap-2">
           <p
