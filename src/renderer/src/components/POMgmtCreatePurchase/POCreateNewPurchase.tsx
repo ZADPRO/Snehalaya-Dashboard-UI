@@ -9,6 +9,8 @@ import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { Download, FileText, Printer } from 'lucide-react'
 import { generateInvoice } from './InvoicePdf'
+import { Toast } from 'primereact/toast';
+import { useRef } from 'react';
 
 interface Supplier {
   supplierId: number
@@ -53,7 +55,8 @@ const POCreateNewPurchase: React.FC = () => {
   const [branches, setBranches] = useState<Branch[]>([])
 
   const [totalPaid, setTotalPaid] = useState<number>(0)
- 
+ const toast = useRef<Toast>(null);
+
 
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null)
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null)
@@ -176,6 +179,31 @@ const POCreateNewPurchase: React.FC = () => {
     setPrice(0)
     setDiscount(0)
   }
+const handleDownloadInvoice = () => {
+  if (!selectedSupplier || !selectedBranch || productEntries.length === 0) {
+    toast.current?.show({
+      severity: 'warn',
+      summary: 'Missing Information',
+      detail: 'Please select supplier, branch, and add at least one product.',
+      life: 3000
+    });
+    return;
+  }
+
+  const pdfProducts = productEntries.map((entry) => ({
+    poId: entry.product.productId,
+    poName: entry.product.productName,
+    poDescription: entry.product.sku,
+    poHSN: entry.product.hsnCode,
+    poQuantity: entry.quantity.toString(),
+    poPrice: entry.price.toFixed(2),
+    poDiscPercent: entry.discount.toFixed(2),
+    poDisc: entry.discountPrice.toFixed(2),
+    poTotalPrice: entry.totalPrice.toFixed(2),
+  }));
+
+  generateInvoice(selectedSupplier, selectedBranch, pdfProducts);
+};
 
   const generateSKU = (index: number): string => {
     const now = new Date()
@@ -196,7 +224,8 @@ const POCreateNewPurchase: React.FC = () => {
 
   return (
     <div className="purchaseOrderCreationCard flex" style={{ width: '100%', height: '100%' }}>
-      {/* Left Section - Form */}
+      {/* Left Section - Form */} <Toast ref={toast} />
+
       <div className="creationCard" style={{ width: '80%' }}>
         <div className="flex">
           <div className="flex flex-column gap-3 p-4" style={{ width: '30%' }}>
@@ -413,12 +442,15 @@ const POCreateNewPurchase: React.FC = () => {
           >
             <FileText size={18} /> Create Invoice
           </p>
-          <p
-            className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
-            style={{ border: '1px solid #8e5ea8' }}
-          >
-            <Download size={18} /> Download
-          </p>
+         <p
+  className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
+  style={{ border: '1px solid #8e5ea8' }}
+  onClick={handleDownloadInvoice}
+>
+  <Download size={18} /> Download Invoice
+</p>
+
+
           {/* <p
             className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
             style={{ border: '1px solid #8e5ea8' }}

@@ -52,6 +52,8 @@ interface InvoiceParams {
   discountTotal: number;
   tax: number;
   total: number;
+  totalPaid: number;
+  pendingPayment: number;
 }
 
 const getImageBase64 = (url: string): Promise<string> =>
@@ -71,14 +73,18 @@ const getImageBase64 = (url: string): Promise<string> =>
     img.onerror = reject;
   });
 
-export const generateInvoice1 = async ({
+export const debitInvoice1 = async ({
   supplier,
   branch,
   productEntries,
   creditedDate,
+  transport,
   subTotal,
+  discountTotal,
   tax,
-  total
+  total,
+  totalPaid,
+  pendingPayment
 }: InvoiceParams) => {
   const doc = new jsPDF();
   const base64Logo = await getImageBase64(logo);
@@ -131,13 +137,13 @@ export const generateInvoice1 = async ({
   // Product Table
   const columns = [
     { header: 'S.No', dataKey: 'slno' },
-    { header: 'Product Description', dataKey: 'poName' },
+    { header: 'Description', dataKey: 'poName' },
     { header: 'HSN', dataKey: 'poHSN' },
-    { header: 'Quantity', dataKey: 'poQuantity' },
+    { header: 'Qty', dataKey: 'poQuantity' },
     { header: 'Price', dataKey: 'poPrice' },
     { header: 'Disc%', dataKey: 'poDiscPercent' },
     { header: 'Discount', dataKey: 'poDisc' },
-    { header: 'Total Price', dataKey: 'poTotalPrice' },
+    { header: 'Amount', dataKey: 'poTotalPrice' },
     { header: 'SKU', dataKey: 'sku' }
   ];
 
@@ -154,43 +160,57 @@ export const generateInvoice1 = async ({
     headStyles: { fillColor: [0, 0, 0], textColor: [255, 255, 255] }
   });
 
-  // Space check for Tax Summary
-  let currentY = doc.lastAutoTable?.finalY ?? 120;
-  const estimatedTaxHeight = 40;
-  const pageHeight = doc.internal.pageSize.getHeight();
+  // Summary Table (instead of separate tax summary)
+  let currentY = doc.lastAutoTable?.finalY ?? 130;
+  const summaryRows = [
+    ['Sub Total', `₹${subTotal.toFixed(2)}`],
+    ['Discount', `₹${discountTotal.toFixed(2)}`],
+    ['Tax (5%)', `₹${tax.toFixed(2)}`],
+    ['Total', `₹${total.toFixed(2)}`],
+    ['Total Paid', `₹${totalPaid.toFixed(2)}`],
+    ['Pending Payment', `₹${pendingPayment.toFixed(2)}`]
+  ];
 
-  if (currentY + estimatedTaxHeight > pageHeight - 20) {
-    doc.addPage();
-    currentY = 20;
+  // autoTable(doc, {
+  //   startY: currentY + 10,
+  //   head: [['Summary', 'Amount']],
+  //   body: summaryRows,
+  //   styles: { fontSize: 10 },
+  //   headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
+  //   bodyStyles: { fontStyle: 'normal', halign: 'right' },
+  //   columnStyles: {
+  //     0: { halign: 'left' },
+  //     1: { halign: 'right' }
+  //   },
+  //   theme: 'grid'
+  // });
+autoTable(doc, {
+  startY: currentY + 10,
+  head: [['Summary', 'Amount']],
+  body: summaryRows,
+  theme: 'grid',
+  styles: {
+    font: 'helvetica',
+    fontSize: 10
+  },
+  headStyles: {
+    fillColor: [230, 230, 230],
+    textColor: [0, 0, 0],
+    fontStyle: 'bold',
+    halign: 'center'
+  },
+  bodyStyles: {
+    textColor: [0, 0, 0],
+    fontStyle: 'normal'
+  },
+  columnStyles: {
+    0: { fontStyle: 'bold', halign: 'left' }, 
+    1: { fontStyle: 'normal', halign: 'right' } 
   }
-
-  // Tax Summary Table
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.text('Tax Summary', 14, currentY + 10);
-
-  autoTable(doc, {
-    startY: currentY + 15,
-    head: [['Tax Type', 'Tax Rate', 'Taxable Value', 'Tax Amount']],
-    body: [[
-      'GST', '5%',
-      `₹${subTotal.toFixed(2)}`,
-      `₹${tax.toFixed(2)}`
-    ]],
-    styles: { fontSize: 9 },
-    headStyles: { fillColor: [0, 0, 0], textColor: [255, 255, 255] },
-    theme: 'grid'
-  });
-
-  const afterTaxY = doc.lastAutoTable.finalY + 5;
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.text(`Total: ₹${total.toFixed(2)}`, 14, afterTaxY);
+});
 
   // Page numbers
-const pageCount = (doc as any).internal.getNumberOfPages();
-
+  const pageCount = (doc as any).internal.getNumberOfPages();
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(8);

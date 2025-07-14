@@ -1,43 +1,42 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { DataTable } from 'primereact/datatable'
-import { Column } from 'primereact/column'
-import { Button } from 'primereact/button'
-import { Tag } from 'primereact/tag'
-import { InputText } from 'primereact/inputtext'
-import { Toolbar } from 'primereact/toolbar'
-import { IconField } from 'primereact/iconfield'
-import { InputIcon } from 'primereact/inputicon'
-import { Sidebar } from 'primereact/sidebar'
-import SettingsAddNewCategories from './SettingsAddNewCategories'
-import { Toast } from 'primereact/toast'
-import axios from 'axios'
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog'
+import React, { useEffect, useRef, useState } from 'react';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Button } from 'primereact/button';
+import { Tag } from 'primereact/tag';
+import { InputText } from 'primereact/inputtext';
+import { Toolbar } from 'primereact/toolbar';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
+import { Sidebar } from 'primereact/sidebar';
+import { Toast } from 'primereact/toast';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import axios from 'axios';
+
+import SettingsAddNewCategories from './SettingsAddNewCategories';
 
 interface Category {
-  refCategoryId: number
-  categoryName: string
-  categoryCode: string
-  isActive: boolean
-  createdAt: string
-  createdBy: string
-  updatedAt: string
-  updatedBy: string
+  refCategoryId: number;
+  categoryName: string;
+  categoryCode: string;
+  isActive: boolean;
+  createdAt: string;
+  createdBy: string;
+  updatedAt: string;
+  updatedBy: string;
 }
 
 const SettingsCategories: React.FC = () => {
-  const [categories, setCategories] = useState<Category[]>([])
-  const [globalFilter, setGlobalFilter] = useState<string>('')
-  const [visibleRight, setVisibleRight] = useState(false)
-
-  const dtRef = React.useRef<DataTable<Category[]>>(null)
-
-  const [editData, setEditData] = useState<Category | null>(null)
-  const [mode, setMode] = useState<'add' | 'edit'>('add')
-  const toast = useRef<Toast>(null)
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [visibleRight, setVisibleRight] = useState(false);
+  const [editData, setEditData] = useState<Category | null>(null);
+  const [mode, setMode] = useState<'add' | 'edit'>('add');
+  const dtRef = useRef<DataTable<Category[]>>(null);
+  const toast = useRef<Toast>(null);
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -45,37 +44,55 @@ const SettingsCategories: React.FC = () => {
         `${import.meta.env.VITE_API_URL}/admin/settings/categories`,
         {
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: sessionStorage.getItem('token')
+            Authorization: sessionStorage.getItem('token') || ''
           }
         }
-      )
-      if (response.status) {
-        setCategories(response.data.data)
+      );
+      if (response.data?.status) {
+        setCategories(response.data.data);
+      } else {
+        toast.current?.show({
+          severity: 'warn',
+          summary: 'Warning',
+          detail: response.data.message || 'Failed to load categories',
+          life: 3000
+        });
       }
-    } catch (error) {
-      console.log(error)
+    } catch (error: any) {
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: error.response?.data?.message || 'Error fetching categories',
+        life: 3000
+      });
     }
-  }
+  };
 
   const exportExcel = () => {
-    dtRef.current?.exportCSV()
-  }
+    dtRef.current?.exportCSV();
+  };
 
-  const activeStatusBody = (rowData: Category) => (
+  const activeStatusBody = (row: Category) => (
     <Tag
-      value={rowData.isActive ? 'Active' : 'Inactive'}
-      severity={rowData.isActive ? 'success' : 'danger'}
+      value={row.isActive ? 'Active' : 'Inactive'}
+      severity={row.isActive ? 'success' : 'danger'}
     />
-  )
+  );
 
   const leftHeader = (
     <div className="flex gap-2 items-center">
       <Button icon="pi pi-file-excel" severity="success" onClick={exportExcel} />
-      <Button label="" icon="pi pi-plus" onClick={() => setVisibleRight(true)} />
-      <Button label="" icon="pi pi-refresh" severity="secondary" onClick={fetchData} />
+      <Button
+        icon="pi pi-plus"
+        onClick={() => {
+          setMode('add');
+          setEditData(null);
+          setVisibleRight(true);
+        }}
+      />
+      <Button icon="pi pi-refresh" severity="secondary" onClick={fetchData} />
     </div>
-  )
+  );
 
   const rightHeader = (
     <IconField iconPosition="left">
@@ -87,7 +104,7 @@ const SettingsCategories: React.FC = () => {
         onChange={(e) => setGlobalFilter(e.target.value)}
       />
     </IconField>
-  )
+  );
 
   const actionBody = (rowData: Category) => (
     <div className="flex gap-2">
@@ -95,9 +112,9 @@ const SettingsCategories: React.FC = () => {
         icon="pi pi-pencil"
         text
         onClick={() => {
-          setEditData(rowData)
-          setMode('edit')
-          setVisibleRight(true)
+          setEditData(rowData);
+          setMode('edit');
+          setVisibleRight(true);
         }}
       />
       <Button
@@ -107,67 +124,69 @@ const SettingsCategories: React.FC = () => {
         onClick={() => handleDelete(rowData.refCategoryId)}
       />
     </div>
-  )
+  );
 
-  const handleDelete = async (id: number, forceDelete: boolean = false) => {
+ const handleDelete = async (id: number, forceDelete = false) => {
   try {
     const response = await axios.delete(
       `${import.meta.env.VITE_API_URL}/admin/settings/categories/${id}`,
       {
         headers: {
-          Authorization: sessionStorage.getItem('token')
+          Authorization: sessionStorage.getItem('token') || '',
         },
-        params: forceDelete ? { force: true } : {}
+        params: forceDelete ? { forceDelete: true } : {}, // ✅ Correct key!
       }
-    )
+    );
 
-    const data = response.data
+    const data = response.data;
 
     if (data.confirmationNeeded) {
+      const subList = data.subcategories?.map(
+        (s: any) => `• ${s.subCategoryName} (${s.subCategoryCode})`
+      ).join('\n') || '';
+
       confirmDialog({
-        message: data.message || 'This category contains subcategories. Are you sure you want to delete it?',
-        header: 'Confirmation Required',
+        message: `${data.message}\n\nSubcategories:\n${subList}\n\nDo you still want to force delete?`,
+        header: 'Force Delete Confirmation',
         icon: 'pi pi-exclamation-triangle',
         acceptLabel: 'Yes, Delete',
         rejectLabel: 'Cancel',
-        accept: () => handleDelete(id, true),  // <-- Retry with forceDelete
+        accept: () => handleDelete(id, true),
         reject: () => {
           toast.current?.show({
             severity: 'info',
             summary: 'Cancelled',
-            detail: 'Category deletion cancelled.',
-            life: 2000
-          })
-        }
-      })
+            detail: 'Deletion cancelled.',
+            life: 2000,
+          });
+        },
+      });
     } else if (data.status) {
-      fetchData()
+      fetchData();
       toast.current?.show({
         severity: 'success',
         summary: 'Deleted',
         detail: data.message || 'Category deleted successfully',
-        life: 2000
-      })
+        life: 2000,
+      });
     } else {
       toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: data.message || 'Failed to delete category',
-        life: 3000
-      })
+        severity: 'warn',
+        summary: 'Failed',
+        detail: data.message || 'Could not delete category',
+        life: 3000,
+      });
     }
   } catch (error: any) {
-    console.error(error)
     toast.current?.show({
       severity: 'error',
       summary: 'Error',
-      detail:
-        error?.response?.data?.message ||
-        'An unexpected error occurred while deleting the category.',
-      life: 3000
-    })
+      detail: error.response?.data?.message || 'Unexpected error during deletion',
+      life: 3000,
+    });
   }
-}
+};
+1
 
   const handleSave = async (newCategory: Category) => {
     try {
@@ -180,19 +199,36 @@ const SettingsCategories: React.FC = () => {
         },
         {
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: sessionStorage.getItem('token')
+            Authorization: sessionStorage.getItem('token') || ''
           }
         }
-      )
-
-      if (response.data?.status) {
-        fetchData()
+      );
+      if (response.data.status) {
+        fetchData();
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Created',
+          detail: response.data.message || 'Category created successfully',
+          life: 2000
+        });
+        setVisibleRight(false);
+      } else {
+        toast.current?.show({
+          severity: 'warn',
+          summary: 'Creation Failed',
+          detail: response.data.message,
+          life: 3000
+        });
       }
-    } catch (error) {
-      console.log(error)
+    } catch (error: any) {
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: error.response?.data?.message || 'Error creating category',
+        life: 3000
+      });
     }
-  }
+  };
 
   const handleUpdate = async (updatedCategory: Category) => {
     try {
@@ -206,24 +242,41 @@ const SettingsCategories: React.FC = () => {
         },
         {
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: sessionStorage.getItem('token')
+            Authorization: sessionStorage.getItem('token') || ''
           }
         }
-      )
-
-      if (response.data?.status) {
-        fetchData()
+      );
+      if (response.data.status) {
+        fetchData();
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Updated',
+          detail: response.data.message || 'Category updated successfully',
+          life: 2000
+        });
+        setVisibleRight(false);
+      } else {
+        toast.current?.show({
+          severity: 'warn',
+          summary: 'Update Failed',
+          detail: response.data.message,
+          life: 3000
+        });
       }
-    } catch (error) {
-      console.log(error)
+    } catch (error: any) {
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: error.response?.data?.message || 'Error updating category',
+        life: 3000
+      });
     }
-  }
+  };
 
   return (
     <div className="card">
       <Toast ref={toast} />
-       <ConfirmDialog />
+      <ConfirmDialog />
       <Toolbar className="mb-4" left={rightHeader} right={leftHeader} />
 
       <DataTable
@@ -231,7 +284,6 @@ const SettingsCategories: React.FC = () => {
         value={categories}
         paginator
         rows={10}
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         rowsPerPageOptions={[10, 25, 50]}
         showGridlines
         scrollable
@@ -241,26 +293,22 @@ const SettingsCategories: React.FC = () => {
         emptyMessage="No categories found."
         className="p-datatable-sm"
       >
-        <Column
-          header="S.No"
-          body={(_rowData, options) => options.rowIndex + 1}
-          style={{ minWidth: '1rem' }}
-        />
-        <Column field="categoryName" header="Category Name" sortable style={{ minWidth: '5rem' }} />
-        <Column field="categoryCode" header="Category Code" sortable style={{ minWidth: '5rem' }} />
-        <Column header="Status" body={activeStatusBody} style={{ minWidth: '5rem' }} />
-        <Column field="createdAt" header="Created At" sortable style={{ minWidth: '5rem' }} />
-        <Column field="createdBy" header="Created By" sortable style={{ minWidth: '5rem' }} />
-        <Column header="Actions" body={actionBody} style={{ minWidth: '5rem' }} />
+        <Column header="S.No" body={(_, opts) => opts.rowIndex + 1} />
+        <Column field="categoryName" header="Category Name" sortable />
+        <Column field="categoryCode" header="Category Code" sortable />
+        <Column header="Status" body={activeStatusBody} />
+        <Column field="createdAt" header="Created At" sortable />
+        <Column field="createdBy" header="Created By" sortable />
+        <Column header="Actions" body={actionBody} />
       </DataTable>
 
       <Sidebar
         visible={visibleRight}
         position="right"
         onHide={() => {
-          setVisibleRight(false)
-          setEditData(null)
-          setMode('add')
+          setVisibleRight(false);
+          setEditData(null);
+          setMode('add');
         }}
         style={{ width: '50vw' }}
       >
@@ -273,7 +321,7 @@ const SettingsCategories: React.FC = () => {
         />
       </Sidebar>
     </div>
-  )
-}
+  );
+};
 
-export default SettingsCategories
+export default SettingsCategories;
