@@ -4,6 +4,7 @@ import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { FloatLabel } from 'primereact/floatlabel';
+import { InputNumber } from 'primereact/inputnumber';
 
 interface StatusOption {
   name: string;
@@ -110,11 +111,13 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onClose, onSa
     }
     return '';
   };
-const isSaveDisabled = Object.values(errors).some((error) => error !== '') ||
-  !formData.supplierEmail ||
-  !formData.supplierContactNumber ||
-  !formData.supplierBankACNumber ||
-  !formData.emergencyContactNumber;
+
+  const isSaveDisabled =
+    Object.values(errors).some((error) => error !== '') ||
+    !formData.supplierEmail ||
+    !formData.supplierContactNumber ||
+    !formData.supplierBankACNumber ||
+    !formData.emergencyContactNumber;
 
   const handleChange = (field: keyof Supplier, value: string | boolean | null) => {
     setFormData((prev) => ({ ...prev, [field]: value as any }));
@@ -125,71 +128,89 @@ const isSaveDisabled = Object.values(errors).some((error) => error !== '') ||
   const renderError = (field: string) =>
     errors[field] && <small style={{ color: 'red' }}>{errors[field]}</small>;
 
-  const renderInput = (field: keyof Supplier, label: string, type: 'text' = 'text') => (
-    <div className="flex-1">
-      <FloatLabel className="flex-1 always-float">
-        <InputText
-          id={field}
-          value={formData[field] as string}
-          className={`w-full ${errors[field] ? 'p-invalid' : ''}`}
-          onChange={(e) => handleChange(field, e.target.value)}
-          type={type}
-        />
-        <label htmlFor={field}>{label}</label>
-      </FloatLabel>
-      {renderError(field)}
-    </div>
-  );
-const handleSubmit = async () => {
-  const requiredFields: (keyof Supplier)[] = [
-    'supplierEmail',
-    'supplierContactNumber',
-    'supplierBankACNumber',
-    'emergencyContactNumber',
-  ];
+  const renderInput = (field: keyof Supplier, label: string, type: 'text' | 'number' = 'text') => {
+    const isNumberField =
+      field === 'supplierContactNumber' ||
+      field === 'emergencyContactNumber' ||
+      field === 'supplierBankACNumber';
 
-  const newErrors: { [key: string]: string } = {};
+    return (
+      <div className="flex-1">
+        <FloatLabel className="flex-1 always-float">
+          {isNumberField ? (
+            <InputNumber
+              id={field}
+              value={formData[field] ? parseInt(formData[field] as string) : undefined}
+              onValueChange={(e) => handleChange(field, e.value?.toString() || '')}
+              useGrouping={false}
+              className={`w-full ${errors[field] ? 'p-invalid' : ''}`}
+            />
+          ) : (
+            <InputText
+              id={field}
+              value={formData[field] as string}
+              className={`w-full ${errors[field] ? 'p-invalid' : ''}`}
+              onChange={(e) => handleChange(field, e.target.value)}
+              type={type}
+            />
+          )}
+          <label htmlFor={field}>{label}</label>
+        </FloatLabel>
+        {renderError(field)}
+      </div>
+    );
+  };
 
-  requiredFields.forEach((field) => {
-    const error = validateField(field, formData[field]);
-    if (error) newErrors[field] = error;
-  });
+  const handleSubmit = async () => {
+    const requiredFields: (keyof Supplier)[] = [
+      'supplierEmail',
+      'supplierContactNumber',
+      'supplierBankACNumber',
+      'emergencyContactNumber',
+    ];
 
-  if (Object.keys(newErrors).length > 0) {
-    setErrors((prev) => ({ ...prev, ...newErrors }));
-    toast.current?.show({
-      severity: 'error',
-      summary: 'Validation Error',
-      detail: 'Please fix the errors before saving.',
+    const newErrors: { [key: string]: string } = {};
+
+    requiredFields.forEach((field) => {
+      const error = validateField(field, formData[field]);
+      if (error) newErrors[field] = error;
     });
-    return;
-  }
 
-  try {
-    if (mode === 'add' && onSave) {
-      await onSave(formData);
+    if (Object.keys(newErrors).length > 0) {
+      setErrors((prev) => ({ ...prev, ...newErrors }));
       toast.current?.show({
-        severity: 'success',
-        summary: 'Saved',
-        detail: 'Supplier added successfully',
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'Please fix the errors before saving.',
       });
-    } else if (mode === 'edit' && onUpdate) {
-      await onUpdate(formData);
+      return;
+    }
+
+    try {
+      if (mode === 'add' && onSave) {
+        await onSave(formData);
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Saved',
+          detail: 'Supplier added successfully',
+        });
+      } else if (mode === 'edit' && onUpdate) {
+        await onUpdate(formData);
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Updated',
+          detail: 'Supplier updated successfully',
+        });
+      }
+      onClose();
+    } catch (err) {
       toast.current?.show({
-        severity: 'success',
-        summary: 'Updated',
-        detail: 'Supplier updated successfully',
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Something went wrong while saving.',
       });
     }
-    onClose();
-  } catch (err) {
-    toast.current?.show({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'Something went wrong while saving.',
-    });
-  }
-};
+  };
 
   return (
     <div className="p-4 pb-20">

@@ -116,7 +116,6 @@ export const debitInvoice1 = async ({
   doc.text(`Mobile: ${supplier.supplierContactNumber}`, 130, 60);
   doc.text(`Supplier Code: ${supplier.supplierCode}`, 130, 65);
 
- 
   doc.setFont('helvetica', 'bold');
   doc.text('Dispatched From:', 14, 85);
   doc.setFont('helvetica', 'normal');
@@ -159,55 +158,42 @@ export const debitInvoice1 = async ({
   });
 
   let currentY = doc.lastAutoTable?.finalY ?? 130;
-  const summaryRows = [
-    ['Sub Total', `₹${subTotal.toFixed(2)}`],
-    ['Discount', `₹${discountTotal.toFixed(2)}`],
-    ['Tax (5%)', `₹${tax.toFixed(2)}`],
-    ['Total', `₹${total.toFixed(2)}`],
-    ['Total Paid', `₹${totalPaid.toFixed(2)}`],
-    ['Pending Payment', `₹${pendingPayment.toFixed(2)}`]
-  ];
+  const remainingSpace = doc.internal.pageSize.height - currentY;
 
-  // autoTable(doc, {
-  //   startY: currentY + 10,
-  //   head: [['Summary', 'Amount']],
-  //   body: summaryRows,
-  //   styles: { fontSize: 10 },
-  //   headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
-  //   bodyStyles: { fontStyle: 'normal', halign: 'right' },
-  //   columnStyles: {
-  //     0: { halign: 'left' },
-  //     1: { halign: 'right' }
-  //   },
-  //   theme: 'grid'
-  // });
+  if (remainingSpace < 70) {
+    doc.addPage();
+    currentY = 20;
+  }
+  const formatAmount = (value: number) => value.toFixed(2);
+const summaryRows = [
+  ['Sub Total', formatAmount(subTotal)],
+  ['Discount', formatAmount(discountTotal)],
+  ['Tax (5%)', formatAmount(tax)],
+  ['Total', formatAmount(total)],
+  ['Total Paid', formatAmount(totalPaid)],
+  ['Pending Payment', formatAmount(pendingPayment)],
+];
+
 autoTable(doc, {
-  startY: currentY + 10,
+ startY: currentY + 10,
   head: [['Summary', 'Amount']],
   body: summaryRows,
-  theme: 'grid',
-  styles: {
-    font: 'helvetica',
-    fontSize: 10
-  },
-  headStyles: {
-    fillColor: [230, 230, 230],
-    textColor: [0, 0, 0],
-    fontStyle: 'bold',
-    halign: 'center'
-  },
-  bodyStyles: {
-    textColor: [0, 0, 0],
-    fontStyle: 'normal'
+  styles: { fontSize: 10, cellPadding: 3 },
+   headStyles: {
+    fillColor: [0, 0, 0],      // Black background
+    textColor: [255, 255, 255] // White text
   },
   columnStyles: {
-    0: { fontStyle: 'bold', halign: 'left' }, 
-    1: { fontStyle: 'normal', halign: 'right' } 
-  }
+    0: { halign: 'left', cellWidth: 40},   // "Summary" left aligned
+    1: { halign: 'left', cellWidth: 35 } 
+  },
+   tableWidth: 'wrap'
 });
 
- 
-  const pageCount = (doc as any).internal.getNumberOfPages();
+
+  // Footer with page count
+ const pageCount = (doc as any).internal.getNumberOfPages();
+
   for (let i = 1; i <= pageCount; i++) {
     doc.setPage(i);
     doc.setFontSize(8);

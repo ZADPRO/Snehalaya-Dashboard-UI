@@ -193,13 +193,14 @@ const handleDownloadInvoice = () => {
   const pdfProducts = productEntries.map((entry) => ({
     poId: entry.product.productId,
     poName: entry.product.productName,
-    poDescription: entry.product.sku,
+    poDescription: entry.product.sku,  // Use the SKU here
     poHSN: entry.product.hsnCode,
     poQuantity: entry.quantity.toString(),
     poPrice: entry.price.toFixed(2),
     poDiscPercent: entry.discount.toFixed(2),
     poDisc: entry.discountPrice.toFixed(2),
     poTotalPrice: entry.totalPrice.toFixed(2),
+    posku: entry.product.sku // Make sure SKU is included here
   }));
 
   generateInvoice(selectedSupplier, selectedBranch, pdfProducts);
@@ -430,18 +431,19 @@ const handleDownloadInvoice = () => {
         style={{ width: '20%' }}
       >
         <div className="buttons p-3 flex flex-column gap-2">
-          <p
+          {/* <p
             className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
             style={{ border: '1px solid #8e5ea8' }}
+             onClick={handlePrintOrder} 
           >
             <Printer size={18} /> Print Order
-          </p>
-          <p
+          </p> */}
+          {/* <p
             className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
             style={{ border: '1px solid #8e5ea8' }}
           >
             <FileText size={18} /> Create Invoice
-          </p>
+          </p> */}
          <p
   className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
   style={{ border: '1px solid #8e5ea8' }}

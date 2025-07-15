@@ -4,6 +4,7 @@ import { FloatLabel } from 'primereact/floatlabel';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { InputSwitch } from 'primereact/inputswitch';
 import { Button } from 'primereact/button';
+import { InputNumber } from 'primereact/inputnumber';
 
 interface StatusOption {
   name: string;
@@ -239,19 +240,24 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
     </div>
 
     <div className="flex-1">
-      <FloatLabel className="flex-1 always-float">
-        <InputText
-          id="refMobile"
-          value={formData.refMobile}
-          className={`w-full ${errors.refMobile ? 'p-invalid' : ''}`}
-          onChange={(e) => handleChange('refMobile', e.target.value)}
-        />
-        <label htmlFor="refMobile">Mobile</label>
-      </FloatLabel>
-      {errors.refMobile && (
-        <small style={{ color: 'red' }}>{errors.refMobile}</small>
-      )}
-    </div>
+  <FloatLabel className="flex-1 always-float">
+    <InputNumber
+  id="refMobile"
+  value={formData.refMobile ? parseInt(formData.refMobile) : null}
+  onValueChange={(e) => handleChange('refMobile', e.value?.toString() || '')}
+  useGrouping={false}
+  className={`w-full ${errors.refMobile ? 'p-invalid' : ''}`}
+  inputStyle={{ width: '100%' }}
+  maxLength={10}
+/>
+
+    <label htmlFor="refMobile">Mobile</label>
+  </FloatLabel>
+
+  {errors.refMobile && (
+    <small style={{ color: 'red' }}>{errors.refMobile}</small>
+  )}
+</div>
   </div>
 
   <div className="flex gap-4 align-items-center">

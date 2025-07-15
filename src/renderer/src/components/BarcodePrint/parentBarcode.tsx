@@ -16,12 +16,14 @@ export default function BarcodePrint() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   const [sidebarVisible, setSidebarVisible] = useState(false);
-  const [invoiceNumber, setInvoiceNumber] = useState('');
 
-  const currentMonthYear = new Date().toLocaleDateString('en-US', {
-    month: 'long',
-    year: 'numeric',
-  });
+  // Format invoice number
+  const formatPOINV = (id: number) => {
+    const now = new Date();
+    const dd = String(now.getDate()).padStart(2, '0');
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    return `POINV-${dd}-${mm}-${1000 + id}`;
+  };
 
   useEffect(() => {
     const mock: Product[] = Array.from({ length: 140 }, (_, i) => ({
@@ -41,6 +43,18 @@ export default function BarcodePrint() {
     <div className="p-4">
       <h2>Product Barcode Selection</h2>
 
+      {/* Button on right */}
+      <div className="flex justify-content-end mb-3">
+        <button
+          className="p-button p-button-sm"
+          disabled={!selectedProducts.length}
+          onClick={() => setSidebarVisible(true)}
+        >
+          Add to Print
+        </button>
+      </div>
+
+      {/* Product Table */}
       <DataTable
         value={products}
         selectionMode="multiple"
@@ -58,40 +72,17 @@ export default function BarcodePrint() {
         <Column field="price" header="Price" body={(row) => `₹ ${row.price}`} />
       </DataTable>
 
-      <div className="p-mt-3">
-        <label>
-          Invoice Number:
-          <input
-            type="text"
-            value={invoiceNumber}
-            onChange={(e) => setInvoiceNumber(e.target.value)}
-            className="p-inputtext p-ml-2"
-          />
-        </label>
-      </div>
-
-      <button
-        className="p-button p-mt-3"
-        disabled={!selectedProducts.length}
-        onClick={() => setSidebarVisible(true)}
-      >
-        Add to Print
-      </button>
-
+      {/* Print Sidebar */}
       <Sidebar
         visible={sidebarVisible}
         onHide={() => setSidebarVisible(false)}
         position="right"
-        style={{ width: '400px' }}
+        style={{ width: '50vw' }}
+        className="p-sidebar-lg"
       >
-        <h3>Preview & Print</h3>
-        <button className="p-button" onClick={handlePrint}>
-          Print Preview
-        </button>
-      </Sidebar>
-
-      {selectedProducts.length > 0 && (
-        <div className="print-area">
+        <h3>Print Preview</h3>
+        <div className="print-area flex flex-column gap-4">
+          {/* Top Half: Barcode Stickers */}
           <div className="barcode-grid">
             {selectedProducts.map((p, i) => (
               <div className="barcode-item" key={i}>
@@ -99,13 +90,19 @@ export default function BarcodePrint() {
                 <Barcode value={p.sku} height={40} width={1} displayValue={false} />
                 <div>{p.sku}</div>
                 <div>₹ {p.price.toFixed(2)}</div>
-                <div>{invoiceNumber}</div>
-                <div>{currentMonthYear}</div>
+                <div>{formatPOINV(p.productId)}</div>
               </div>
             ))}
           </div>
+
+          {/* Bottom Half: Actions */}
+          <div className="flex justify-content-center">
+            <button className="p-button p-button-success" onClick={handlePrint}>
+              Print Stickers
+            </button>
+          </div>
         </div>
-      )}
+      </Sidebar>
     </div>
   );
 }
