@@ -70,33 +70,6 @@
 }
 
 
-@media print {
-  .print-area {
-    display: block !important;
-    width: 100% !important;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-
-  .barcode-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-  }
-
-  .barcode-item {
-    box-sizing: border-box;
-    width: 9cm;
-    margin: 0.5cm;
-    page-break-inside: avoid;
-  }
-
-  /* Optional: Break after every 12 stickers */
-  .barcode-item:nth-child(12n) {
-    page-break-after: always;
-  }
-}
 
 
 

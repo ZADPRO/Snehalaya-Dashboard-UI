@@ -11,13 +11,12 @@ interface Product {
   sku: string;
   price: number;
 }
-
 export default function BarcodePrint() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
-  // Format invoice number
+ 
   const formatPOINV = (id: number) => {
     const now = new Date();
     const dd = String(now.getDate()).padStart(2, '0');
@@ -43,7 +42,6 @@ export default function BarcodePrint() {
     <div className="p-4">
       <h2>Product Barcode Selection</h2>
 
-      {/* Button on right */}
       <div className="flex justify-content-end mb-3">
         <button
           className="p-button p-button-sm"
@@ -53,8 +51,6 @@ export default function BarcodePrint() {
           Add to Print
         </button>
       </div>
-
-      {/* Product Table */}
       <DataTable
         value={products}
         selectionMode="multiple"
@@ -71,8 +67,6 @@ export default function BarcodePrint() {
         <Column field="sku" header="SKU" />
         <Column field="price" header="Price" body={(row) => `₹ ${row.price}`} />
       </DataTable>
-
-      {/* Print Sidebar */}
       <Sidebar
         visible={sidebarVisible}
         onHide={() => setSidebarVisible(false)}
@@ -81,8 +75,7 @@ export default function BarcodePrint() {
         className="p-sidebar-lg"
       >
         <h3>Print Preview</h3>
-        <div className="print-area flex flex-column gap-4">
-          {/* Top Half: Barcode Stickers */}
+        <div className="print-area flex flex-column gap-4"> 
           <div className="barcode-grid">
             {selectedProducts.map((p, i) => (
               <div className="barcode-item" key={i}>
@@ -94,8 +87,6 @@ export default function BarcodePrint() {
               </div>
             ))}
           </div>
-
-          {/* Bottom Half: Actions */}
           <div className="flex justify-content-center">
             <button className="p-button p-button-success" onClick={handlePrint}>
               Print Stickers

@@ -200,7 +200,7 @@ const POGoodsReturned: React.FC = () => {
 
     setProductEntries((prev) => [...prev, entry])
 
-    // Reset inputs
+   
     setSelectedProduct(null)
     setQuantity(1)
     setPrice(0)
