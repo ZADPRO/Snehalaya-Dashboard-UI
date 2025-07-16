@@ -421,7 +421,7 @@ const pendingPayment = total - totalPaid
           <p
             className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
             style={{ border: '1px solid #8e5ea8', background: 'none', borderRadius: '6px' }}
-            onClick={handleGenerateInvoice}
+           
           >
             <FileText size={18} /> Print DebitNote
           </p>
@@ -429,6 +429,7 @@ const pendingPayment = total - totalPaid
           <p
             className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
             style={{ border: '1px solid #8e5ea8' }}
+             onClick={handleGenerateInvoice}
           >
             <Download size={18} /> Download
           </p>

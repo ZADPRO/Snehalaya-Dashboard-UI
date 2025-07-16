@@ -7,7 +7,6 @@ declare module 'jspdf' {
     lastAutoTable?: any;
   }
 }
-
 interface Supplier {
   supplierId: number;
   supplierCompanyName: string;
@@ -116,12 +115,16 @@ export const debitInvoice1 = async ({
   doc.text(`Mobile: ${supplier.supplierContactNumber}`, 130, 60);
   doc.text(`Supplier Code: ${supplier.supplierCode}`, 130, 65);
 
-  doc.setFont('helvetica', 'bold');
-  doc.text('Dispatched From:', 14, 85);
-  doc.setFont('helvetica', 'normal');
-  doc.text(supplier.supplierCompanyName, 15, 90);
-  doc.text(`${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`, 15, 95);
-  doc.text(`${supplier.supplierCity}, ${supplier.supplierState} - India`, 14, 100);
+ doc.setFont('helvetica', 'bold');
+doc.text('Dispatched From:', 14, 80);
+
+doc.setFont('helvetica', 'normal');
+doc.text(supplier.supplierCompanyName, 14, 85);
+doc.text(`${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`, 14, 90);
+doc.text(`${supplier.supplierCity}, ${supplier.supplierState} - India`, 14, 95);
+doc.text(`Email: ${supplier.supplierEmail}`, 14, 100);
+doc.text(`Mobile: ${supplier.supplierContactNumber}`, 14, 105);
+
 
   doc.setFont('helvetica', 'bold');
   doc.text('Dispatched To:', 135, 75);
@@ -164,34 +167,79 @@ export const debitInvoice1 = async ({
     doc.addPage();
     currentY = 20;
   }
+
   const formatAmount = (value: number) => value.toFixed(2);
-const summaryRows = [
-  ['Sub Total', formatAmount(subTotal)],
-  ['Discount', formatAmount(discountTotal)],
-  ['Tax (5%)', formatAmount(tax)],
-  ['Total', formatAmount(total)],
-  ['Total Paid', formatAmount(totalPaid)],
-  ['Pending Payment', formatAmount(pendingPayment)],
+
+ const summaryColumns = [
+  { header: 'Sub Total', dataKey: 'subTotal' },
+  { header: 'Discount', dataKey: 'discount' },
+  { header: 'Tax (5%)', dataKey: 'tax' },
+  { header: 'Total', dataKey: 'total' },
+  { header: 'Total Paid', dataKey: 'totalPaid' },
+  { header: 'Pending Payment', dataKey: 'pendingPayment' }
 ];
 
+
+const summaryData = [
+  {
+    subTotal: formatAmount(subTotal),
+    discount: formatAmount(discountTotal),
+    tax: formatAmount(tax),
+    total: formatAmount(total),
+    totalPaid: formatAmount(totalPaid),
+    pendingPayment: formatAmount(pendingPayment)
+  }
+];
+
+
+const commonTableStyles = {
+  fontSize: 7,        
+  cellPadding: 1,     
+  minCellHeight: 6,   
+};
+
 autoTable(doc, {
- startY: currentY + 10,
-  head: [['Summary', 'Amount']],
-  body: summaryRows,
-  styles: { fontSize: 10, cellPadding: 3 },
-   headStyles: {
-    fillColor: [0, 0, 0],      // Black background
-    textColor: [255, 255, 255] // White text
+  startY: 110,
+  columns,
+  body: data,
+  styles: commonTableStyles,
+  headStyles: {
+    fillColor: [0, 0, 0],
+    textColor: [255, 255, 255],
+    // cellPadding: 1,
+    minCellHeight: 6,
+  }
+});
+const summaryStartY = doc.lastAutoTable?.finalY + 10;
+doc.setFont('helvetica', 'bold');
+doc.setFontSize(11);
+doc.text('Summary', 14, summaryStartY); 
+
+autoTable(doc, {
+  startY: summaryStartY + 3,  
+  columns: summaryColumns,
+  body: summaryData,
+  styles: commonTableStyles,
+  headStyles: {
+    fillColor: [0, 0, 0],
+    textColor: [255, 255, 255],
+    cellPadding: 1,
+    minCellHeight: 6,
   },
   columnStyles: {
-    0: { halign: 'left', cellWidth: 40},   // "Summary" left aligned
-    1: { halign: 'left', cellWidth: 35 } 
+    subTotal: { halign: 'left' },
+    discount: { halign: 'left' },
+    tax: { halign: 'left' },
+    total: { halign: 'left' },
+    totalPaid: { halign: 'left' },
+    pendingPayment: { halign: 'left' },
   },
-   tableWidth: 'wrap'
+  tableWidth: 'auto',
 });
 
 
-  // Footer with page count
+
+
  const pageCount = (doc as any).internal.getNumberOfPages();
 
   for (let i = 1; i <= pageCount; i++) {

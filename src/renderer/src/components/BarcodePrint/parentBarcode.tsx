@@ -74,7 +74,12 @@ export default function BarcodePrint() {
         style={{ width: '50vw' }}
         className="p-sidebar-lg"
       >
-        <h3>Print Preview</h3>
+       <div className="flex justify-content-around align-items-center mb-3">
+        <h3 className="m-0">Print Preview</h3>
+        <div style={{ flex: 1 }} /> {/* spacer in the middle */}
+        <button className="p-button p-button-success mt-2" onClick={handlePrint}>Print Stickers</button>
+      </div>
+
         <div className="print-area flex flex-column gap-4"> 
           <div className="barcode-grid">
             {selectedProducts.map((p, i) => (
@@ -87,11 +92,7 @@ export default function BarcodePrint() {
               </div>
             ))}
           </div>
-          <div className="flex justify-content-center">
-            <button className="p-button p-button-success" onClick={handlePrint}>
-              Print Stickers
-            </button>
-          </div>
+          
         </div>
       </Sidebar>
     </div>
