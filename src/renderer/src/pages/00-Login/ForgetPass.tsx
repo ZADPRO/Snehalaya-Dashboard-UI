@@ -65,7 +65,7 @@ const [passwordReset, setPasswordReset] = useState(false);
     const res = await axios.post(`${BASE_URL}/admin/forgot-password`, { email });
     toast.current?.show({ severity: 'success', summary: 'OTP Sent', detail: res.data.message, life: 2000 });
     setStep(2);
-    setOtpSent(true); 
+    setOtpSent(true);
   } catch (err: any) {
     setOtpSent(false);
     toast.current?.show({ severity: 'error', summary: 'Error', detail: err?.response?.data?.message || 'Failed to send OTP.', life: 3000 });
@@ -104,7 +104,7 @@ const handleResetPassword = async () => {
   try {
     const res = await axios.post(`${BASE_URL}/admin/reset-password`, { email, newPassword });
     toast.current?.show({ severity: 'success', summary: 'Success', detail: res.data.message || 'Password reset successful.', life: 2000 });
-    setPasswordReset(true); 
+    setPasswordReset(true);
     setTimeout(() => navigate('/login', { replace: true }), 2000);
   } catch (err: any) {
     toast.current?.show({ severity: 'error', summary: 'Reset Failed', detail: err?.response?.data?.message || 'Could not reset password.', life: 3000 });

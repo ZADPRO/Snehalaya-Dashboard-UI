@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
 import {
   FolderKanban,
   Layers3,
@@ -8,30 +7,30 @@ import {
   UsersRound,
   BadgeInfo,
   // Banknote,
-  // PanelsTopLeft,
-  // SlidersVertical
+  PanelsTopLeft,
+  SlidersVertical
 } from 'lucide-react'
 import { Divider } from 'primereact/divider'
-import SettingsCategories from '@renderer/components/SettingsCategories/SettingsCategories'
-import SettingsSubCategories from '@renderer/components/SettingsSubCategories/SettingsSubCategories'
-import SettingsBranches from '@renderer/components/SettingsBranches/SettingsBranches'
-import SettingsSuppliers from '@renderer/components/SettingsSuppliers/SettingsSuppliers'
-import SettingsUsers from '@renderer/components/SettingsUsers/SettingsUsers'
-import SettingsEmployees from '@renderer/components/SettingsEmployees/SettingsEmployees'
-// import SettingsBank from '@renderer/components/SettingsBank/SettingsBank'
-// import SettingsOverview from '@renderer/components/SettingsOverview/SettingsOverview'
-// import SettingsAttributes from '@renderer/components/SettingsAttributes/SettingsAttributes'
 
 import './Settings.css'
+import SettingsOverview from '../../components/SettingsOverview/SettingsOverview'
+import SettingsCategories from '../../components/SettingsCategories/SettingsCategories'
+import SettingsSubCategories from '../../components/SettingsSubCategories/SettingsSubCategories'
+import SettingsBranches from '../../components/SettingsBranches/SettingsBranches'
+import SettingsSuppliers from '../../components/SettingsSuppliers/SettingsSuppliers'
+import SettingsUsers from '../../components/SettingsUsers/SettingsUsers'
+import SettingsAttributes from '../../components/SettingsAttributes/SettingsAttributes'
+import SettingsEmployees from '../../components/SettingsEmployees/SettingsEmployees'
+import IndivHeader from '../../components/IndivHeader/IndivHeader'
 
 // Sidebar items config
 const sidebarItems = [
-  // {
-  //   key: 'overview',
-  //   label: 'Overview',
-  //   icon: <PanelsTopLeft />,
-  //   component: <SettingsOverview />
-  // },
+  {
+    key: 'overview',
+    label: 'Overview',
+    icon: <PanelsTopLeft />,
+    component: <SettingsOverview />
+  },
   {
     key: 'categories',
     label: 'Categories',
@@ -52,14 +51,13 @@ const sidebarItems = [
     component: <SettingsSuppliers />
   },
   { key: 'users', label: 'Users Roles', icon: <UsersRound />, component: <SettingsUsers /> },
-  // {
-  //   key: 'attributes',
-  //   label: 'Attributes',
-  //   icon: <SlidersVertical />,
-  //   component: <SettingsAttributes />
-  // },
+  {
+    key: 'attributes',
+    label: 'Attributes',
+    icon: <SlidersVertical />,
+    component: <SettingsAttributes />
+  },
   { key: 'employees', label: 'Employees', icon: <BadgeInfo />, component: <SettingsEmployees /> }
-  // { key: 'bank', label: 'Bank', icon: <Banknote />, component: <SettingsBank /> }
 ]
 
 const Settings: React.FC = () => {

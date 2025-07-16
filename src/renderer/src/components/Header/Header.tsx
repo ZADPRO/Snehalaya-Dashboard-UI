@@ -50,7 +50,7 @@ const bottomRoutes = [
     icon: <CircleUserRound />,
   },
   {
-    path: '#', 
+    path: '#',
     name: 'Logout',
     icon: <LogOut />,
   },
@@ -100,7 +100,7 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
               }}
               className="sidebar"
             >
- 
+
               <div className="flex align-items-center justify-content-center">
                 <img src={snehalayaaLogo} alt="Logo" className="logo_image" />
               </div>
@@ -132,12 +132,12 @@ const Header: React.FC<HeaderProps> = ({ children }) => {
                 ))}
               </section>
 
-              
+
               <div className="bottom_section">
                 {bottomRoutes.map((route) =>
                   route.name === 'Logout' ? (
                     <NavLink
-                        to="/logout" 
+                        to="/logout"
                         key={route.name}
                         className={({ }) => `link ${location.pathname === '/logout' ? 'active' : ''}`}
                         onClick={(e) => {

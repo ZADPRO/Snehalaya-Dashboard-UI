@@ -12,6 +12,7 @@ import { generateInvoice } from './InvoicePdf'
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
 
+
 interface Supplier {
   supplierId: number
   supplierCompanyName: string
@@ -56,6 +57,7 @@ const POCreateNewPurchase: React.FC = () => {
 
   const [totalPaid, setTotalPaid] = useState<number>(0)
  const toast = useRef<Toast>(null);
+
 
 
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null)

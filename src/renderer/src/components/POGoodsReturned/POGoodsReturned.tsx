@@ -11,6 +11,7 @@ import { FileText, Download } from 'lucide-react'
 import { debitInvoice1 } from '../../components/POGoodsReturned/debitinvoice'
 import { Toast } from 'primereact/toast'
 
+
 interface Supplier {
   supplierId: number
   supplierCompanyName: string
@@ -55,6 +56,7 @@ const POGoodsReturned: React.FC = () => {
 
   const [totalPaid, setTotalPaid] = useState<number>(0)
 
+
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null)
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null)
 
@@ -83,6 +85,7 @@ const POGoodsReturned: React.FC = () => {
       })
       return
     }
+
 
     const formattedProducts = productEntries.map((entry) => ({
       poId: entry.product.productId,
@@ -125,6 +128,7 @@ const POGoodsReturned: React.FC = () => {
         detail: 'Something went wrong while generating the invoice.',
         life: 3000
       })
+
     }
   }
 
@@ -221,6 +225,7 @@ const taxableAmount = subTotal - discountTotal
 const tax = taxableAmount * 0.05
 const total = taxableAmount + tax
 const pendingPayment = total - totalPaid
+
 
 
   return (
@@ -423,6 +428,7 @@ const pendingPayment = total - totalPaid
             style={{ border: '1px solid #8e5ea8', background: 'none', borderRadius: '6px' }}
            
           >
+
             <FileText size={18} /> Print DebitNote
           </p>
 
@@ -465,6 +471,7 @@ const pendingPayment = total - totalPaid
           <div className="flex justify-content-between">
             <strong>Pending Payment</strong>
             <strong>₹{pendingPayment.toFixed(2)}</strong>
+
           </div>
         </div>
       </div>

@@ -1,8 +1,8 @@
 import React, { JSX } from 'react'
-import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
 import { ChartNoAxesCombined, ShoppingBasket, Sparkles, Users, IndianRupee } from 'lucide-react'
 import { Divider } from 'primereact/divider'
-import DashboardChartAnalysisTesting from '@renderer/components/DashboardChartAnalysisTesting/DashboardChartAnalysisTesting'
+import IndivHeader from '../../components/IndivHeader/IndivHeader'
+import DashboardChartAnalysisTesting from '../../components/DashboardChartAnalysisTesting/DashboardChartAnalysisTesting'
 
 const Dashboard: React.FC = () => {
   // CARD ALIGNMENT DATA
