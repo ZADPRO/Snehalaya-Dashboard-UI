@@ -55,14 +55,14 @@ const SettingsAttributes: React.FC = () => {
     }
 
     axios
-      .get('http://localhost:8080/api/v1/admin/settings/categories', { headers })
+      .get('http://192.168.29.54:8080/api/v1/admin/settings/categories', { headers })
       .then((res) => {
         setCategories(res.data.data)
       })
       .catch((err) => console.error('Failed to fetch categories', err))
 
     axios
-      .get('http://localhost:8080/api/v1/admin/settings/subcategories', { headers })
+      .get('http://192.168.29.54:8080/api/v1/admin/settings/subcategories', { headers })
       .then((res) => {
         setSubCategories(res.data.data)
       })

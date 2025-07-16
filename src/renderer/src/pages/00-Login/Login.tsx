@@ -18,18 +18,17 @@ import logo from '../../assets/logo/icon.png'
 const images = [carousel1, carousel2, carousel3]
 
 const Login: React.FC = () => {
-  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false)
 
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [index, setIndex] = useState(0);
-  const [checked, setChecked] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [redirecting, setRedirecting] = useState(false);
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [index, setIndex] = useState(0)
+  const [checked, setChecked] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [redirecting, setRedirecting] = useState(false)
 
-  const toast = useRef<Toast>(null);
-  const navigate = useNavigate();
-
+  const toast = useRef<Toast>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -46,11 +45,11 @@ const Login: React.FC = () => {
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (loading) return;
+    e.preventDefault()
+    if (loading) return
 
-    setLoading(true);
-    toast.current?.clear();
+    setLoading(true)
+    toast.current?.clear()
 
     const payload = {
       Username: username,
@@ -63,45 +62,42 @@ const Login: React.FC = () => {
       const result = response.data
 
       if (result?.data?.status && result.data.token) {
-        const storage = checked ? localStorage : sessionStorage;
-        storage.setItem('token', 'Bearer ' + result.data.token);
-        storage.setItem('user', JSON.stringify(result.data.user));
-
+        const storage = checked ? localStorage : sessionStorage
+        storage.setItem('token', 'Bearer ' + result.data.token)
+        storage.setItem('user', JSON.stringify(result.data.user))
 
         toast.current?.show({
           severity: 'success',
           summary: 'Login Successful',
           detail: 'Welcome to Snehalaya',
-          life: 1500,
-        });
+          life: 1500
+        })
 
         setTimeout(() => {
-          setLoginSuccess(true);
-          setRedirecting(true);
-          setLoading(false);
-          setTimeout(() => navigate('/dashboard'), 1000);
-        }, 1500);
-
+          setLoginSuccess(true)
+          setRedirecting(true)
+          setLoading(false)
+          setTimeout(() => navigate('/dashboard'), 1000)
+        }, 1500)
       } else {
         toast.current?.show({
           severity: 'error',
           summary: 'Login Failed',
           detail: 'Enter details correctly',
-          life: 3000,
-        });
-        setLoading(false);
-        setLoginSuccess(false);
-
+          life: 3000
+        })
+        setLoading(false)
+        setLoginSuccess(false)
       }
     } catch (error) {
       toast.current?.show({
         severity: 'error',
         summary: 'Login Failed',
         detail: 'Something went wrong. Please try again.',
-        life: 3000,
-      });
-      setLoading(false);
-      setLoginSuccess(false);
+        life: 3000
+      })
+      setLoading(false)
+      setLoginSuccess(false)
     }
   }
 
@@ -148,7 +144,6 @@ const Login: React.FC = () => {
               toggleMask
               feedback={false}
               disabled={loading}
-
             />
           </div>
 
@@ -170,22 +165,23 @@ const Login: React.FC = () => {
             </Link>
           </div>
 
-         <Button
-  type="submit"
-  label={loading ? 'Logging in...' : 'Login Now'}
-  className="login-button uppercase"
-  disabled={loading || !username || !password || loginSuccess}
-/>
-
+          <Button
+            type="submit"
+            label={loading ? 'Logging in...' : 'Login Now'}
+            className="login-button uppercase"
+            disabled={loading || !username || !password || loginSuccess}
+          />
 
           {redirecting && (
             <div className="flex justify-content-center align-items-center mt-4">
-              <i className="pi pi-spin pi-spinner" style={{ fontSize: '2rem', color: '#A267D6' }}></i>
+              <i
+                className="pi pi-spin pi-spinner"
+                style={{ fontSize: '2rem', color: '#A267D6' }}
+              ></i>
               <span className="ml-2">Redirecting to Dashboard...</span>
             </div>
           )}
         </form>
-
       </div>
     </div>
   )
