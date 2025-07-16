@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef ,useEffect, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { FloatLabel } from 'primereact/floatlabel';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
+
 
 interface StatusOption {
   name: string;
@@ -83,6 +85,7 @@ const SettingsAddNewSupplier: React.FC<SettingsAddNewSupplierProps> = ({
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const mobileRegex = /^\d{10}$/;
+const toast = useRef<Toast>(null);
 
   const validateField = (field: keyof SupplierFormData, value: string): string => {
     const trimmed = value.trim();
@@ -232,7 +235,10 @@ const SettingsAddNewSupplier: React.FC<SettingsAddNewSupplierProps> = ({
   );
 
   return (
+    
     <div className="p-4 pb-20 relative">
+    <Toast ref={toast} position="top-right" />
+
       <p className="font-medium text-sm mt-4 mb-2">Basic Details</p>
       <div className="flex gap-4">
         {renderInput('supplierName', 'Supplier Name*')}

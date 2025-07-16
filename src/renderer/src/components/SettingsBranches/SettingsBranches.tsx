@@ -147,52 +147,90 @@ const SettingsBranches: React.FC = () => {
     }
   };
 
-  const handleSave = async (newBra: Branch) => {
-    // Simple validation (e.g., ensure required fields are filled)
-    if (!newBra.refBranchName || !newBra.refBranchCode || !newBra.refLocation || !newBra.refMobile || !newBra.refEmail || !newBra.refBTId) {
+ const handleSave = async (newBra: Branch) => {
+  // ✅ Validate required fields
+  if (
+    !newBra.refBranchName ||
+    !newBra.refBranchCode ||
+    !newBra.refLocation ||
+    !newBra.refMobile ||
+    !newBra.refEmail ||
+    !newBra.refBTId
+  ) {
+    toast.current?.show({
+      severity: 'error',
+      summary: 'Validation Error',
+      detail: 'Please fill in all required fields!',
+      life: 3000,
+    });
+    return;
+  }
+
+  // ✅ Debug: Log data being saved
+  console.log('Saving new branch:', newBra);
+
+  try {
+    const payload = {
+      refBranchName: newBra.refBranchName,
+      refBranchCode: newBra.refBranchCode,
+      refLocation: newBra.refLocation,
+      refMobile: newBra.refMobile,
+      refEmail: newBra.refEmail,
+      isMainBranch: newBra.isMainBranch,
+      isActive: newBra.isActive,
+      refBTId: newBra.refBTId,
+    };
+
+    const apiUrl = `${import.meta.env.VITE_API_URL}/admin/settings/branches`;
+
+    // ✅ Debug: Log URL and payload
+    console.log('POST to:', apiUrl, 'Payload:', payload);
+
+    const res = await axios.post(apiUrl, payload, {
+      headers: {
+        Authorization: sessionStorage.getItem('token') || '',
+      },
+    });
+
+    // ✅ Debug: Log response
+    console.log('Save response:', res.data);
+
+    if (res.data.status) {
+      // Success handling
+      fetchData();
       toast.current?.show({
-        severity: 'error',
-        summary: 'Validation Error',
-        detail: 'Please fill in all required fields!',
-        life: 3000
+        severity: 'success',
+        summary: 'Created',
+        detail: res.data.message || 'Branch created successfully!',
+        life: 2000,
       });
-      return;
-    }
-
-    try {
-      const res = await axios.post(`${import.meta.env.VITE_API_URL}/admin/settings/branches`, {
-        refBranchName: newBra.refBranchName,
-        refBranchCode: newBra.refBranchCode,
-        refLocation: newBra.refLocation,
-        refMobile: newBra.refMobile,
-        refEmail: newBra.refEmail,
-        isMainBranch: newBra.isMainBranch,
-        isActive: newBra.isActive,
-        refBTId: newBra.refBTId
-      }, { headers: { Authorization: sessionStorage.getItem('token') || '' } });
-
-      if (res.data.status) {
-        fetchData();  // Refresh the list of branches
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Created',
-          detail: res.data.message || 'Branch created successfully!',
-          life: 2000
-        });
-        setVisibleSidebar(false);  // Close the sidebar
-      } else {
-        throw new Error(res.data.message || 'Something went wrong!');
-      }
-    } catch (err: any) {
-      console.error('Error saving branch:', err);
+      setVisibleSidebar(false);
+    } else {
+      // Backend returned status = false
       toast.current?.show({
         severity: 'error',
         summary: 'Error',
-        detail: err?.response?.data?.message || 'Error saving branch',
-        life: 3000
+        detail: res.data.message || 'Failed to create branch.',
+        life: 3000,
       });
     }
-  };
+  } catch (err: any) {
+    console.error('Error saving branch:', err);
+
+    const message =
+      err.response?.data?.message ||
+      err.message ||
+      'Unknown error occurred while saving branch.';
+
+    toast.current?.show({
+      severity: 'error',
+      summary: 'Save Failed',
+      detail: message,
+      life: 3000,
+    });
+  }
+};
+
 
   const handleUpdate = async (updatedBranch: Branch) => {
     try {
