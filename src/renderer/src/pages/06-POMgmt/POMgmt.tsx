@@ -1,15 +1,14 @@
-import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
-import POCreateProducts from '@renderer/components/POCreateProducts/POCreateProducts'
-import POMgmtCreatePurchase from '@renderer/components/POMgmtCreatePurchase/POCreateNewPurchase'
-import POMgmtOverview from '@renderer/components/POMgmtOverview/POMgmtOverview'
-import POMgmtViewPurchase from '@renderer/components/POMgmtViewPurchase/POMgmtViewPurchase'
-import POProducts from '@renderer/components/POProducts/POProducts'
+import IndivHeader from '../..//components/IndivHeader/IndivHeader'
+import POCreateProducts from '../..//components/POCreateProducts/POCreateProducts'
+import POMgmtCreatePurchase from '../..//components/POMgmtCreatePurchase/POCreateNewPurchase'
+import POMgmtOverview from '../..//components/POMgmtOverview/POMgmtOverview'
+import POMgmtViewPurchase from '../../components/POMgmtViewPurchase/POMgmtViewPurchase'
 import POGoodsReturned from '../../components/POGoodsReturned/POGoodsReturned'
 // import POGoodsReceived from '../../components/POGoodsReceived/POGoodsReceived'
 import {
   Barcode,
   Blocks,
-  PackageCheck,
+  // PackageCheck,
   PackageMinus,
   PackagePlus,
   PackageSearch,
@@ -19,7 +18,8 @@ import {
 } from 'lucide-react'
 import { Divider } from 'primereact/divider'
 import React, { useState } from 'react'
-import BarcodePrint from '@renderer/components/BarcodePrint/parentBarcode'
+import BarcodePrint from '../../components/BarcodePrint/parentBarcode'
+import Products from '../../components/POProducts/POProducts'
 
 // Sidebar items config
 const sidebarItems = [
@@ -45,7 +45,7 @@ const sidebarItems = [
     key: 'products',
     label: 'Products',
     icon: <PackageSearch />,
-    component: <POProducts />
+    component: <Products />
   },
   {
     key: 'createProducts',
@@ -71,10 +71,10 @@ const sidebarItems = [
     icon: <PackageX />,
     component: <POGoodsReturned />
   },
-   {
+  {
     key: 'barcode',
     label: 'BarcodePrint',
-    icon: <PackageX />,
+    icon: <Barcode />,
     component: <BarcodePrint />
   }
 ]
@@ -86,11 +86,11 @@ const POMgmt: React.FC = () => {
     <div className="h-full flex flex-column">
       <IndivHeader title="Purchase Order" subtitle="Modify User Details" />
       <div
-        className="flex flex-1 m-3 border-round-md shadow-1"
+        className="flex flex-1 m-1 border-round-md shadow-1"
         style={{ height: 'calc(100% - 80px)' }}
       >
         <div
-          className="flex flex-column px-3 my-3 border-round-md overflow-auto"
+          className="flex flex-column px-2 my-2 border-round-md overflow-auto"
           style={{ width: '15%' }}
         >
           <div className="sidebarContainer flex flex-column gap-2">
@@ -100,14 +100,14 @@ const POMgmt: React.FC = () => {
                 <div
                   key={item.key}
                   onClick={() => setActiveKey(item.key)}
-                  className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
+                  className="iconContents cursor-pointer border-round-md px-2 py-1 flex align-items-center gap-2"
                   style={{
                     border: '1px solid #8e5ea8',
                     backgroundColor: isActive ? '#f3e9f8' : 'transparent'
                   }}
                 >
                   {item.icon}
-                  <p className="m-0">{item.label}</p>
+                  <p className="m-0 text-sm">{item.label}</p>
                 </div>
               )
             })}

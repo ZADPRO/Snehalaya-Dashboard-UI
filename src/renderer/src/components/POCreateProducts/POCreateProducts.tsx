@@ -37,8 +37,7 @@ const AddProduct: React.FC = () => {
 
     if (currentValue === value) return
 
-  setIsDirty(true); 
-
+    setIsDirty(true)
 
     const numericFields: (keyof ProductPayload)[] = [
       'poHSN',
@@ -135,7 +134,7 @@ const AddProduct: React.FC = () => {
 
   return (
     <div className="p-4">
-      <Toast ref={toast}   pt={{ icon: { className: 'mr-3' }  }} />
+      <Toast ref={toast} pt={{ icon: { className: 'mr-3' } }} />
       <h2 className="text-xl font-semibold mb-4">Add New Product</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
@@ -147,26 +146,6 @@ const AddProduct: React.FC = () => {
             className="w-full"
           />
           <label htmlFor="poName">Product Name</label>
-        </FloatLabel>
-
-        <FloatLabel className="always-float">
-          <InputText
-            id="poHSN"
-            value={product.poHSN}
-            onChange={(e) => handleChange('poHSN', e.target.value)}
-            className="w-full"
-          />
-          <label htmlFor="poHSN">HSN</label>
-        </FloatLabel>
-
-        <FloatLabel className="always-float">
-          <InputText
-            id="poQuantity"
-            value={product.poQuantity}
-            onChange={(e) => handleChange('poQuantity', e.target.value)}
-            className="w-full"
-          />
-          <label htmlFor="poQuantity">Quantity</label>
         </FloatLabel>
 
         <FloatLabel className="always-float">
@@ -218,7 +197,6 @@ const AddProduct: React.FC = () => {
           className=" gap-2"
           onClick={handleSaveProduct}
           disabled={!isDirty}
-          
         />
       </div>
     </div>
