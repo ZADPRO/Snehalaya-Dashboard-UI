@@ -60,8 +60,8 @@ import 'primereact/resources/themes/saga-purple/theme.css'
 
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
-    <PrimeReactProvider>
-      <App />
-    </PrimeReactProvider>
+  <PrimeReactProvider>
+    <App />
+  </PrimeReactProvider>
   // </StrictMode>
 )

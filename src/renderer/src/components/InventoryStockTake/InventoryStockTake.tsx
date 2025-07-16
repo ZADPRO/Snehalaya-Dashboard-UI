@@ -1,6 +1,6 @@
 import React from 'react';
 
-const POGoodsReceived: React.FC = () => {
+const InventoryStockTake: React.FC = () => {
     return (
         <div>
 
@@ -8,4 +8,4 @@ const POGoodsReceived: React.FC = () => {
     );
 };
 
-export default POGoodsReceived;
+export default InventoryStockTake;
