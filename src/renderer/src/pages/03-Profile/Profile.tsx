@@ -1,7 +1,7 @@
-import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
 import { Avatar } from 'primereact/avatar'
 import { Divider } from 'primereact/divider'
 import React from 'react'
+import IndivHeader from '../../components/IndivHeader/IndivHeader'
 
 const Profile: React.FC = () => {
   return (

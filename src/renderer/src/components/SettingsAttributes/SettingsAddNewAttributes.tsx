@@ -42,8 +42,9 @@ const SettingsAddNewAttributes: React.FC<Props> = ({
   onSave,
   onCancel
 }) => {
+  console.log('onSave', onSave)
   const [name, setName] = useState(attribute.name || '')
-  const [visible, setVisible] = useState(attribute.visible || true)
+  // const [visible, setVisible] = useState(attribute.visible || true)
   const [category, setCategory] = useState(attribute.category || null)
   const [subCategory, setSubCategory] = useState(attribute.subCategory || null)
   const [description, setDescription] = useState(attribute.description || '')

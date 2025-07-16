@@ -1,11 +1,10 @@
-import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
-// import InventoryManageStocks from '@renderer/components/InventoryManageStocks/InventoryManageStocks'
-import InventoryStockHistory from '@renderer/components/InventoryStockHistory/InventoryStockHistory'
-import InventoryStockTake from '@renderer/components/InventoryStockTake/InventoryStockTake'
-import InventoryStockTransfer from '@renderer/components/InventoryStockTransfer/InventoryStockTransfer'
 import { FolderCheck, FolderInput, FolderOutput, FolderSync } from 'lucide-react'
 import { Divider } from 'primereact/divider'
 import React, { useState } from 'react'
+import InventoryStockHistory from '../../components/InventoryStockHistory/InventoryStockHistory'
+import InventoryStockTransfer from '../../components/InventoryStockTransfer/InventoryStockTransfer'
+import InventoryStockTake from '../../components/InventoryStockTake/InventoryStockTake'
+import IndivHeader from '../../components/IndivHeader/IndivHeader'
 
 const sidebarItems = [
   {

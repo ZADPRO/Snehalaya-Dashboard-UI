@@ -1,11 +1,11 @@
 {
-  "name": "snehalayaa",
+  "name": "frontend",
   "version": "1.0.0",
   "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
-      "name": "snehalayaa",
+      "name": "frontend",
       "version": "1.0.0",
       "devDependencies": {}
     }

@@ -1,9 +1,8 @@
-import IndivHeader from '@renderer/components/IndivHeader/IndivHeader'
-import POCreateProducts from '@renderer/components/POCreateProducts/POCreateProducts'
-import POMgmtCreatePurchase from '@renderer/components/POMgmtCreatePurchase/POCreateNewPurchase'
-import POMgmtOverview from '@renderer/components/POMgmtOverview/POMgmtOverview'
-import POMgmtViewPurchase from '@renderer/components/POMgmtViewPurchase/POMgmtViewPurchase'
-import POProducts from '@renderer/components/POProducts/POProducts'
+import IndivHeader from '../..//components/IndivHeader/IndivHeader'
+import POCreateProducts from '../..//components/POCreateProducts/POCreateProducts'
+import POMgmtCreatePurchase from '../..//components/POMgmtCreatePurchase/POCreateNewPurchase'
+import POMgmtOverview from '../..//components/POMgmtOverview/POMgmtOverview'
+import POMgmtViewPurchase from '../../components/POMgmtViewPurchase/POMgmtViewPurchase'
 import POGoodsReturned from '../../components/POGoodsReturned/POGoodsReturned'
 // import POGoodsReceived from '../../components/POGoodsReceived/POGoodsReceived'
 import {
@@ -19,7 +18,8 @@ import {
 } from 'lucide-react'
 import { Divider } from 'primereact/divider'
 import React, { useState } from 'react'
-import BarcodePrint from '@renderer/components/BarcodePrint/parentBarcode'
+import BarcodePrint from '../../components/BarcodePrint/parentBarcode'
+import Products from '../../components/POProducts/POProducts'
 
 // Sidebar items config
 const sidebarItems = [
@@ -45,7 +45,7 @@ const sidebarItems = [
     key: 'products',
     label: 'Products',
     icon: <PackageSearch />,
-    component: <POProducts />
+    component: <Products />
   },
   {
     key: 'createProducts',

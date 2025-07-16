@@ -7,8 +7,8 @@ import axios from 'axios'
 import { Divider } from 'primereact/divider'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
-import { Download, FileText, Printer } from 'lucide-react'
-import { generateInvoice1 } from '../../components/POGoodsReturned/debitinvoice';
+import { Download, FileText } from 'lucide-react'
+import { generateInvoice1 } from '../../components/POGoodsReturned/debitinvoice'
 interface Supplier {
   supplierId: number
   supplierCompanyName: string
@@ -47,12 +47,11 @@ interface ProductEntry {
   totalPrice: number
 }
 
-const  POGoodsReceived: React.FC = () => {
+const POGoodsReceived: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [branches, setBranches] = useState<Branch[]>([])
 
-  const [totalPaid, setTotalPaid] = useState<number>(0)
-  
+  const [totalPaid, _setTotalPaid] = useState<number>(0)
 
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null)
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null)
@@ -69,44 +68,43 @@ const  POGoodsReceived: React.FC = () => {
   const [quantity, setQuantity] = useState<number>(1)
   const [price, setPrice] = useState<number>(0)
   const [discount, setDiscount] = useState<number>(0)
-const handleGenerateInvoice = () => {
-  console.log('Clicked');
+  const handleGenerateInvoice = () => {
+    console.log('Clicked')
 
-  if (!selectedSupplier || !selectedBranch || productEntries.length === 0) {
-    alert('Please fill all required fields.');
-    return;
+    if (!selectedSupplier || !selectedBranch || productEntries.length === 0) {
+      alert('Please fill all required fields.')
+      return
+    }
+
+    const formattedProducts = productEntries.map((entry) => ({
+      poId: entry.product.productId,
+      poName: entry.product.productName,
+      poHSN: entry.product.hsnCode,
+      poQuantity: entry.quantity.toString(),
+      poPrice: entry.price.toFixed(2),
+      poDiscPercent: entry.discount.toString(),
+      poDisc: entry.discountPrice.toFixed(2),
+      poTotalPrice: entry.totalPrice.toFixed(2),
+      sku: entry.product.sku
+    }))
+
+    try {
+      generateInvoice1({
+        supplier: selectedSupplier,
+        branch: selectedBranch,
+        productEntries: formattedProducts,
+        creditedDate: creditedDate?.toLocaleDateString() ?? '',
+        transport,
+        subTotal,
+        discountTotal,
+        tax,
+        total
+      })
+    } catch (err) {
+      console.error('PDF generation failed:', err)
+      alert('Something went wrong while generating the invoice.')
+    }
   }
-
-  const formattedProducts = productEntries.map((entry) => ({
-    poId: entry.product.productId,
-    poName: entry.product.productName,
-    poHSN: entry.product.hsnCode,
-    poQuantity: entry.quantity.toString(),
-    poPrice: entry.price.toFixed(2),
-    poDiscPercent: entry.discount.toString(),
-    poDisc: entry.discountPrice.toFixed(2),
-    poTotalPrice: entry.totalPrice.toFixed(2),
-    sku: entry.product.sku,
-  }));
-
-  try {
-    generateInvoice1({
-      supplier: selectedSupplier,
-      branch: selectedBranch,
-      productEntries: formattedProducts,
-      creditedDate: creditedDate?.toLocaleDateString() ?? '',
-      transport,
-      subTotal,
-      discountTotal,
-      tax,
-      total,
-    });
-  } catch (err) {
-    console.error('PDF generation failed:', err);
-    alert('Something went wrong while generating the invoice.');
-  }
-};
-
 
   useEffect(() => {
     const token = sessionStorage.getItem('token')
@@ -196,7 +194,7 @@ const handleGenerateInvoice = () => {
     const entry: ProductEntry = {
       product: {
         ...selectedProduct,
-        sku 
+        sku
       },
       quantity,
       price,
@@ -230,6 +228,7 @@ const handleGenerateInvoice = () => {
   const tax = 0
   const total = subTotal - discountTotal + tax
   const pendingPayment = total - totalPaid
+  console.log('pendingPayment', pendingPayment)
 
   return (
     <div className="purchaseOrderCreationCard flex" style={{ width: '100%', height: '100%' }}>
@@ -439,16 +438,13 @@ const handleGenerateInvoice = () => {
           >
             <Printer size={18} /> Print Order
           </p> */}
-        <p
-               
-                className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
-                style={{ border: '1px solid #8e5ea8', background: 'none', borderRadius: '6px' }}
-                onClick={handleGenerateInvoice}
-                >
-                <FileText size={18} /> Print DebitNote 
-                </p>
-
-          
+          <p
+            className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
+            style={{ border: '1px solid #8e5ea8', background: 'none', borderRadius: '6px' }}
+            onClick={handleGenerateInvoice}
+          >
+            <FileText size={18} /> Print DebitNote
+          </p>
 
           <p
             className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
@@ -463,27 +459,27 @@ const handleGenerateInvoice = () => {
             <StickyNote size={18} /> Notes
           </p> */}
         </div>
-         <div className="Tax Summary p-3"></div>
-       <Divider />
-            <div className="mt-4">
-            <h5 className="mb-3 font-bold">Tax Summary</h5>
-            <div className="flex justify-content-between mb-2">
-                <span>Tax Type</span>
-                <span>GST</span>
-            </div>
-            <div className="flex justify-content-between mb-2">
-                <span>Tax Rate</span>
-                <span>5%</span>
-            </div>
-            <div className="flex justify-content-between mb-2">
-                <span>Taxable Value</span>
-                <span>₹1355.00</span>
-            </div>
-            <div className="flex justify-content-between mb-2">
-                <span>Tax Amount</span>
-                <span>₹67.75</span>
-            </div>
-            </div>
+        <div className="Tax Summary p-3"></div>
+        <Divider />
+        <div className="mt-4">
+          <h5 className="mb-3 font-bold">Tax Summary</h5>
+          <div className="flex justify-content-between mb-2">
+            <span>Tax Type</span>
+            <span>GST</span>
+          </div>
+          <div className="flex justify-content-between mb-2">
+            <span>Tax Rate</span>
+            <span>5%</span>
+          </div>
+          <div className="flex justify-content-between mb-2">
+            <span>Taxable Value</span>
+            <span>₹1355.00</span>
+          </div>
+          <div className="flex justify-content-between mb-2">
+            <span>Tax Amount</span>
+            <span>₹67.75</span>
+          </div>
+        </div>
       </div>
     </div>
   )

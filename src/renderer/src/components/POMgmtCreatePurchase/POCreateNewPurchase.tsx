@@ -8,7 +8,7 @@ import { Divider } from 'primereact/divider'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { Download, FileText, Printer } from 'lucide-react'
-import { generateInvoice } from './InvoicePdf'
+// import { generateInvoice } from './InvoicePdf'
 
 interface Supplier {
   supplierId: number
@@ -52,8 +52,8 @@ const POCreateNewPurchase: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [branches, setBranches] = useState<Branch[]>([])
 
-  const [totalPaid, setTotalPaid] = useState<number>(0)
- 
+  const [totalPaid, _setTotalPaid] = useState<number>(0)
+
 
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null)
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null)

@@ -1,41 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { Sidebar } from 'primereact/sidebar';
-import Barcode from 'react-barcode';
-import './PrintableSelection.css';
+import { useState, useEffect } from 'react'
+import { DataTable } from 'primereact/datatable'
+import { Column } from 'primereact/column'
+import { Sidebar } from 'primereact/sidebar'
+import Barcode from 'react-barcode'
+import './PrintableSelection.css'
 
 interface Product {
-  productId: number;
-  productName: string;
-  sku: string;
-  price: number;
+  productId: number
+  productName: string
+  sku: string
+  price: number
 }
 
 export default function BarcodePrint() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-  const [sidebarVisible, setSidebarVisible] = useState(false);
-  const [invoiceNumber, setInvoiceNumber] = useState('');
+  const [products, setProducts] = useState<Product[]>([])
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>([])
+  const [sidebarVisible, setSidebarVisible] = useState(false)
+  const [invoiceNumber, setInvoiceNumber] = useState('')
 
   const currentMonthYear = new Date().toLocaleDateString('en-US', {
     month: 'long',
-    year: 'numeric',
-  });
+    year: 'numeric'
+  })
 
   useEffect(() => {
     const mock: Product[] = Array.from({ length: 140 }, (_, i) => ({
       productId: i + 1,
       productName: `Product ${i + 1}`,
       sku: `SS-07-25-${(1000 + i).toString().padStart(4, '0')}`,
-      price: Math.floor(Math.random() * 1000 + 100),
-    }));
-    setProducts(mock);
-  }, []);
+      price: Math.floor(Math.random() * 1000 + 100)
+    }))
+    setProducts(mock)
+  }, [])
 
   const handlePrint = () => {
-    window.print();
-  };
+    window.print()
+  }
 
   return (
     <div className="p-4">
@@ -107,5 +107,5 @@ export default function BarcodePrint() {
         </div>
       )}
     </div>
-  );
+  )
 }
