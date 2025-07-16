@@ -1,12 +1,14 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import logo from '../../assets/logo/invoice.png';
-
 declare module 'jspdf' {
   interface jsPDF {
-    lastAutoTable?: any;
+    lastAutoTable?: {
+      finalY?: number;
+    };
   }
 }
+
 interface Supplier {
   supplierId: number;
   supplierCompanyName: string;
@@ -55,23 +57,6 @@ interface InvoiceParams {
   pendingPayment: number;
 }
 
-const getImageBase64 = (url: string): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.src = url;
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      ctx?.drawImage(img, 0, 0);
-      const dataURL = canvas.toDataURL('image/png');
-      resolve(dataURL);
-    };
-    img.onerror = reject;
-  });
-
 export const debitInvoice1 = async ({
   supplier,
   branch,
@@ -88,43 +73,35 @@ export const debitInvoice1 = async ({
   const doc = new jsPDF();
   const base64Logo = await getImageBase64(logo);
 
-  // Header
-  doc.addImage(base64Logo, 'PNG', 12, 5, 80, 45);
+  doc.addImage(base64Logo, 'PNG', 12, 5, 50, 35);
+
+  doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text('Debit Note', 185, 15, { align: 'right' });
+  doc.text('SNEHALAYAA SILKS', 14, 40);
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
-  doc.text('SNEHALAYAA SILKS', 14, 50);
-  doc.text('SVAP TEXTILES LLP', 14, 55);
-  doc.text('No.23, Venkatanarayana Road, T.Nagar,', 14, 60);
-  doc.text('Chennai, Tamil Nadu, India - 600017', 14, 65);
-  doc.text('GST No: 33AFDFS4445R1ZG', 14, 70);
-  doc.text('Supplier Ref: 287', 14, 75);
-  doc.text(`Created On: ${new Date().toLocaleString()}`, 190, 20, { align: 'right' });
+  doc.text('SVAP TEXTILES LLP', 14, 45);
+  doc.text('No.23, Venkatanarayana Road, T.Nagar,', 14, 50);
+  doc.text('Chennai, Tamil Nadu, India - 600017', 14, 55);
+  doc.text('GST No: 33AFDFS4445R1ZG', 14, 60);
+  doc.text(`Supplier Ref: ${supplier.supplierCode}`, 14, 65);
 
   doc.setFont('helvetica', 'bold');
-  doc.text('Supplier Detail', 130, 35);
+  doc.text('Debit Note', 180, 15, { align: 'right' });
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Created On: ${new Date().toLocaleString()}`, 180, 20, { align: 'right' });
+
+  doc.setFont('helvetica', 'bold');
+  doc.text('Dispatched From:', 14, 75);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
-  doc.text(supplier.supplierCompanyName, 130, 40);
-  doc.text(`${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`, 130, 45);
-  doc.text(`${supplier.supplierCity}, ${supplier.supplierState}, ${supplier.supplierCountry}`, 130, 50);
-  doc.text(`Email: ${supplier.supplierEmail}`, 130, 55);
-  doc.text(`Mobile: ${supplier.supplierContactNumber}`, 130, 60);
-  doc.text(`Supplier Code: ${supplier.supplierCode}`, 130, 65);
-
- doc.setFont('helvetica', 'bold');
-doc.text('Dispatched From:', 14, 80);
-
-doc.setFont('helvetica', 'normal');
-doc.text(supplier.supplierCompanyName, 14, 85);
-doc.text(`${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`, 14, 90);
-doc.text(`${supplier.supplierCity}, ${supplier.supplierState} - India`, 14, 95);
-doc.text(`Email: ${supplier.supplierEmail}`, 14, 100);
-doc.text(`Mobile: ${supplier.supplierContactNumber}`, 14, 105);
-
+  doc.text(supplier.supplierCompanyName, 14, 80);
+  doc.text(`${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`, 14, 85);
+  doc.text(`${supplier.supplierCity}, ${supplier.supplierState}, India`, 14, 90);
+  doc.text(`Email: ${supplier.supplierEmail}`, 14, 95);
+  doc.text(`Mobile: ${supplier.supplierContactNumber}`, 14, 100);
 
   doc.setFont('helvetica', 'bold');
   doc.text('Dispatched To:', 135, 75);
@@ -135,9 +112,29 @@ doc.text(`Mobile: ${supplier.supplierContactNumber}`, 14, 105);
   doc.text(`Mobile: ${branch.refMobile}`, 135, 95);
   doc.text(`Expected Date: ${creditedDate}`, 135, 100);
 
+  doc.setFont('helvetica', 'bold');
+    doc.text('Supplier Detail', 127, 35);
+    doc.setFont('helvetica', 'normal');
+    if (supplier) {
+      doc.text(supplier.supplierCompanyName, 130, 40);
+      doc.text(`Membership Number: ${supplier.supplierCode}`, 130, 45);
+      doc.text(
+        `${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`,
+        130,
+        50
+      );
+      doc.text(
+        `${supplier.supplierCity}, ${supplier.supplierState}, ${supplier.supplierCountry}`,
+        130,
+        55
+      );
+      doc.text(`Email: ${supplier.supplierEmail}`, 130, 60);
+      doc.text(`Mobile: ${supplier.supplierContactNumber}`, 130, 65);
+    }
+
   const columns = [
     { header: 'S.No', dataKey: 'slno' },
-    { header: 'Description', dataKey: 'poName' },
+    { header: 'Product', dataKey: 'poName' },
     { header: 'HSN', dataKey: 'poHSN' },
     { header: 'Qty', dataKey: 'poQuantity' },
     { header: 'Price', dataKey: 'poPrice' },
@@ -156,75 +153,59 @@ doc.text(`Mobile: ${supplier.supplierContactNumber}`, 14, 105);
     startY: 110,
     columns,
     body: data,
-    styles: { fontSize: 8 },
-    headStyles: { fillColor: [0, 0, 0], textColor: [255, 255, 255] }
+    styles: { fontSize: 8, textColor: '#000000' },
+    headStyles: {
+      fillColor: false,
+      textColor: '#000000',
+      fontStyle: 'bold'
+    },
+   didDrawPage: (data) => {
+  const pageSize = doc.internal.pageSize;
+  const pageCount = (doc as any).internal.getNumberOfPages();
+
+  doc.setFontSize(8);
+  doc.text(
+    `Page ${data.pageNumber} of ${pageCount}`,
+    pageSize.width / 2,
+    pageSize.height - 10,
+    { align: 'center' }
+  );
+}
+
   });
 
-  let currentY = doc.lastAutoTable?.finalY ?? 130;
-  const remainingSpace = doc.internal.pageSize.height - currentY;
-
-  if (remainingSpace < 70) {
-    doc.addPage();
-    currentY = 20;
-  }
-
-  const formatAmount = (value: number) => value.toFixed(2);
-
+const summaryStartY = (doc.lastAutoTable?.finalY ?? 110) + 10;
  const summaryColumns = [
   { header: 'Sub Total', dataKey: 'subTotal' },
   { header: 'Discount', dataKey: 'discount' },
   { header: 'Tax (5%)', dataKey: 'tax' },
   { header: 'Total', dataKey: 'total' },
   { header: 'Total Paid', dataKey: 'totalPaid' },
-  { header: 'Pending Payment', dataKey: 'pendingPayment' }
+  { header: 'Pending Payment', dataKey: 'pendingPayment' },
 ];
-
 
 const summaryData = [
   {
-    subTotal: formatAmount(subTotal),
-    discount: formatAmount(discountTotal),
-    tax: formatAmount(tax),
-    total: formatAmount(total),
-    totalPaid: formatAmount(totalPaid),
-    pendingPayment: formatAmount(pendingPayment)
-  }
+    subTotal: subTotal.toFixed(2),
+    discount: discountTotal.toFixed(2),
+    tax: tax.toFixed(2),
+    total: total.toFixed(2),
+    totalPaid: totalPaid.toFixed(2),
+    pendingPayment: pendingPayment.toFixed(2),
+  },
 ];
-
-
-const commonTableStyles = {
-  fontSize: 7,        
-  cellPadding: 1,     
-  minCellHeight: 6,   
-};
-
-autoTable(doc, {
-  startY: 110,
-  columns,
-  body: data,
-  styles: commonTableStyles,
-  headStyles: {
-    fillColor: [0, 0, 0],
-    textColor: [255, 255, 255],
-    // cellPadding: 1,
-    minCellHeight: 6,
-  }
-});
-const summaryStartY = doc.lastAutoTable?.finalY + 10;
 doc.setFont('helvetica', 'bold');
-doc.setFontSize(11);
-doc.text('Summary', 14, summaryStartY); 
-
+doc.setFontSize(10); 
+doc.text('Summary', 14, summaryStartY + 1);  
 autoTable(doc, {
-  startY: summaryStartY + 3,  
+  startY: summaryStartY +3,
   columns: summaryColumns,
   body: summaryData,
-  styles: commonTableStyles,
+  styles: { fontSize: 7 },
   headStyles: {
-    fillColor: [0, 0, 0],
-    textColor: [255, 255, 255],
-    cellPadding: 1,
-    minCellHeight: 6,
+    fillColor: false,       // disables header background color
+    textColor: [0, 0, 0],   // black text
+    fontStyle: 'bold',
   },
   columnStyles: {
     subTotal: { halign: 'left' },
@@ -239,14 +220,22 @@ autoTable(doc, {
 
 
 
-
- const pageCount = (doc as any).internal.getNumberOfPages();
-
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    doc.setFontSize(8);
-    doc.text(`Page ${i} of ${pageCount}`, 105, 290, { align: 'center' });
-  }
-
   doc.save(`debit-note-${Date.now()}.pdf`);
 };
+
+const getImageBase64 = (url: string): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = url;
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx?.drawImage(img, 0, 0);
+      const dataURL = canvas.toDataURL('image/png');
+      resolve(dataURL);
+    };
+    img.onerror = reject;
+  });

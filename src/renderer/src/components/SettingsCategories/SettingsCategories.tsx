@@ -28,7 +28,7 @@ interface Category {
 const SettingsCategories: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [globalFilter, setGlobalFilter] = useState('');
-  const [visibleRight, setVisibleRight] = useState(false);
+  const [visibleSidebar, setVisibleSidebar] = useState(false);
   const [editData, setEditData] = useState<Category | null>(null);
   const [mode, setMode] = useState<'add' | 'edit'>('add');
   const dtRef = useRef<DataTable<Category[]>>(null);
@@ -40,61 +40,36 @@ const SettingsCategories: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/admin/settings/categories`,
-        {
-          headers: {
-            Authorization: sessionStorage.getItem('token') || ''
-          }
-        }
-      );
-      if (response.data?.status) {
-        setCategories(response.data.data);
-      } else {
-        toast.current?.show({
-          severity: 'warn',
-          summary: 'Warning',
-          detail: response.data.message || 'Failed to load categories',
-          life: 3000
-        });
-      }
-    } catch (error: any) {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/settings/categories`, {
+        headers: { Authorization: sessionStorage.getItem('token') || '' }
+      });
+      if (res.data?.status) setCategories(res.data.data);
+      else throw new Error(res.data.message);
+    } catch (err: any) {
       toast.current?.show({
         severity: 'error',
         summary: 'Error',
-        detail: error.response?.data?.message || 'Error fetching categories',
+        detail: err.message || 'Failed to load categories',
         life: 3000
       });
     }
   };
 
-  const exportExcel = () => {
-    dtRef.current?.exportCSV();
-  };
+  const exportExcel = () => dtRef.current?.exportCSV();
 
   const activeStatusBody = (row: Category) => (
-    <Tag
-      value={row.isActive ? 'Active' : 'Inactive'}
-      severity={row.isActive ? 'success' : 'danger'}
-    />
+    <Tag value={row.isActive ? 'Active' : 'Inactive'} severity={row.isActive ? 'success' : 'danger'} />
   );
 
-  const leftHeader = (
+  const leftToolbar = (
     <div className="flex gap-2 items-center">
       <Button icon="pi pi-file-excel" severity="success" onClick={exportExcel} />
-      <Button
-        icon="pi pi-plus"
-        onClick={() => {
-          setMode('add');
-          setEditData(null);
-          setVisibleRight(true);
-        }}
-      />
+      <Button icon="pi pi-plus" onClick={() => { setMode('add'); setEditData(null); setVisibleSidebar(true); }} />
       <Button icon="pi pi-refresh" severity="secondary" onClick={fetchData} />
     </div>
   );
 
-  const rightHeader = (
+  const rightToolbar = (
     <IconField iconPosition="left">
       <InputIcon className="pi pi-search" />
       <InputText
@@ -106,170 +81,103 @@ const SettingsCategories: React.FC = () => {
     </IconField>
   );
 
-  const actionBody = (rowData: Category) => (
+  const actionBody = (row: Category) => (
     <div className="flex gap-2">
-      <Button
-        icon="pi pi-pencil"
-        text
-        onClick={() => {
-          setEditData(rowData);
-          setMode('edit');
-          setVisibleRight(true);
-        }}
-      />
-      <Button
-        icon="pi pi-trash"
-        text
-        severity="danger"
-        onClick={() => handleDelete(rowData.refCategoryId)}
-      />
+      <Button icon="pi pi-pencil" text onClick={() => { setMode('edit'); setEditData(row); setVisibleSidebar(true); }} />
+      <Button icon="pi pi-trash" text severity="danger" onClick={() => handleDelete(row.refCategoryId)} />
     </div>
   );
 
- const handleDelete = async (id: number, forceDelete = false) => {
-  try {
-    const response = await axios.delete(
-      `${import.meta.env.VITE_API_URL}/admin/settings/categories/${id}`,
-      {
-        headers: {
-          Authorization: sessionStorage.getItem('token') || '',
-        },
-        params: forceDelete ? { forceDelete: true } : {}, 
-      }
-    );
-
-    const data = response.data;
-
-    if (data.confirmationNeeded) {
-      const subList = data.subcategories?.map(
-        (s: any) => `• ${s.subCategoryName} (${s.subCategoryCode})`
-      ).join('\n') || '';
-
-      confirmDialog({
-        message: `${data.message}\n\nSubcategories:\n${subList}\n\nDo you still want to force delete?`,
-        header: 'Force Delete Confirmation',
-        icon: 'pi pi-exclamation-triangle',
-        acceptLabel: 'Yes, Delete',
-        rejectLabel: 'Cancel',
-        accept: () => handleDelete(id, true),
-        reject: () => {
-          toast.current?.show({
-            severity: 'info',
-            summary: 'Cancelled',
-            detail: 'Deletion cancelled.',
-            life: 2000,
-          });
-        },
-      });
-    } else if (data.status) {
-      fetchData();
-      toast.current?.show({
-        severity: 'success',
-        summary: 'Deleted',
-        detail: data.message || 'Category deleted successfully',
-        life: 2000,
-      });
-    } else {
-      toast.current?.show({
-        severity: 'warn',
-        summary: 'Failed',
-        detail: data.message || 'Could not delete category',
-        life: 3000,
-      });
-    }
-  } catch (error: any) {
-    toast.current?.show({
-      severity: 'error',
-      summary: 'Error',
-      detail: error.response?.data?.message || 'Unexpected error during deletion',
-      life: 3000,
-    });
-  }
-};
-1
-
-  const handleSave = async (newCategory: Category) => {
+  const handleDelete = async (id: number, forceDelete = false) => {
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/admin/settings/categories`,
-        {
-          categoryName: newCategory.categoryName,
-          categoryCode: newCategory.categoryCode,
-          isActive: newCategory.isActive
-        },
-        {
-          headers: {
-            Authorization: sessionStorage.getItem('token') || ''
-          }
-        }
-      );
-      if (response.data.status) {
+      const url = `${import.meta.env.VITE_API_URL}/admin/settings/categories/${id}`;
+      const params = forceDelete ? { forceDelete: true } : {};
+
+      console.log('Deleting:', url, 'with params:', params);
+
+      const response = await axios.delete(url, {
+        headers: { Authorization: sessionStorage.getItem('token') || '' },
+        params
+      });
+
+      if (response.data?.status) {
         fetchData();
         toast.current?.show({
           severity: 'success',
-          summary: 'Created',
-          detail: response.data.message || 'Category created successfully',
-          life: 2000
-        });
-        setVisibleRight(false);
-      } else {
-        toast.current?.show({
-          severity: 'warn',
-          summary: 'Creation Failed',
-          detail: response.data.message,
-          life: 3000
+          summary: 'Deleted',
+          detail: response.data.message || 'Category deleted successfully.',
+          life: 2000,
         });
       }
     } catch (error: any) {
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.response?.data?.message || 'Error creating category',
-        life: 3000
-      });
+      const data = error.response?.data;
+      console.error('Delete error:', error.response);
+
+      if (error.response?.status === 409 && data?.confirmationNeeded) {
+        
+
+        confirmDialog({
+          message: `${data.message}\n\nDo you want to delete?`,
+          header: 'Delete Confirmation',
+          // icon: 'pi pi-exclamation-triangle',
+          acceptLabel: 'Yes, Delete',
+          rejectLabel: 'Cancel',
+          acceptClassName: 'p-button-danger',
+          accept: () => handleDelete(id, true),
+          reject: () => {
+            toast.current?.show({
+              severity: 'info',
+              summary: 'Cancelled',
+              detail: 'delete cancelled.',
+              life: 2000,
+            });
+          },
+        });
+      } else {
+        toast.current?.show({
+          severity: 'error',
+          summary: 'Error',
+          detail: data?.message || 'Failed to delete category.',
+          life: 3000,
+        });
+      }
     }
   };
 
-  const handleUpdate = async (updatedCategory: Category) => {
+  const handleSave = async (newCat: Category) => {
     try {
-      const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/admin/settings/categories`,
-        {
-          refCategoryId: updatedCategory.refCategoryId,
-          categoryName: updatedCategory.categoryName,
-          categoryCode: updatedCategory.categoryCode,
-          isActive: updatedCategory.isActive
-        },
-        {
-          headers: {
-            Authorization: sessionStorage.getItem('token') || ''
-          }
-        }
-      );
-      if (response.data.status) {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/admin/settings/categories`, {
+        categoryName: newCat.categoryName,
+        categoryCode: newCat.categoryCode,
+        isActive: newCat.isActive
+      }, { headers: { Authorization: sessionStorage.getItem('token') || '' } });
+
+      if (res.data.status) {
         fetchData();
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Updated',
-          detail: response.data.message || 'Category updated successfully',
-          life: 2000
-        });
-        setVisibleRight(false);
-      } else {
-        toast.current?.show({
-          severity: 'warn',
-          summary: 'Update Failed',
-          detail: response.data.message,
-          life: 3000
-        });
-      }
-    } catch (error: any) {
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: error.response?.data?.message || 'Error updating category',
-        life: 3000
-      });
+        toast.current?.show({ severity: 'success', summary: 'Created', detail: res.data.message, life: 2000 });
+        setVisibleSidebar(false);
+      } else throw new Error(res.data.message);
+    } catch (err: any) {
+      toast.current?.show({ severity: 'error', summary: 'Error', detail: err.message || 'Error creating category', life: 3000 });
+    }
+  };
+
+  const handleUpdate = async (updCat: Category) => {
+    try {
+      const res = await axios.put(`${import.meta.env.VITE_API_URL}/admin/settings/categories`, {
+        refCategoryId: updCat.refCategoryId,
+        categoryName: updCat.categoryName,
+        categoryCode: updCat.categoryCode,
+        isActive: updCat.isActive
+      }, { headers: { Authorization: sessionStorage.getItem('token') || '' } });
+
+      if (res.data.status) {
+        fetchData();
+        toast.current?.show({ severity: 'success', summary: 'Updated', detail: res.data.message, life: 2000 });
+        setVisibleSidebar(false);
+      } else throw new Error(res.data.message);
+    } catch (err: any) {
+      toast.current?.show({ severity: 'error', summary: 'Error', detail: err.message || 'Error updating category', life: 3000 });
     }
   };
 
@@ -277,7 +185,7 @@ const SettingsCategories: React.FC = () => {
     <div className="card">
       <Toast ref={toast} />
       <ConfirmDialog />
-      <Toolbar className="mb-4" left={rightHeader} right={leftHeader} />
+      <Toolbar left={leftToolbar} right={rightToolbar} className="mb-4" />
 
       <DataTable
         ref={dtRef}
@@ -289,7 +197,7 @@ const SettingsCategories: React.FC = () => {
         scrollable
         sortMode="multiple"
         globalFilter={globalFilter}
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
         emptyMessage="No categories found."
         className="p-datatable-sm"
       >
@@ -303,19 +211,15 @@ const SettingsCategories: React.FC = () => {
       </DataTable>
 
       <Sidebar
-        visible={visibleRight}
+        visible={visibleSidebar}
         position="right"
-        onHide={() => {
-          setVisibleRight(false);
-          setEditData(null);
-          setMode('add');
-        }}
+        onHide={() => { setVisibleSidebar(false); setEditData(null); setMode('add'); }}
         style={{ width: '50vw' }}
       >
         <SettingsAddNewCategories
           mode={mode}
           editData={editData}
-          onClose={() => setVisibleRight(false)}
+          onClose={() => setVisibleSidebar(false)}
           onSave={handleSave}
           onUpdate={handleUpdate}
         />
