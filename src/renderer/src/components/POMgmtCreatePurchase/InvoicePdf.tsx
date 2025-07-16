@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import logo from '../../assets/logo/invoice.png';
+import logo from '../../assets/logo/invoice.png'; // Adjust path as needed
 
 interface Supplier {
   supplierId: number;
@@ -27,7 +27,6 @@ interface Branch {
 interface Product {
   poId: number;
   poName: string;
-  // poDescription: string;
   poHSN: string;
   poQuantity: string;
   poPrice: string;
@@ -37,144 +36,132 @@ interface Product {
   poTotalPrice: string;
 }
 
-export const generateInvoice = (
+// Convert image to base64
+const toBase64 = (url: string): Promise<string> => {
+  return fetch(url)
+    .then((res) => res.blob())
+    .then(
+      (blob) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        })
+    );
+};
+
+export const generateInvoice = async (
   supplier: Supplier | null,
   branch: Branch | null,
-  products: Product[]
-) => {
+  products: Product[],
+  creditedDate: Date | null
+): Promise<jsPDF> => {
   const doc = new jsPDF();
-  const img = new Image();
-  img.src = logo;
+  const base64Logo = await toBase64(logo); // ✅ Wait for logo
 
-  img.onload = () => {
-    doc.addImage(img, 'PNG', 12, 5, 50, 35);
+  const formatDate = (date: Date) =>
+    `${date.getFullYear()}-${(date.getMonth() + 1)
+      .toString()
+      .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+  const dueDate = creditedDate ? formatDate(creditedDate) : '--';
 
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.text('SNEHALAYAA SILKS', 14, 40);
+  // Header
+  doc.addImage(base64Logo, 'PNG', 12, 5, 50, 35);
+  doc.setFontSize(12).setFont('helvetica', 'bold').text('SNEHALAYAA SILKS', 14, 40);
+  doc.setFontSize(10).setFont('helvetica', 'normal');
+  doc.text('SVAP TEXTILES LLP', 14, 45);
+  doc.text('No.23, Venkatanarayana Road, T.Nagar,', 14, 50);
+  doc.text('Chennai, Tamil Nadu, India - 600017', 14, 55);
+  doc.text('GST No: 33AFDFS4445R1ZG', 14, 60);
+  doc.text(`Supplier Ref: ${supplier?.supplierCode || 'N/A'}`, 14, 65);
 
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text('SVAP TEXTILES LLP', 14, 45);
-    doc.text('No.23, Venkatanarayana Road, T.Nagar,', 14, 50);
-    doc.text('Chennai, Tamil Nadu, India - 600017', 14, 55);
-    doc.text('GST No: 33AFDFS4445R1ZG', 14, 60);
-    doc.text(`Supplier Ref: ${supplier?.supplierCode || 'N/A'}`, 14, 65);
+  doc.setFontSize(11).setFont('helvetica', 'bold');
+  doc.text(`Purchase/PO-${Date.now()}`, 145, 15);
+  doc.setFontSize(10).setFont('helvetica', 'normal');
+  doc.text(`Created On: ${new Date().toLocaleString()}`, 145, 20);
+  doc.text(`Due On: ${dueDate}`, 145, 25);
 
-    
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`Purchase/PO-${Date.now()}`, 145, 15);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.text(`Created On: ${new Date().toLocaleString()}`, 145, 20);
-    doc.text('Due On: --', 145, 25);
+  // Dispatched From
+  doc.setFontSize(11).setFont('helvetica', 'bold').text('Dispatched From:', 14, 75);
+  doc.setFontSize(10).setFont('helvetica', 'normal');
+  if (supplier) {
+    doc.text(supplier.supplierCompanyName, 14, 80);
+    doc.text(`${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`, 14, 85);
+    doc.text(`${supplier.supplierCity}, ${supplier.supplierState}, ${supplier.supplierCountry}`, 14, 90);
+    doc.text(`Email: ${supplier.supplierEmail}`, 14, 95);
+    doc.text(`Mobile: ${supplier.supplierContactNumber}`, 14, 100);
+  }
 
-   
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Dispatched From:', 14, 75);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    if (supplier) {
-      doc.text(supplier.supplierCompanyName, 14, 80);
-      doc.text(
-        `${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`,
-        14,
-        85
-      );
-      doc.text(
-        `${supplier.supplierCity}, ${supplier.supplierState}, ${supplier.supplierCountry}`,
-        14,
-        90
-      );
-      doc.text(`Email: ${supplier.supplierEmail}`, 14, 95);
-      doc.text(`Mobile: ${supplier.supplierContactNumber}`, 14, 100);
-    }
+  // Supplier Detail & Dispatched To
+  const rightStartX = 135;
+  const lineHeight = 5;
+  const supplierStartY = 35;
 
-   
-    doc.setFont('helvetica', 'bold');
-    doc.text('Dispatched To:', 135, 75);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    if (branch) {
-      doc.text(branch.refBranchName, 135, 80);
-      doc.text(branch.refLocation, 135, 85);
-      doc.text(`Email: ${branch.refEmail}`, 135, 90);
-      doc.text(`Mobile: ${branch.refMobile}`, 135, 95);
-    }
+  doc.setFont('helvetica', 'bold').text('Supplier Detail:', rightStartX, supplierStartY);
+  doc.setFont('helvetica', 'normal');
+  if (supplier) {
+    doc.text(supplier.supplierCompanyName, rightStartX, supplierStartY + lineHeight);
+    doc.text(`Membership Number: ${supplier.supplierCode}`, rightStartX, supplierStartY + lineHeight * 2);
+    doc.text(`${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`, rightStartX, supplierStartY + lineHeight * 3);
+    doc.text(`${supplier.supplierCity}, ${supplier.supplierState}, ${supplier.supplierCountry}`, rightStartX, supplierStartY + lineHeight * 4);
+    doc.text(`Email: ${supplier.supplierEmail}`, rightStartX, supplierStartY + lineHeight * 5);
+    doc.text(`Mobile: ${supplier.supplierContactNumber}`, rightStartX, supplierStartY + lineHeight * 6);
+  }
 
-  
-    doc.setFont('helvetica', 'bold');
-    doc.text('Supplier Detail', 127, 35);
-    doc.setFont('helvetica', 'normal');
-    if (supplier) {
-      doc.text(supplier.supplierCompanyName, 130, 40);
-      doc.text(`Membership Number: ${supplier.supplierCode}`, 130, 45);
-      doc.text(
-        `${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`,
-        130,
-        50
-      );
-      doc.text(
-        `${supplier.supplierCity}, ${supplier.supplierState}, ${supplier.supplierCountry}`,
-        130,
-        55
-      );
-      doc.text(`Email: ${supplier.supplierEmail}`, 130, 60);
-      doc.text(`Mobile: ${supplier.supplierContactNumber}`, 130, 65);
-    }
+  const dispatchedToStartY = supplierStartY + lineHeight * 8;
+  doc.setFont('helvetica', 'bold').text('Dispatched To:', rightStartX, dispatchedToStartY);
+  doc.setFont('helvetica', 'normal').setFontSize(10);
+  if (branch) {
+    doc.text(branch.refBranchName, rightStartX, dispatchedToStartY + lineHeight);
+    doc.text(branch.refLocation, rightStartX, dispatchedToStartY + lineHeight * 2);
+    doc.text(`Email: ${branch.refEmail}`, rightStartX, dispatchedToStartY + lineHeight * 3);
+    doc.text(`Mobile: ${branch.refMobile}`, rightStartX, dispatchedToStartY + lineHeight * 4);
+  }
 
-    // Table columns and data
-    const columns = [
-      { header: 'SL.NO', dataKey: 'slno' },
-      { header: 'Product', dataKey: 'product' },
-      // { header: 'Description', dataKey: 'description' },
-      { header: 'SKU', dataKey: 'sku' }, // SKU Column
-      { header: 'HSN/SAC', dataKey: 'hsn' },
-      { header: 'Quantity', dataKey: 'qty' },
-      { header: 'Price', dataKey: 'price' },
-      { header: 'Disc%', dataKey: 'disc' },
-      { header: 'Discount', dataKey: 'discount' },
-      { header: 'Total Price', dataKey: 'total' },
-    ];
+  // Product Table
+  const columns = [
+    { header: 'SL.NO', dataKey: 'slno' },
+    { header: 'Product', dataKey: 'product' },
+    { header: 'SKU', dataKey: 'sku' },
+    { header: 'HSN/SAC', dataKey: 'hsn' },
+    { header: 'Quantity', dataKey: 'qty' },
+    { header: 'Price', dataKey: 'price' },
+    { header: 'Disc%', dataKey: 'disc' },
+    { header: 'Discount', dataKey: 'discount' },
+    { header: 'Total Price', dataKey: 'total' },
+  ];
 
-    const data = products.map((p, index) => ({
-      slno: index + 1,
-      product: p.poName, 
-      // description: `${p.poDescription}`,
-      sku: p.posku, 
-      hsn: p.poHSN,
-      qty: p.poQuantity.toString(), 
-  price: parseFloat(p.poPrice.toString()).toFixed(2), 
-  disc: parseFloat(p.poDiscPercent.toString()).toFixed(2),  
-  discount: parseFloat(p.poDisc.toString()).toFixed(2),  
-  total: parseFloat(p.poTotalPrice.toString()).toFixed(2), 
-    }));
+  const data = products.map((p, index) => ({
+    slno: index + 1,
+    product: p.poName,
+    sku: p.posku,
+    hsn: p.poHSN,
+    qty: p.poQuantity,
+    price: parseFloat(p.poPrice).toFixed(2),
+    disc: parseFloat(p.poDiscPercent).toFixed(2),
+    discount: parseFloat(p.poDisc).toFixed(2),
+    total: parseFloat(p.poTotalPrice).toFixed(2),
+  }));
 
-    autoTable(doc, {
-      startY: 110,
-      columns,
-      body: data,
-      styles: { fontSize: 8, textColor: '#000000' },
-      headStyles: {
-        fontStyle: 'bold',
-        fillColor: false,
-        textColor: '#000000',
-      },
-      didDrawPage: () => {
-        const pageCount = doc.getNumberOfPages();
-        const pageSize = doc.internal.pageSize;
-        const pageHeight = pageSize.height || pageSize.getHeight();
-        doc.setFontSize(9);
-        doc.text(
-          `Page ${doc.getCurrentPageInfo().pageNumber} of ${pageCount}`,
-          pageSize.width - 40,
-          pageHeight - 10
-        );
-      },
-    });
+  autoTable(doc, {
+    startY: 110,
+    columns,
+    body: data,
+    styles: { fontSize: 8, textColor: '#000000' },
+    headStyles: {
+      fontStyle: 'bold',
+      fillColor: false,
+      textColor: '#000000',
+    },
+    didDrawPage: () => {
+      const pageCount = doc.getNumberOfPages();
+      const pageSize = doc.internal.pageSize;
+      const pageHeight = pageSize.height || pageSize.getHeight();
+      doc.setFontSize(9);
+      doc.text(`Page ${doc.getCurrentPageInfo().pageNumber} of ${pageCount}`, pageSize.width - 40, pageHeight - 10);
+    },
+  });
 
-    doc.save('invoice.pdf');
-  };
+  return doc;
 };

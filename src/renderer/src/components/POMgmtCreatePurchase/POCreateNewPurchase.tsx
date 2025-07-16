@@ -12,6 +12,7 @@ import { generateInvoice } from './InvoicePdf'
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
 
+
 interface Supplier {
   supplierId: number
   supplierCompanyName: string
@@ -68,6 +69,7 @@ const POCreateNewPurchase: React.FC = () => {
 
   const [productList, setProductList] = useState<Product[]>([])
   const [productEntries, setProductEntries] = useState<ProductEntry[]>([])
+  const [loading, setLoading] = useState(false);
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [quantity, setQuantity] = useState<number>(1)
@@ -151,6 +153,21 @@ const POCreateNewPurchase: React.FC = () => {
 
     setProductList(mockProducts)
   }, [])
+// const handlePrint = async () => {
+//   const doc = await generateInvoice(supplier, branch, products, creditedDate);
+//   const blob = doc.output('blob');
+//   const blobUrl = URL.createObjectURL(blob);
+
+//   const iframe = document.createElement('iframe');
+//   iframe.style.display = 'none';
+//   iframe.src = blobUrl;
+//   document.body.appendChild(iframe);
+
+//   iframe.onload = () => {
+//     iframe.contentWindow?.focus();
+//     iframe.contentWindow?.print();
+//   };
+// };
 
   const handleAddProduct = () => {
     if (!selectedProduct || quantity <= 0 || price <= 0) return
@@ -179,32 +196,103 @@ const POCreateNewPurchase: React.FC = () => {
     setPrice(0)
     setDiscount(0)
   }
-const handleDownloadInvoice = () => {
+const handleDownloadInvoice = async () => {
   if (!selectedSupplier || !selectedBranch || productEntries.length === 0) {
     toast.current?.show({
       severity: 'warn',
       summary: 'Missing Information',
       detail: 'Please select supplier, branch, and add at least one product.',
-      life: 3000
+      life: 3000,
     });
     return;
   }
 
-  const pdfProducts = productEntries.map((entry) => ({
-    poId: entry.product.productId,
-    poName: entry.product.productName,
-    // poDescription: entry.product.sku, 
-    poHSN: entry.product.hsnCode,
-    poQuantity: entry.quantity.toString(),
-    poPrice: entry.price.toFixed(2),
-    poDiscPercent: entry.discount.toFixed(2),
-    poDisc: entry.discountPrice.toFixed(2),
-    poTotalPrice: entry.totalPrice.toFixed(2),
-    posku: entry.product.sku 
-  }));
+  setLoading(true);
 
-  generateInvoice(selectedSupplier, selectedBranch, pdfProducts);
+  try {
+    const pdfProducts = productEntries.map((entry) => ({
+      poId: entry.product.productId,
+      poName: entry.product.productName,
+      poHSN: entry.product.hsnCode,
+      poQuantity: entry.quantity.toString(),
+      poPrice: entry.price.toFixed(2),
+      poDiscPercent: entry.discount.toFixed(2),
+      poDisc: entry.discountPrice.toFixed(2),
+      poTotalPrice: entry.totalPrice.toFixed(2),
+      posku: entry.product.sku,
+    }));
+
+    const doc = await generateInvoice(
+      selectedSupplier,
+      selectedBranch,
+      pdfProducts,
+      creditedDate
+    );
+
+    // 👇 Save as file (triggers download)
+    doc.save(`Invoice-${Date.now()}.pdf`);
+  } catch (error) {
+    toast.current?.show({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to generate invoice.',
+      life: 3000,
+    });
+  } finally {
+    setLoading(false);
+  }
 };
+
+
+  const handlePrintInvoice = async () => {
+    if (!selectedSupplier || !selectedBranch || productEntries.length === 0) {
+      toast.current?.show({
+        severity: 'warn',
+        summary: 'Missing Info',
+        detail: 'Please select supplier, branch, and add at least one product.',
+        life: 3000,
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Prepare the data for the invoice
+      const pdfProducts = productEntries.map((entry) => ({
+        poId: entry.product.productId,
+        poName: entry.product.productName,
+        poHSN: entry.product.hsnCode,
+        poQuantity: entry.quantity.toString(),
+        poPrice: entry.price.toFixed(2),
+        poDiscPercent: entry.discount.toFixed(2),
+        poDisc: entry.discountPrice.toFixed(2),
+        poTotalPrice: entry.totalPrice.toFixed(2),
+        posku: entry.product.sku,
+      }));
+
+      // Generate PDF
+      const doc = await generateInvoice(selectedSupplier, selectedBranch, pdfProducts,creditedDate);
+
+      // Print the document
+      doc.autoPrint();
+      // doc.open();
+      window.print();
+
+    } catch (error) {
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to print invoice.',
+        life: 3000,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
 
   const generateSKU = (index: number): string => {
     const now = new Date()
@@ -431,28 +519,51 @@ const handleDownloadInvoice = () => {
         style={{ width: '20%' }}
       >
         <div className="buttons p-3 flex flex-column gap-2">
-          {/* <p
-            className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
-            style={{ border: '1px solid #8e5ea8' }}
-             onClick={handlePrintOrder} 
-          >
-            <Printer size={18} /> Print Order
-          </p> */}
+         <p
+  className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2 p-button-info"
+  style={{
+    border: '1px solid #1f8ceb',
+    opacity: loading ? 0.6 : 1,
+    pointerEvents: loading ? 'none' : 'auto',
+  }}
+  onClick={() => !loading && handlePrintInvoice()}
+>
+  {loading ? (
+    <>
+      <i className="pi pi-spin pi-spinner" />
+      Preparing Print...
+    </>
+  ) : (
+    <>
+      <i className="pi pi-print" />
+      Print Invoice
+    </>
+  )}
+</p>
+
           {/* <p
             className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
             style={{ border: '1px solid #8e5ea8' }}
           >
             <FileText size={18} /> Create Invoice
           </p> */}
-         <p
-            className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
-            style={{ border: '1px solid #8e5ea8' }}
-            onClick={handleDownloadInvoice}
-          >
-            <Download size={18} /> Download Invoice
-          </p>
-
-
+        <p
+          className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2 p-button-success"
+          style={{ border: '1px solid #8e5ea8', opacity: loading ? 0.6 : 1, pointerEvents: loading ? 'none' : 'auto' }}
+          onClick={() => !loading && handleDownloadInvoice()}
+        >
+          {loading ? (
+            <>
+              <i className="pi pi-spin pi-spinner" />
+              Generating Invoice...
+            </>
+          ) : (
+            <>
+              <Download size={18} />
+              Download Invoice
+            </>
+          )}
+        </p>
             {/* <p
             className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
             style={{ border: '1px solid #8e5ea8' }}

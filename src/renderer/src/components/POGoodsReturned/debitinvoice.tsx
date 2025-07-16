@@ -93,45 +93,91 @@ export const debitInvoice1 = async ({
   doc.setFont('helvetica', 'normal');
   doc.text(`Created On: ${new Date().toLocaleString()}`, 180, 20, { align: 'right' });
 
-  doc.setFont('helvetica', 'bold');
-  doc.text('Dispatched From:', 14, 75);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10);
-  doc.text(supplier.supplierCompanyName, 14, 80);
-  doc.text(`${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`, 14, 85);
-  doc.text(`${supplier.supplierCity}, ${supplier.supplierState}, India`, 14, 90);
-  doc.text(`Email: ${supplier.supplierEmail}`, 14, 95);
-  doc.text(`Mobile: ${supplier.supplierContactNumber}`, 14, 100);
+  // doc.setFont('helvetica', 'bold');
+  // doc.text('Dispatched From:', 14, 75);
+  // doc.setFont('helvetica', 'normal');
+  // doc.setFontSize(10);
+  // // doc.text(supplier.supplierCompanyName, 14, 80);
+  // // doc.text(`${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`, 14, 85);
+  // // doc.text(`${supplier.supplierCity}, ${supplier.supplierState}, India`, 14, 90);
+  // // doc.text(`Email: ${supplier.supplierEmail}`, 14, 95);
+  // // doc.text(`Mobile: ${supplier.supplierContactNumber}`, 14, 100);
 
-  doc.setFont('helvetica', 'bold');
-  doc.text('Dispatched To:', 135, 75);
-  doc.setFont('helvetica', 'normal');
-  doc.text(branch.refBranchName, 135, 80);
-  doc.text(branch.refLocation, 135, 85);
-  doc.text(`Email: ${branch.refEmail}`, 135, 90);
-  doc.text(`Mobile: ${branch.refMobile}`, 135, 95);
-  doc.text(`Expected Date: ${creditedDate}`, 135, 100);
+  // doc.setFont('helvetica', 'bold');
+  // doc.text('Dispatched To:', 135, 75);
+  // doc.setFont('helvetica', 'normal');
+  //  doc.text(supplier.supplierCompanyName, 135, 80);
+  // doc.text(`${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`, 135, 85);
+  // doc.text(`${supplier.supplierCity}, ${supplier.supplierState}, India`, 135, 90);
+  // doc.text(`Email: ${supplier.supplierEmail}`, 135, 95);
+  // doc.text(`Mobile: ${supplier.supplierContactNumber}`, 135, 100);
+  // // doc.text(branch.refBranchName, 135, 80);
+  // // doc.text(branch.refLocation, 135, 85);
+  // // doc.text(`Email: ${branch.refEmail}`, 135, 90);
+  // // doc.text(`Mobile: ${branch.refMobile}`, 135, 95);
+  // // doc.text(`Expected Date: ${creditedDate}`, 135, 100);
 
-  doc.setFont('helvetica', 'bold');
-    doc.text('Supplier Detail', 127, 35);
-    doc.setFont('helvetica', 'normal');
-    if (supplier) {
-      doc.text(supplier.supplierCompanyName, 130, 40);
-      doc.text(`Membership Number: ${supplier.supplierCode}`, 130, 45);
-      doc.text(
-        `${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`,
-        130,
-        50
-      );
-      doc.text(
-        `${supplier.supplierCity}, ${supplier.supplierState}, ${supplier.supplierCountry}`,
-        130,
-        55
-      );
-      doc.text(`Email: ${supplier.supplierEmail}`, 130, 60);
-      doc.text(`Mobile: ${supplier.supplierContactNumber}`, 130, 65);
-    }
+  // doc.setFont('helvetica', 'bold');
+  //   doc.text('Supplier Detail', 127, 35);
+  //   doc.setFont('helvetica', 'normal');
+  //   if (supplier) {
+  //     doc.text(supplier.supplierCompanyName, 130, 40);
+  //     doc.text(`Membership Number: ${supplier.supplierCode}`, 130, 45);
+  //     doc.text(
+  //       `${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`,
+  //       130,
+  //       50
+  //     );
+  //     doc.text(
+  //       `${supplier.supplierCity}, ${supplier.supplierState}, ${supplier.supplierCountry}`,
+  //       130,
+  //       55
+  //     );
+  //     doc.text(`Email: ${supplier.supplierEmail}`, 130, 60);
+  //     doc.text(`Mobile: ${supplier.supplierContactNumber}`, 130, 65);
+  //   }
+const leftStartX = 14;    
+const rightStartX = 135;  
+const dispatchedFromY = 75;
+const supplierStartY = 35;  
+const lineHeight = 5;
 
+// Dispatched From (unchanged)
+doc.setFont('helvetica', 'bold');
+doc.text('Dispatched From:', leftStartX, dispatchedFromY);
+doc.setFont('helvetica', 'normal');
+doc.text(supplier.supplierCompanyName, leftStartX, dispatchedFromY + lineHeight);
+doc.text(`${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`, leftStartX, dispatchedFromY + lineHeight * 2);
+doc.text(`${supplier.supplierCity}, ${supplier.supplierState}, India`, leftStartX, dispatchedFromY + lineHeight * 3);
+doc.text(`Email: ${supplier.supplierEmail}`, leftStartX, dispatchedFromY + lineHeight * 4);
+doc.text(`Mobile: ${supplier.supplierContactNumber}`, leftStartX, dispatchedFromY + lineHeight * 5);
+
+// Supplier Detail (moved upward)
+doc.setFont('helvetica', 'bold');
+doc.text('Supplier Detail:', rightStartX, supplierStartY);
+doc.setFont('helvetica', 'normal');
+doc.text(supplier.supplierCompanyName, rightStartX, supplierStartY + lineHeight);
+doc.text(`Membership Number: ${supplier.supplierCode}`, rightStartX, supplierStartY + lineHeight * 2);
+doc.text(`${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`, rightStartX, supplierStartY + lineHeight * 3);
+doc.text(`${supplier.supplierCity}, ${supplier.supplierState}, ${supplier.supplierCountry}`, rightStartX, supplierStartY + lineHeight * 4);
+doc.text(`Email: ${supplier.supplierEmail}`, rightStartX, supplierStartY + lineHeight * 5);
+doc.text(`Mobile: ${supplier.supplierContactNumber}`, rightStartX, supplierStartY + lineHeight * 6);
+
+// Dispatched To (below Supplier Detail)
+const dispatchedToStartY = supplierStartY + lineHeight * 8;
+doc.setFont('helvetica', 'bold');
+doc.text('Dispatched To:', rightStartX, dispatchedToStartY);
+doc.setFont('helvetica', 'normal');
+// doc.text(branch.refBranchName, rightStartX, dispatchedToStartY + lineHeight);
+// doc.text(branch.refLocation, rightStartX, dispatchedToStartY + lineHeight * 2);
+// doc.text(`Email: ${branch.refEmail}`, rightStartX, dispatchedToStartY + lineHeight * 3);
+// doc.text(`Mobile: ${branch.refMobile}`, rightStartX, dispatchedToStartY + lineHeight * 4);
+// doc.text(`Expected Date: ${creditedDate}`, rightStartX, dispatchedToStartY + lineHeight * 5);
+ doc.text(supplier.supplierCompanyName, rightStartX, dispatchedToStartY + lineHeight);
+  doc.text(`${supplier.supplierDoorNumber}, ${supplier.supplierStreet}`, rightStartX, dispatchedToStartY + lineHeight * 2);
+  doc.text(`${supplier.supplierCity}, ${supplier.supplierState}, India`, rightStartX, dispatchedToStartY + lineHeight * 3);
+  doc.text(`Email: ${supplier.supplierEmail}`,rightStartX, dispatchedToStartY + lineHeight * 4);
+  doc.text(`Mobile: ${supplier.supplierContactNumber}`,rightStartX, dispatchedToStartY + lineHeight * 5);
   const columns = [
     { header: 'S.No', dataKey: 'slno' },
     { header: 'Product', dataKey: 'poName' },
@@ -176,47 +222,44 @@ export const debitInvoice1 = async ({
 
 const summaryStartY = (doc.lastAutoTable?.finalY ?? 110) + 10;
  const summaryColumns = [
-  { header: 'Sub Total', dataKey: 'subTotal' },
-  { header: 'Discount', dataKey: 'discount' },
-  { header: 'Tax (5%)', dataKey: 'tax' },
+  { header: 'Tax Type', dataKey: 'taxType' },
+  { header: 'Taxable Value', dataKey: 'taxableValue' },
+  { header: 'Tax Amount', dataKey: 'taxAmount' },
   { header: 'Total', dataKey: 'total' },
-  { header: 'Total Paid', dataKey: 'totalPaid' },
-  { header: 'Pending Payment', dataKey: 'pendingPayment' },
 ];
 
 const summaryData = [
   {
-    subTotal: subTotal.toFixed(2),
-    discount: discountTotal.toFixed(2),
-    tax: tax.toFixed(2),
+    taxType: 'IGST ',
+    taxableValue: subTotal.toFixed(2),
+    taxAmount: tax.toFixed(2),
     total: total.toFixed(2),
-    totalPaid: totalPaid.toFixed(2),
-    pendingPayment: pendingPayment.toFixed(2),
   },
 ];
+
 doc.setFont('helvetica', 'bold');
-doc.setFontSize(10); 
-doc.text('Summary', 14, summaryStartY + 1);  
+doc.setFontSize(10);
+doc.text('Tax Summary', 14, summaryStartY + 1);
+
 autoTable(doc, {
-  startY: summaryStartY +3,
+  startY: summaryStartY + 3,
   columns: summaryColumns,
   body: summaryData,
-  styles: { fontSize: 7 },
+  styles: { fontSize: 8 },
   headStyles: {
-    fillColor: false,       // disables header background color
-    textColor: [0, 0, 0],   // black text
-    fontStyle: 'bold',
+    fillColor: false,
+    textColor: [0, 0, 0],
+   
   },
   columnStyles: {
-    subTotal: { halign: 'left' },
-    discount: { halign: 'left' },
-    tax: { halign: 'left' },
+    taxType: { halign: 'left' },
+    taxableValue: { halign: 'left' },
+    taxAmount: { halign: 'left' },
     total: { halign: 'left' },
-    totalPaid: { halign: 'left' },
-    pendingPayment: { halign: 'left' },
   },
   tableWidth: 'auto',
 });
+
 
 
 

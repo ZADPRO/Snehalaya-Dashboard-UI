@@ -154,11 +154,12 @@ const SettingsCategories: React.FC = () => {
 
       if (res.data.status) {
         fetchData();
-        toast.current?.show({ severity: 'success', summary: 'Created', detail: res.data.message, life: 2000 });
+        // toast.current?.show({ severity: 'success', summary: 'Created', detail: res.data.message, life: 2000 });
         setVisibleSidebar(false);
       } else throw new Error(res.data.message);
     } catch (err: any) {
-      toast.current?.show({ severity: 'error', summary: 'Error', detail: err.message || 'Error creating category', life: 3000 });
+      console.log(err)
+      // toast.current?.show({ severity: 'error', summary: 'Error', detail: err.message || 'Error creating category', life: 3000 });
     }
   };
 
@@ -173,11 +174,12 @@ const SettingsCategories: React.FC = () => {
 
       if (res.data.status) {
         fetchData();
-        toast.current?.show({ severity: 'success', summary: 'Updated', detail: res.data.message, life: 2000 });
+        // toast.current?.show({ severity: 'success', summary: 'Updated', detail: res.data.message, life: 2000 });
         setVisibleSidebar(false);
       } else throw new Error(res.data.message);
-    } catch (err: any) {
-      toast.current?.show({ severity: 'error', summary: 'Error', detail: err.message || 'Error updating category', life: 3000 });
+    } catch (err) {
+        console.log(err)
+      // toast.current?.show({ severity: 'error', summary: 'Error', detail: err.message || 'Error updating category', life: 3000 });
     }
   };
 

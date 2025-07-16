@@ -1,94 +1,81 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { DataTable } from 'primereact/datatable'
-import { Column } from 'primereact/column'
-import { Button } from 'primereact/button'
-import { Tag } from 'primereact/tag'
-import { InputText } from 'primereact/inputtext'
-import { Toolbar } from 'primereact/toolbar'
-import { IconField } from 'primereact/iconfield'
-import { InputIcon } from 'primereact/inputicon'
-import { Sidebar } from 'primereact/sidebar'
-import SettingsAddNewBranch from './SettingsAddNewBranch'
-import { Toast } from 'primereact/toast'
-import axios from 'axios'
-import { InputSwitch } from 'primereact/inputswitch'
+import React, { useEffect, useRef, useState } from 'react';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Button } from 'primereact/button';
+import { Tag } from 'primereact/tag';
+import { InputText } from 'primereact/inputtext';
+import { Toolbar } from 'primereact/toolbar';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
+import { Sidebar } from 'primereact/sidebar';
+import { Toast } from 'primereact/toast';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import axios from 'axios';
+import SettingsAddNewBranch from './SettingsAddNewBranch';
 
-export interface Branch {
-  refBranchId: number
-  refBranchName: string
-  refBranchCode: string
-  refLocation: string
-  refMobile: string
-  refEmail: string
-  isMainBranch: boolean
-  isActive: boolean
-  isDelete: boolean
-  refBTId: number
-  createdAt: string
-  createdBy: string
-  updatedAt: string
-  updatedBy: string
+interface Branch {
+  refBranchId: number;
+  refBranchName: string;
+  refBranchCode: string;
+  refLocation: string;
+  refMobile: string;
+  refEmail: string;
+  isMainBranch: boolean;
+  isActive: boolean;
+  isDelete: boolean;
+  refBTId: number;
+  createdAt: string;
+  createdBy: string;
+  updatedAt: string;
+  updatedBy: string;
 }
 
 const SettingsBranches: React.FC = () => {
-  const [categories, setCategories] = useState<Branch[]>([])
-  const [globalFilter, setGlobalFilter] = useState<string>('')
-  const [visibleRight, setVisibleRight] = useState(false)
-
-  const dtRef = React.useRef<DataTable<Branch[]>>(null)
-
-  const [editData, setEditData] = useState<Branch | null>(null)
-  const [mode, setMode] = useState<'add' | 'edit'>('add')
-  const toast = useRef<Toast>(null)
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [visibleSidebar, setVisibleSidebar] = useState(false);
+  const [editData, setEditData] = useState<Branch | null>(null);
+  const [mode, setMode] = useState<'add' | 'edit'>('add');
+  const dtRef = useRef<DataTable<Branch[]>>(null);
+  const toast = useRef<Toast>(null);
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/admin/settings/branches`, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: sessionStorage.getItem('token')
-        }
-      })
-      console.log('response', response)
-      if (response.status) {
-        setCategories(response.data.data)
-      }
-    } catch (error) {
-      console.log(error)
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/settings/branches`, {
+        headers: { Authorization: sessionStorage.getItem('token') || '' }
+      });
+      if (res.data?.status) setBranches(res.data.data);
+      else throw new Error(res.data.message);
+    } catch (err: any) {
+      console.error('Error fetching branches:', err.response);
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: err.response?.data?.message || 'Failed to load branches',
+        life: 3000
+      });
     }
-  }
+  };
 
-  const exportExcel = () => {
-    dtRef.current?.exportCSV()
-  }
+  const exportExcel = () => dtRef.current?.exportCSV();
 
-  const activeStatusBody = (rowData: Branch) => (
-    <Tag
-      value={rowData.isActive ? 'Active' : 'Inactive'}
-      severity={rowData.isActive ? 'success' : 'danger'}
-    />
-  )
+  const activeStatusBody = (row: Branch) => (
+    <Tag value={row.isActive ? 'Active' : 'Inactive'} severity={row.isActive ? 'success' : 'danger'} />
+  );
 
-  const branchStatusBody = (rowData: Branch) => (
-    <InputSwitch
-      checked={rowData.isMainBranch}
-      // onChange={(e) => handleMainBranchToggle(rowData, e.value)}
-    />
-  )
-
-  const leftHeader = (
+  const leftToolbar = (
     <div className="flex gap-2 items-center">
       <Button icon="pi pi-file-excel" severity="success" onClick={exportExcel} />
-      <Button label="" icon="pi pi-plus" onClick={() => setVisibleRight(true)} />
-      <Button label="" icon="pi pi-refresh" severity="secondary" onClick={fetchData} />
+      <Button icon="pi pi-plus" onClick={() => { setMode('add'); setEditData(null); setVisibleSidebar(true); }} />
+      <Button icon="pi pi-refresh" severity="secondary" onClick={fetchData} />
     </div>
-  )
+  );
 
-  const rightHeader = (
+  const rightToolbar = (
     <IconField iconPosition="left">
       <InputIcon className="pi pi-search" />
       <InputText
@@ -98,222 +85,200 @@ const SettingsBranches: React.FC = () => {
         onChange={(e) => setGlobalFilter(e.target.value)}
       />
     </IconField>
-  )
+  );
 
-  const actionBody = (rowData: Branch) => (
+  const actionBody = (row: Branch) => (
     <div className="flex gap-2">
-      <Button
-        icon="pi pi-pencil"
-        rounded
-        text
-        onClick={() => {
-          setEditData(rowData)
-          setMode('edit')
-          setVisibleRight(true)
-        }}
-      />
-      <Button
-        icon="pi pi-trash"
-        rounded
-        text
-        severity="danger"
-        onClick={() => handleDelete(rowData.refBranchId)}
-      />
+      <Button icon="pi pi-pencil" text onClick={() => { setMode('edit'); setEditData(row); setVisibleSidebar(true); }} />
+      <Button icon="pi pi-trash" text severity="danger" onClick={() => handleDelete(row.refBranchId)} />
     </div>
-  )
+  );
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: number, forceDelete = false) => {
     try {
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/admin/settings/branches/${id}`,
-        {
-          headers: {
-            Authorization: sessionStorage.getItem('token')
-          }
-        }
-      )
+      const url = `${import.meta.env.VITE_API_URL}/admin/settings/branches/${id}`;
+      const params = forceDelete ? { forceDelete: true } : {};
 
-      const data = response.data
+      console.log('Deleting branch:', url, 'with params:', params);
 
-      if (data.confirmationNeeded) {
-        toast.current?.show({
-          severity: 'warn',
-          summary: 'Confirmation Needed',
-          detail: `${data.message}. Contains ${data.subcategories.length} subcategories.`,
-          life: 5000
-        })
-      } else if (data.status) {
-        fetchData()
+      const response = await axios.delete(url, {
+        headers: { Authorization: sessionStorage.getItem('token') || '' },
+        params
+      });
+
+      if (response.data?.status) {
+        fetchData();
         toast.current?.show({
           severity: 'success',
           summary: 'Deleted',
-          detail: 'Category deleted successfully',
-          life: 2000
-        })
+          detail: response.data.message || 'Branch deleted successfully.',
+          life: 2000,
+        });
       }
-    } catch (error) {
-      console.error(error)
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to delete category',
-        life: 2000
-      })
-    }
-  }
-const handleSave = async (newBranch: Branch) => {
-  try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_URL}/admin/settings/branches`,
-      {
-        refBranchName: newBranch.refBranchName.trim(),
-        refBranchCode: newBranch.refBranchCode.trim(),
-        refLocation: newBranch.refLocation.trim(),
-        refMobile: newBranch.refMobile.trim(),
-        refEmail: newBranch.refEmail.trim(),
-        isMainBranch: newBranch.isMainBranch,
-        isActive: newBranch?.isActive ?? true,
-        refBTId: 1,
-        createdAt: newBranch?.createdAt ?? new Date().toISOString(),
-        createdBy: 'Admin',
-        updatedAt: new Date().toISOString(),
-        updatedBy: 'Admin',
-        isDelete: false
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: sessionStorage.getItem('token')
-        }
+    } catch (error: any) {
+      const data = error.response?.data;
+      console.error('Delete error:', error.response); // Log error response for debugging
+
+      if (error.response?.status === 409 && data?.confirmationNeeded) {
+        confirmDialog({
+          message: `${data.message}\n\nDo you want to delete?`,
+          header: 'Delete Confirmation',
+          acceptLabel: 'Yes, Delete',
+          rejectLabel: 'Cancel',
+          acceptClassName: 'p-button-danger',
+          accept: () => handleDelete(id, true),
+          reject: () => {
+            toast.current?.show({
+              severity: 'info',
+              summary: 'Cancelled',
+              detail: 'Delete cancelled.',
+              life: 2000,
+            });
+          },
+        });
+      } else {
+        toast.current?.show({
+          severity: 'error',
+          summary: 'Error',
+          detail: data?.message || 'Failed to delete branch.',
+          life: 3000,
+        });
       }
-    )
-
-    if (response.data?.status) {
-      fetchData()
-      toast.current?.show({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Branch created successfully!',
-        life: 3000
-      })
-      setVisibleRight(false)
     }
-  } catch (error: any) {
-    if (error.response?.status === 409) {
+  };
+
+  const handleSave = async (newBra: Branch) => {
+    // Simple validation (e.g., ensure required fields are filled)
+    if (!newBra.refBranchName || !newBra.refBranchCode || !newBra.refLocation || !newBra.refMobile || !newBra.refEmail || !newBra.refBTId) {
       toast.current?.show({
         severity: 'error',
-        summary: 'Conflict',
-        detail: error.response?.data?.message || 'Branch name or code already exists.',
+        summary: 'Validation Error',
+        detail: 'Please fill in all required fields!',
         life: 3000
-      })
-    } else {
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Something went wrong while creating branch.',
-        life: 3000
-      })
+      });
+      return;
     }
-  }
-}
 
-
-  const handleUpdate = async (updatedCategory: Branch) => {
     try {
-      const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/admin/settings/branches`,
-        {
-          refBranchId: updatedCategory.refBranchId,
-          refBranchName: updatedCategory.refBranchName,
-          refBranchCode: updatedCategory.refBranchCode,
-          refLocation: updatedCategory.refLocation,
-          refMobile: updatedCategory.refMobile,
-          refEmail: updatedCategory.refEmail,
-          isMainBranch: updatedCategory.isMainBranch,
-          isActive: updatedCategory.isActive,
-          refBTId: 1
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: sessionStorage.getItem('token')
-          }
-        }
-      )
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/admin/settings/branches`, {
+        refBranchName: newBra.refBranchName,
+        refBranchCode: newBra.refBranchCode,
+        refLocation: newBra.refLocation,
+        refMobile: newBra.refMobile,
+        refEmail: newBra.refEmail,
+        isMainBranch: newBra.isMainBranch,
+        isActive: newBra.isActive,
+        refBTId: newBra.refBTId
+      }, { headers: { Authorization: sessionStorage.getItem('token') || '' } });
 
-      if (response.data?.status) {
-        fetchData()
-         toast.current?.show({
-    severity: 'success',
-    summary: 'Success',
-    detail: 'Branch created successfully!',
-    life: 3000
-  })
-  setVisibleRight(false)
-     
+      if (res.data.status) {
+        fetchData();  // Refresh the list of branches
+        toast.current?.show({
+          severity: 'success',
+          summary: 'Created',
+          detail: res.data.message || 'Branch created successfully!',
+          life: 2000
+        });
+        setVisibleSidebar(false);  // Close the sidebar
+      } else {
+        throw new Error(res.data.message || 'Something went wrong!');
       }
-    } catch (error) {
-      console.log(error)
-     
+    } catch (err: any) {
+      console.error('Error saving branch:', err);
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: err?.response?.data?.message || 'Error saving branch',
+        life: 3000
+      });
     }
-  }
+  };
+
+  const handleUpdate = async (updatedBranch: Branch) => {
+    try {
+      const res = await axios.put(`${import.meta.env.VITE_API_URL}/admin/settings/branches`, {
+        refBranchId: updatedBranch.refBranchId,
+        refBranchName: updatedBranch.refBranchName,
+        refBranchCode: updatedBranch.refBranchCode,
+        refLocation: updatedBranch.refLocation,
+        refMobile: updatedBranch.refMobile,
+        refEmail: updatedBranch.refEmail,
+        isMainBranch: updatedBranch.isMainBranch,
+        isActive: updatedBranch.isActive,
+      }, { headers: { Authorization: sessionStorage.getItem('token') || '' } });
+
+      if (res.data.status) {
+        fetchData();
+        // toast.current?.show({
+        //   severity: 'success',
+        //   summary: 'Updated',
+        //   detail: res.data.message || 'Branch updated successfully!',
+        //   life: 2000
+        // });
+        setVisibleSidebar(false);
+      } else throw new Error(res.data.message);
+    } catch (err: any) {
+      // toast.current?.show({
+      //   severity: 'error',
+      //   summary: 'Error',
+      //   detail: err.message || 'Error updating branch',
+      //   life: 3000
+      // });
+    }
+  };
 
   return (
     <div className="card">
-      <Toast ref={toast}   pt={{ icon: { className: 'mr-3' }  }}  />
-      <Toolbar className="mb-4" left={rightHeader} right={leftHeader} />
+      {/* Toast for notifications */}
+      <Toast ref={toast} />
+      {/* Confirm Dialog for delete confirmation */}
+      <ConfirmDialog />
+      
+      {/* Toolbar */}
+      <Toolbar left={leftToolbar} right={rightToolbar} className="mb-4" />
+
+      {/* DataTable for displaying branches */}
       <DataTable
         ref={dtRef}
-        value={categories}
+        value={branches}
         paginator
         rows={10}
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         rowsPerPageOptions={[10, 25, 50]}
         showGridlines
         scrollable
         sortMode="multiple"
         globalFilter={globalFilter}
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-        emptyMessage="No categories found."
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+        emptyMessage="No branches found."
         className="p-datatable-sm"
       >
-        <Column
-          header="S.No"
-          body={(_rowData, options) => options.rowIndex + 1}
-          style={{ minWidth: '1rem' }}
-        />
-        <Column field="refBranchName" header="Branch Name" sortable style={{ minWidth: '5rem' }} />
-        <Column field="refBranchCode" header="Branch Code" sortable style={{ minWidth: '5rem' }} />
-        <Column field="refLocation" header="Location" sortable style={{ minWidth: '5rem' }} />
-        <Column field="refMobile" header="Mobile" sortable style={{ minWidth: '5rem' }} />
-        <Column header="Main Branch" body={branchStatusBody} style={{ minWidth: '5rem' }} />
-
-        <Column header="Status" body={activeStatusBody} style={{ minWidth: '5rem' }} />
-        <Column field="createdAt" header="Created At" sortable style={{ minWidth: '5rem' }} />
-        <Column field="createdBy" header="Created By" sortable style={{ minWidth: '5rem' }} />
-        <Column header="Actions" body={actionBody} style={{ minWidth: '5rem' }} />
+        <Column header="S.No" body={(_, opts) => opts.rowIndex + 1} />
+        <Column field="refBranchName" header="Branch Name" sortable />
+        <Column field="refBranchCode" header="Branch Code" sortable />
+        <Column field="refLocation" header="Location" sortable />
+        <Column field="refMobile" header="Mobile" sortable />
+        <Column field="refEmail" header="Email" sortable />
+        <Column header="Status" body={activeStatusBody} />
+        <Column header="Actions" body={actionBody} />
       </DataTable>
 
+      {/* Sidebar for add/edit */}
       <Sidebar
-        visible={visibleRight}
+        visible={visibleSidebar}
         position="right"
-        onHide={() => {
-          setVisibleRight(false)
-          setEditData(null)
-          setMode('add')
-        }}
+        onHide={() => { setVisibleSidebar(false); setEditData(null); setMode('add'); }}
         style={{ width: '50vw' }}
       >
         <SettingsAddNewBranch
           mode={mode}
           editData={editData}
-          onClose={() => setVisibleRight(false)}
+          onClose={() => setVisibleSidebar(false)}
           onSave={handleSave}
           onUpdate={handleUpdate}
         />
       </Sidebar>
     </div>
-  )
-}
+  );
+};
 
-export default SettingsBranches
+export default SettingsBranches;
