@@ -161,53 +161,62 @@ const SettingsBranches: React.FC = () => {
       })
     }
   }
-
-  const handleSave = async (newCategory: Branch) => {
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/admin/settings/branches`,
-        {
-          refBranchName: newCategory.refBranchName.trim(),
-          refBranchCode: newCategory.refBranchCode.trim(),
-          refLocation: newCategory.refLocation.trim(),
-          refMobile: newCategory.refMobile.trim(),
-          refEmail: newCategory.refEmail.trim(),
-          isMainBranch: newCategory.isMainBranch,
-          isActive: newCategory?.isActive ?? true,
-          refBTId: 1, // Hardcoded for now; make dynamic if needed
-          createdAt: newCategory?.createdAt ?? new Date().toISOString(),
-          createdBy: 'Admin',
-          updatedAt: new Date().toISOString(),
-          updatedBy: 'Admin',
-          isDelete: false
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: sessionStorage.getItem('token')
-          }
+const handleSave = async (newBranch: Branch) => {
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_URL}/admin/settings/branches`,
+      {
+        refBranchName: newBranch.refBranchName.trim(),
+        refBranchCode: newBranch.refBranchCode.trim(),
+        refLocation: newBranch.refLocation.trim(),
+        refMobile: newBranch.refMobile.trim(),
+        refEmail: newBranch.refEmail.trim(),
+        isMainBranch: newBranch.isMainBranch,
+        isActive: newBranch?.isActive ?? true,
+        refBTId: 1,
+        createdAt: newBranch?.createdAt ?? new Date().toISOString(),
+        createdBy: 'Admin',
+        updatedAt: new Date().toISOString(),
+        updatedBy: 'Admin',
+        isDelete: false
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: sessionStorage.getItem('token')
         }
-      )
-
-      if (response.data?.status) {
-        fetchData()
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Category created successfully',
-          life: 2000
-        })
       }
-    } catch (error) {
-      console.log(error)
+    )
+
+    if (response.data?.status) {
+      fetchData()
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Branch created successfully!',
+        life: 3000
+      })
+      setVisibleRight(false)
+    }
+  } catch (error: any) {
+    if (error.response?.status === 409) {
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Conflict',
+        detail: error.response?.data?.message || 'Branch name or code already exists.',
+        life: 3000
+      })
+    } else {
       toast.current?.show({
         severity: 'error',
         summary: 'Error',
-        detail: 'Failed to create category',
-        life: 2000
+        detail: 'Something went wrong while creating branch.',
+        life: 3000
       })
     }
   }
+}
+
 
   const handleUpdate = async (updatedCategory: Branch) => {
     try {
@@ -234,21 +243,18 @@ const SettingsBranches: React.FC = () => {
 
       if (response.data?.status) {
         fetchData()
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Updated',
-          detail: 'Category updated successfully',
-          life: 2000
-        })
+         toast.current?.show({
+    severity: 'success',
+    summary: 'Success',
+    detail: 'Branch created successfully!',
+    life: 3000
+  })
+  setVisibleRight(false)
+     
       }
     } catch (error) {
       console.log(error)
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to update category',
-        life: 2000
-      })
+     
     }
   }
 

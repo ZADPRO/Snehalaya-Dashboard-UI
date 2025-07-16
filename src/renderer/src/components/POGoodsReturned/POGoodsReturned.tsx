@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { Dropdown } from 'primereact/dropdown'
 import { Calendar } from 'primereact/calendar'
 import { InputText } from 'primereact/inputtext'
@@ -7,8 +7,11 @@ import axios from 'axios'
 import { Divider } from 'primereact/divider'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
-import { Download, FileText } from 'lucide-react'
-import { generateInvoice1 } from '../../components/POGoodsReturned/debitinvoice'
+import { FileText, Download } from 'lucide-react'
+import { debitInvoice1 } from '../../components/POGoodsReturned/debitinvoice'
+import { Toast } from 'primereact/toast'
+
+
 interface Supplier {
   supplierId: number
   supplierCompanyName: string
@@ -47,11 +50,12 @@ interface ProductEntry {
   totalPrice: number
 }
 
-const POGoodsReceived: React.FC = () => {
+const POGoodsReturned: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [branches, setBranches] = useState<Branch[]>([])
 
-  const [totalPaid, _setTotalPaid] = useState<number>(0)
+  const [totalPaid, setTotalPaid] = useState<number>(0)
+
 
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null)
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null)
@@ -68,13 +72,20 @@ const POGoodsReceived: React.FC = () => {
   const [quantity, setQuantity] = useState<number>(1)
   const [price, setPrice] = useState<number>(0)
   const [discount, setDiscount] = useState<number>(0)
-  const handleGenerateInvoice = () => {
-    console.log('Clicked')
 
+  const toast = useRef<Toast>(null)
+
+  const handleGenerateInvoice = () => {
     if (!selectedSupplier || !selectedBranch || productEntries.length === 0) {
-      alert('Please fill all required fields.')
+      toast.current?.show({
+        severity: 'warn',
+        summary: 'Incomplete Data',
+        detail: 'Please fill all required fields.',
+        life: 3000
+      })
       return
     }
+
 
     const formattedProducts = productEntries.map((entry) => ({
       poId: entry.product.productId,
@@ -85,24 +96,39 @@ const POGoodsReceived: React.FC = () => {
       poDiscPercent: entry.discount.toString(),
       poDisc: entry.discountPrice.toFixed(2),
       poTotalPrice: entry.totalPrice.toFixed(2),
-      sku: entry.product.sku
+      sku: entry.product.sku,
     }))
 
     try {
-      generateInvoice1({
-        supplier: selectedSupplier,
-        branch: selectedBranch,
-        productEntries: formattedProducts,
-        creditedDate: creditedDate?.toLocaleDateString() ?? '',
-        transport,
-        subTotal,
-        discountTotal,
-        tax,
-        total
+    debitInvoice1({
+  supplier: selectedSupplier!,
+  branch: selectedBranch!,
+  productEntries: formattedProducts,
+  creditedDate: creditedDate?.toLocaleDateString() ?? '',
+  transport,
+  subTotal,
+  discountTotal,
+  tax,
+  total,
+  totalPaid,
+  pendingPayment,
+});
+
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Invoice Generated',
+        detail: 'Debit note has been generated successfully.',
+        life: 3000
       })
     } catch (err) {
       console.error('PDF generation failed:', err)
-      alert('Something went wrong while generating the invoice.')
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Something went wrong while generating the invoice.',
+        life: 3000
+      })
+
     }
   }
 
@@ -114,12 +140,18 @@ const POGoodsReceived: React.FC = () => {
         headers: { Authorization: `${token}` }
       })
       .then((res) => setSuppliers(res.data.data))
+      .catch(() => {
+        toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to load suppliers.', life: 3000 })
+      })
 
     axios
       .get('http://localhost:8080/api/v1/admin/settings/branches', {
         headers: { Authorization: `${token}` }
       })
       .then((res) => setBranches(res.data.data))
+      .catch(() => {
+        toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to load branches.', life: 3000 })
+      })
   }, [])
 
   useEffect(() => {
@@ -131,61 +163,28 @@ const POGoodsReceived: React.FC = () => {
 
   useEffect(() => {
     const mockProducts: Product[] = [
-      {
-        productId: 1,
-        productName: 'Kanchipuram Silk Saree',
-        hsnCode: '5007',
-        sku: ''
-      },
-      {
-        productId: 2,
-        productName: 'Banarasi Saree',
-        hsnCode: '5007',
-        sku: ''
-      },
-      {
-        productId: 3,
-        productName: 'Chiffon Saree',
-        hsnCode: '5407',
-        sku: ''
-      },
-      {
-        productId: 4,
-        productName: 'Georgette Saree',
-        hsnCode: '5408',
-        sku: ''
-      },
-      {
-        productId: 5,
-        productName: 'Cotton Handloom Saree',
-        hsnCode: '5208',
-        sku: ''
-      },
-      {
-        productId: 6,
-        productName: 'Linen Saree',
-        hsnCode: '5309',
-        sku: ''
-      },
-      {
-        productId: 7,
-        productName: 'Tussar Silk Saree',
-        hsnCode: '5007',
-        sku: ''
-      },
-      {
-        productId: 8,
-        productName: 'Organza Saree',
-        hsnCode: '5407',
-        sku: ''
-      }
+      { productId: 1, productName: 'Kanchipuram Silk Saree', hsnCode: '5007', sku: '' },
+      { productId: 2, productName: 'Banarasi Saree', hsnCode: '5007', sku: '' },
+      { productId: 3, productName: 'Chiffon Saree', hsnCode: '5407', sku: '' },
+      { productId: 4, productName: 'Georgette Saree', hsnCode: '5408', sku: '' },
+      { productId: 5, productName: 'Cotton Handloom Saree', hsnCode: '5208', sku: '' },
+      { productId: 6, productName: 'Linen Saree', hsnCode: '5309', sku: '' },
+      { productId: 7, productName: 'Tussar Silk Saree', hsnCode: '5007', sku: '' },
+      { productId: 8, productName: 'Organza Saree', hsnCode: '5407', sku: '' }
     ]
-
     setProductList(mockProducts)
   }, [])
 
   const handleAddProduct = () => {
-    if (!selectedProduct || quantity <= 0 || price <= 0) return
+    if (!selectedProduct || quantity <= 0 || price <= 0) {
+      toast.current?.show({
+        severity: 'warn',
+        summary: 'Invalid Product Entry',
+        detail: 'Please select a product and enter valid quantity and price.',
+        life: 3000
+      })
+      return
+    }
 
     const discountPrice = (price * discount) / 100
     const totalPrice = (price - discountPrice) * quantity
@@ -205,7 +204,7 @@ const POGoodsReceived: React.FC = () => {
 
     setProductEntries((prev) => [...prev, entry])
 
-    // Reset
+   
     setSelectedProduct(null)
     setQuantity(1)
     setPrice(0)
@@ -220,18 +219,18 @@ const POGoodsReceived: React.FC = () => {
     return `SS-${month}-${year}-${serial}`
   }
 
-  const subTotal = productEntries.reduce((sum, entry) => sum + entry.price * entry.quantity, 0)
-  const discountTotal = productEntries.reduce(
-    (sum, entry) => sum + entry.discountPrice * entry.quantity,
-    0
-  )
-  const tax = 0
-  const total = subTotal - discountTotal + tax
-  const pendingPayment = total - totalPaid
-  console.log('pendingPayment', pendingPayment)
+const subTotal = productEntries.reduce((sum, entry) => sum + entry.price * entry.quantity, 0)
+const discountTotal = productEntries.reduce((sum, entry) => sum + entry.discountPrice * entry.quantity, 0)
+const taxableAmount = subTotal - discountTotal
+const tax = taxableAmount * 0.05
+const total = taxableAmount + tax
+const pendingPayment = total - totalPaid
+
+
 
   return (
     <div className="purchaseOrderCreationCard flex" style={{ width: '100%', height: '100%' }}>
+      <Toast ref={toast} />
       {/* Left Section - Form */}
       <div className="creationCard" style={{ width: '80%' }}>
         <div className="flex">
@@ -296,20 +295,20 @@ const POGoodsReceived: React.FC = () => {
 
           <Divider layout="vertical" />
 
-          {/* Right Section - Preview */}
+         
           <div className="flex flex-column gap-3 p-4 border-gray-300" style={{ width: '70%' }}>
             <h4>Preview</h4>
 
             <div className="flex justify-content-between">
               {selectedSupplier && (
-                <div className="">
+                <div>
                   <strong>Dispatched From:</strong>
                   <p>
                     <strong>{selectedSupplier.supplierCompanyName}</strong> (
                     {selectedSupplier.supplierCode})
                   </p>
                   <p>
-                    {selectedSupplier.supplierDoorNumber}, {selectedSupplier.supplierStreet},
+                    {selectedSupplier.supplierDoorNumber}, {selectedSupplier.supplierStreet},{' '}
                     {selectedSupplier.supplierCity}, {selectedSupplier.supplierState},{' '}
                     {selectedSupplier.supplierCountry}
                   </p>
@@ -319,7 +318,7 @@ const POGoodsReceived: React.FC = () => {
               )}
 
               {selectedBranch && (
-                <div className="">
+                <div>
                   <strong>Dispatched To:</strong>
                   <p>
                     <strong>{selectedBranch.refBranchName}</strong> ({selectedBranch.refBranchCode})
@@ -406,12 +405,7 @@ const POGoodsReceived: React.FC = () => {
             </div>
           </div>
 
-          <DataTable
-            value={productEntries}
-            tableStyle={{ minWidth: '50rem' }}
-            stripedRows
-            showGridlines
-          >
+          <DataTable value={productEntries} tableStyle={{ minWidth: '50rem' }} stripedRows showGridlines>
             <Column header="S.No" body={(_, idx) => idx.rowIndex + 1} />
             <Column header="Product" field="product.productName" />
             <Column header="HSN Code" field="product.hsnCode" />
@@ -426,38 +420,25 @@ const POGoodsReceived: React.FC = () => {
       </div>
 
       <Divider layout="vertical" />
-      {/* Right Sidebar Buttons */}
-      <div
-        className="creationCard flex flex-column justify-content-between"
-        style={{ width: '20%' }}
-      >
+  
+      <div className="creationCard flex flex-column justify-content-between" style={{ width: '20%' }}>
         <div className="buttons p-3 flex flex-column gap-2">
-          {/* <p
-            className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
-            style={{ border: '1px solid #8e5ea8' }}
-          >
-            <Printer size={18} /> Print Order
-          </p> */}
           <p
             className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
             style={{ border: '1px solid #8e5ea8', background: 'none', borderRadius: '6px' }}
-            onClick={handleGenerateInvoice}
+           
           >
+
             <FileText size={18} /> Print DebitNote
           </p>
 
           <p
             className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
             style={{ border: '1px solid #8e5ea8' }}
+             onClick={handleGenerateInvoice}
           >
             <Download size={18} /> Download
           </p>
-          {/* <p
-            className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
-            style={{ border: '1px solid #8e5ea8' }}
-          >
-            <StickyNote size={18} /> Notes
-          </p> */}
         </div>
         <div className="Tax Summary p-3"></div>
         <Divider />
@@ -468,16 +449,29 @@ const POGoodsReceived: React.FC = () => {
             <span>GST</span>
           </div>
           <div className="flex justify-content-between mb-2">
-            <span>Tax Rate</span>
-            <span>5%</span>
+            <span>Sub Total</span>
+            <span>₹{subTotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-content-between mb-2">
-            <span>Taxable Value</span>
-            <span>₹1355.00</span>
+            <span>Discount</span>
+            <span>₹{discountTotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-content-between mb-2">
-            <span>Tax Amount</span>
-            <span>₹67.75</span>
+            <span>Tax</span>
+            <span>₹{tax.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-content-between mb-2">
+            <strong>Total</strong>
+            <strong>₹{total.toFixed(2)}</strong>
+          </div>
+          <div className="flex justify-content-between mb-2">
+            <span>Paid</span>
+            <span>₹{totalPaid.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-content-between">
+            <strong>Pending Payment</strong>
+            <strong>₹{pendingPayment.toFixed(2)}</strong>
+
           </div>
         </div>
       </div>
@@ -485,4 +479,4 @@ const POGoodsReceived: React.FC = () => {
   )
 }
 
-export default POGoodsReceived
+export default POGoodsReturned

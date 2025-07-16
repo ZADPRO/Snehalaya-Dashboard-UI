@@ -1,88 +1,75 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { DataTable } from 'primereact/datatable'
-import { Column } from 'primereact/column'
-import { Button } from 'primereact/button'
-import { Tag } from 'primereact/tag'
-import { InputText } from 'primereact/inputtext'
-import { Toolbar } from 'primereact/toolbar'
-import { IconField } from 'primereact/iconfield'
-import { InputIcon } from 'primereact/inputicon'
-import { Sidebar } from 'primereact/sidebar'
-import SettingsAddNewCategories from './SettingsAddNewCategories'
-import { Toast } from 'primereact/toast'
-import axios from 'axios'
+import React, { useEffect, useRef, useState } from 'react';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Button } from 'primereact/button';
+import { Tag } from 'primereact/tag';
+import { InputText } from 'primereact/inputtext';
+import { Toolbar } from 'primereact/toolbar';
+import { IconField } from 'primereact/iconfield';
+import { InputIcon } from 'primereact/inputicon';
+import { Sidebar } from 'primereact/sidebar';
+import { Toast } from 'primereact/toast';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import axios from 'axios';
+
+import SettingsAddNewCategories from './SettingsAddNewCategories';
 
 interface Category {
-  refCategoryId: number
-  categoryName: string
-  categoryCode: string
-  isActive: boolean
-  createdAt: string
-  createdBy: string
-  updatedAt: string
-  updatedBy: string
+  refCategoryId: number;
+  categoryName: string;
+  categoryCode: string;
+  isActive: boolean;
+  createdAt: string;
+  createdBy: string;
+  updatedAt: string;
+  updatedBy: string;
 }
 
 const SettingsCategories: React.FC = () => {
-  const [categories, setCategories] = useState<Category[]>([])
-  const [globalFilter, setGlobalFilter] = useState<string>('')
-  const [visibleRight, setVisibleRight] = useState(false)
-
-  const dtRef = React.useRef<DataTable<Category[]>>(null)
-
-  const [editData, setEditData] = useState<Category | null>(null)
-  const [mode, setMode] = useState<'add' | 'edit'>('add')
-  const toast = useRef<Toast>(null)
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [visibleSidebar, setVisibleSidebar] = useState(false);
+  const [editData, setEditData] = useState<Category | null>(null);
+  const [mode, setMode] = useState<'add' | 'edit'>('add');
+  const dtRef = useRef<DataTable<Category[]>>(null);
+  const toast = useRef<Toast>(null);
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/admin/settings/categories`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: sessionStorage.getItem('token')
-          }
-        }
-      )
-      console.log('response', response)
-      if (response.status) {
-        setCategories(response.data.data)
-      }
-
-      // if(response.message === "Invalid Token"){
-      //   localStorage.clear();
-      //   navigator("/")
-      // }
-    } catch (error) {
-      console.log(error)
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/settings/categories`, {
+        headers: { Authorization: sessionStorage.getItem('token') || '' }
+      });
+      if (res.data?.status) setCategories(res.data.data);
+      else throw new Error(res.data.message);
+    } catch (err: any) {
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: err.message || 'Failed to load categories',
+        life: 3000
+      });
     }
-  }
+  };
 
-  const exportExcel = () => {
-    dtRef.current?.exportCSV()
-  }
+  const exportExcel = () => dtRef.current?.exportCSV();
 
-  const activeStatusBody = (rowData: Category) => (
-    <Tag
-      value={rowData.isActive ? 'Active' : 'Inactive'}
-      severity={rowData.isActive ? 'success' : 'danger'}
-    />
-  )
+  const activeStatusBody = (row: Category) => (
+    <Tag value={row.isActive ? 'Active' : 'Inactive'} severity={row.isActive ? 'success' : 'danger'} />
+  );
 
-  const leftHeader = (
+  const leftToolbar = (
     <div className="flex gap-2 items-center">
       <Button icon="pi pi-file-excel" severity="success" onClick={exportExcel} />
-      <Button label="" icon="pi pi-plus" onClick={() => setVisibleRight(true)} />
-      <Button label="" icon="pi pi-refresh" severity="secondary" onClick={fetchData} />
+      <Button icon="pi pi-plus" onClick={() => { setMode('add'); setEditData(null); setVisibleSidebar(true); }} />
+      <Button icon="pi pi-refresh" severity="secondary" onClick={fetchData} />
     </div>
-  )
+  );
 
-  const rightHeader = (
+  const rightToolbar = (
     <IconField iconPosition="left">
       <InputIcon className="pi pi-search" />
       <InputText
@@ -92,197 +79,153 @@ const SettingsCategories: React.FC = () => {
         onChange={(e) => setGlobalFilter(e.target.value)}
       />
     </IconField>
-  )
+  );
 
-  const actionBody = (rowData: Category) => (
+  const actionBody = (row: Category) => (
     <div className="flex gap-2">
-      <Button
-        icon="pi pi-pencil"
-        text
-        onClick={() => {
-          setEditData(rowData)
-          setMode('edit')
-          setVisibleRight(true)
-        }}
-      />
-      <Button
-        icon="pi pi-trash"
-        text
-        severity="danger"
-        onClick={() => handleDelete(rowData.refCategoryId)}
-      />
+      <Button icon="pi pi-pencil" text onClick={() => { setMode('edit'); setEditData(row); setVisibleSidebar(true); }} />
+      <Button icon="pi pi-trash" text severity="danger" onClick={() => handleDelete(row.refCategoryId)} />
     </div>
-  )
+  );
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: number, forceDelete = false) => {
     try {
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/admin/settings/categories/${id}`,
-        {
-          headers: {
-            Authorization: sessionStorage.getItem('token')
-          }
-        }
-      )
+      const url = `${import.meta.env.VITE_API_URL}/admin/settings/categories/${id}`;
+      const params = forceDelete ? { forceDelete: true } : {};
 
-      const data = response.data
+      console.log('Deleting:', url, 'with params:', params);
 
-      if (data.confirmationNeeded) {
-        toast.current?.show({
-          severity: 'warn',
-          summary: 'Confirmation Needed',
-          detail: `${data.message}. Contains ${data.subcategories.length} subcategories.`,
-          life: 5000
-        })
-      } else if (data.status) {
-        fetchData()
+      const response = await axios.delete(url, {
+        headers: { Authorization: sessionStorage.getItem('token') || '' },
+        params
+      });
+
+      if (response.data?.status) {
+        fetchData();
         toast.current?.show({
           severity: 'success',
           summary: 'Deleted',
-          detail: 'Category deleted successfully',
-          life: 2000
-        })
+          detail: response.data.message || 'Category deleted successfully.',
+          life: 2000,
+        });
       }
-    } catch (error) {
-      console.error(error)
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to delete category',
-        life: 2000
-      })
-    }
-  }
+    } catch (error: any) {
+      const data = error.response?.data;
+      console.error('Delete error:', error.response);
 
-  const handleSave = async (newCategory: Category) => {
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/admin/settings/categories`,
-        {
-          categoryName: newCategory.categoryName,
-          categoryCode: newCategory.categoryCode,
-          isActive: newCategory.isActive
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: sessionStorage.getItem('token')
-          }
-        }
-      )
+      if (error.response?.status === 409 && data?.confirmationNeeded) {
+        
 
-      if (response.data?.status) {
-        fetchData()
+        confirmDialog({
+          message: `${data.message}\n\nDo you want to delete?`,
+          header: 'Delete Confirmation',
+          // icon: 'pi pi-exclamation-triangle',
+          acceptLabel: 'Yes, Delete',
+          rejectLabel: 'Cancel',
+          acceptClassName: 'p-button-danger',
+          accept: () => handleDelete(id, true),
+          reject: () => {
+            toast.current?.show({
+              severity: 'info',
+              summary: 'Cancelled',
+              detail: 'delete cancelled.',
+              life: 2000,
+            });
+          },
+        });
+      } else {
         toast.current?.show({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Category created successfully',
-          life: 2000
-        })
+          severity: 'error',
+          summary: 'Error',
+          detail: data?.message || 'Failed to delete category.',
+          life: 3000,
+        });
       }
-    } catch (error) {
-      console.log(error)
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to create category',
-        life: 2000
-      })
     }
-  }
+  };
 
-  const handleUpdate = async (updatedCategory: Category) => {
+  const handleSave = async (newCat: Category) => {
     try {
-      const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/admin/settings/categories`,
-        {
-          refCategoryId: updatedCategory.refCategoryId,
-          categoryName: updatedCategory.categoryName,
-          categoryCode: updatedCategory.categoryCode,
-          isActive: updatedCategory.isActive
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: sessionStorage.getItem('token')
-          }
-        }
-      )
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/admin/settings/categories`, {
+        categoryName: newCat.categoryName,
+        categoryCode: newCat.categoryCode,
+        isActive: newCat.isActive
+      }, { headers: { Authorization: sessionStorage.getItem('token') || '' } });
 
-      if (response.data?.status) {
-        fetchData()
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Updated',
-          detail: 'Category updated successfully',
-          life: 2000
-        })
-      }
-    } catch (error) {
-      console.log(error)
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to update category',
-        life: 2000
-      })
+      if (res.data.status) {
+        fetchData();
+        toast.current?.show({ severity: 'success', summary: 'Created', detail: res.data.message, life: 2000 });
+        setVisibleSidebar(false);
+      } else throw new Error(res.data.message);
+    } catch (err: any) {
+      toast.current?.show({ severity: 'error', summary: 'Error', detail: err.message || 'Error creating category', life: 3000 });
     }
-  }
+  };
+
+  const handleUpdate = async (updCat: Category) => {
+    try {
+      const res = await axios.put(`${import.meta.env.VITE_API_URL}/admin/settings/categories`, {
+        refCategoryId: updCat.refCategoryId,
+        categoryName: updCat.categoryName,
+        categoryCode: updCat.categoryCode,
+        isActive: updCat.isActive
+      }, { headers: { Authorization: sessionStorage.getItem('token') || '' } });
+
+      if (res.data.status) {
+        fetchData();
+        toast.current?.show({ severity: 'success', summary: 'Updated', detail: res.data.message, life: 2000 });
+        setVisibleSidebar(false);
+      } else throw new Error(res.data.message);
+    } catch (err: any) {
+      toast.current?.show({ severity: 'error', summary: 'Error', detail: err.message || 'Error updating category', life: 3000 });
+    }
+  };
 
   return (
     <div className="card">
-      <Toast ref={toast}   pt={{ icon: { className: 'mr-3' }  }} />
-
-      <Toolbar className="mb-4" left={rightHeader} right={leftHeader} />
+      <Toast ref={toast} />
+      <ConfirmDialog />
+      <Toolbar left={leftToolbar} right={rightToolbar} className="mb-4" />
 
       <DataTable
         ref={dtRef}
         value={categories}
         paginator
         rows={10}
-        paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         rowsPerPageOptions={[10, 25, 50]}
         showGridlines
         scrollable
         sortMode="multiple"
         globalFilter={globalFilter}
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
         emptyMessage="No categories found."
         className="p-datatable-sm"
       >
-        <Column
-          header="S.No"
-          body={(_rowData, options) => options.rowIndex + 1}
-          style={{ minWidth: '1rem' }}
-        />
-        <Column field="categoryName" header="Category Name" sortable style={{ minWidth: '5rem' }} />
-        <Column field="categoryCode" header="Category Code" sortable style={{ minWidth: '5rem' }} />
-        <Column header="Status" body={activeStatusBody} style={{ minWidth: '5rem' }} />
-        <Column field="createdAt" header="Created At" sortable style={{ minWidth: '5rem' }} />
-        <Column field="createdBy" header="Created By" sortable style={{ minWidth: '5rem' }} />
-        <Column header="Actions" body={actionBody} style={{ minWidth: '5rem' }} />
+        <Column header="S.No" body={(_, opts) => opts.rowIndex + 1} />
+        <Column field="categoryName" header="Category Name" sortable />
+        <Column field="categoryCode" header="Category Code" sortable />
+        <Column header="Status" body={activeStatusBody} />
+        <Column field="createdAt" header="Created At" sortable />
+        <Column field="createdBy" header="Created By" sortable />
+        <Column header="Actions" body={actionBody} />
       </DataTable>
 
       <Sidebar
-        visible={visibleRight}
+        visible={visibleSidebar}
         position="right"
-        onHide={() => {
-          setVisibleRight(false)
-          setEditData(null)
-          setMode('add')
-        }}
+        onHide={() => { setVisibleSidebar(false); setEditData(null); setMode('add'); }}
         style={{ width: '50vw' }}
       >
         <SettingsAddNewCategories
           mode={mode}
           editData={editData}
-          onClose={() => setVisibleRight(false)}
+          onClose={() => setVisibleSidebar(false)}
           onSave={handleSave}
           onUpdate={handleUpdate}
         />
       </Sidebar>
     </div>
-  )
-}
+  );
+};
 
-export default SettingsCategories
+export default SettingsCategories;
