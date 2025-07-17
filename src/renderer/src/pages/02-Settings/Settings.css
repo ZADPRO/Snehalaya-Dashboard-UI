@@ -55,6 +55,12 @@
 .p-inputtext:enabled:focus {
   box-shadow: none;
 }
+.p-calendar:not(.p-calendar-disabled).p-focus > .p-inputtext {
+  outline: none;
+  outline-offset: none;
+  box-shadow: none;
+  border-color: #9c27b0;
+}
 
 .p-button {
   box-shadow: none;
@@ -110,4 +116,8 @@
 
 .p-toast-message-content {
   gap: 10px;
+}
+
+.p-dropdown.p-component.p-inputwrapper.p-dropdown-clearable.p-inputwrapper-filled svg {
+  margin-top: -7px;
 }

@@ -36,36 +36,43 @@ const POMgmtViewPurchase: React.FC = () => {
     return `POINV-${dd}-${mm}-${1000 + id}`
   }
 
+  // Calculate total from product entries
+  const calculateTotal = (po: any): number => {
+    const subTotal = po.productEntries.reduce(
+      (sum: number, entry: any) => sum + entry.price * entry.quantity,
+      0
+    )
+    const discountTotal = po.productEntries.reduce(
+      (sum: number, entry: any) => sum + entry.discountPrice * entry.quantity,
+      0
+    )
+    const taxableAmount = subTotal - discountTotal
+    const tax = po.isTaxEnabled ? (taxableAmount * 5) / 100 : 0
+    return taxableAmount + tax
+  }
+
   useEffect(() => {
-    setPurchaseOrders([
-      {
-        id: 1,
-        customerName: 'Ravi Kumar',
-        poStatus: 'Complete',
-        paymentStatus: 'Paid',
-        createdAt: '2025-07-01 10:15 AM',
-        createdBy: 'Admin',
-        totalAmount: 25000
-      },
-      {
-        id: 2,
-        customerName: 'Meena Textiles',
-        poStatus: 'In Progress',
-        paymentStatus: 'Pending Payment',
-        createdAt: '2025-07-05 3:40 PM',
-        createdBy: 'Admin',
-        totalAmount: 17500
-      },
-      {
-        id: 3,
-        customerName: 'Varun Stores',
-        poStatus: 'New',
-        paymentStatus: 'Pending Payment',
-        createdAt: '2025-07-09 11:20 AM',
-        createdBy: 'Admin',
-        totalAmount: 9000
+    const storedData = localStorage.getItem('purchaseOrders')
+    if (storedData) {
+      try {
+        const rawOrders = JSON.parse(storedData)
+        const transformed: PO[] = rawOrders.map((po: any, index: number) => {
+          const total = calculateTotal(po)
+          return {
+            id: index + 1,
+            customerName: po.supplier?.supplierCompanyName || 'Unknown',
+            poStatus: 'Complete', // You can apply logic if needed
+            paymentStatus: po.totalPaid < total ? 'Pending Payment' : 'Paid',
+            createdAt: new Date(Number(po.id?.split('-')[1]) || Date.now()).toLocaleString(),
+            createdBy: 'Admin',
+            totalAmount: total
+          }
+        })
+        setPurchaseOrders(transformed)
+      } catch (error) {
+        console.error('Error parsing purchase orders from localStorage:', error)
       }
-    ])
+    }
   }, [])
 
   const statusBody = (row: PO) => (
@@ -165,6 +172,7 @@ const POMgmtViewPurchase: React.FC = () => {
         paginator
         rows={10}
         showGridlines
+        className="p-datatable-sm"
         rowsPerPageOptions={[10, 25, 50]}
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -176,7 +184,12 @@ const POMgmtViewPurchase: React.FC = () => {
         <Column field="customerName" header="Customer Name" sortable />
         <Column header="Status" body={statusBody} sortable />
         <Column header="Payment Status" body={paymentStatusBody} sortable />
-        <Column field="totalAmount" header="Total Amount" sortable />
+        <Column
+          field="totalAmount"
+          header="Total Amount"
+          sortable
+          body={(row) => `₹${row.totalAmount.toFixed(2)}`}
+        />
         <Column field="createdAt" header="Created At" sortable />
         <Column field="createdBy" header="Created By" sortable />
         <Column header="Actions" body={actionBody} style={{ width: '150px' }} />

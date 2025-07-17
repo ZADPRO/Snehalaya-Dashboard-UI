@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import { Sidebar } from 'primereact/sidebar'
@@ -11,19 +11,19 @@ interface Product {
   sku: string
   price: number
 }
+
 export default function BarcodePrint() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-  const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [products, setProducts] = useState<Product[]>([])
+  const [selectedProducts, setSelectedProducts] = useState<Product[]>([])
+  const [sidebarVisible, setSidebarVisible] = useState(false)
+  const printRef = useRef<HTMLDivElement>(null)
 
- 
   const formatPOINV = (id: number) => {
-    const now = new Date();
-    const dd = String(now.getDate()).padStart(2, '0');
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
-    return `POINV-${dd}-${mm}-${1000 + id}`;
-  };
-
+    const now = new Date()
+    const dd = String(now.getDate()).padStart(2, '0')
+    const mm = String(now.getMonth() + 1).padStart(2, '0')
+    return `POINV-${dd}-${mm}-${1000 + id}`
+  }
 
   useEffect(() => {
     const mock: Product[] = Array.from({ length: 140 }, (_, i) => ({
@@ -35,8 +35,62 @@ export default function BarcodePrint() {
     setProducts(mock)
   }, [])
 
-  const handlePrint = () => {
-    window.print()
+  const handlePrintBarcodes = () => {
+    if (!selectedProducts.length) return
+
+    const stickerHTML = selectedProducts
+      .map((p) => {
+        const barcodeSvg =
+          document.getElementById(`barcode-svg-${p.productId}`)?.outerHTML ||
+          '<div>Barcode missing</div>'
+        const poinv = formatPOINV(p.productId)
+
+        return `
+        <div style="
+          flex: 0 0 calc(25% - 8px);
+          border: 1px solid #ccc;
+          padding: 6px;
+          text-align: center;
+          page-break-inside: avoid;
+        ">
+          <div style="font-weight: bold; margin-bottom: 4px;">${p.productName}</div>
+          ${barcodeSvg}
+          <div style="margin-top: 2px;">${p.sku}</div>
+          <div>₹ ${p.price.toFixed(2)}</div>
+          <div>${poinv}</div>
+        </div>
+      `
+      })
+      .join('')
+
+    const printWindow = window.open('', '_blank', 'width=900,height=700')
+    if (printWindow) {
+      printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print Barcodes</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; font-size: 10px; padding: 10px;">
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            ${stickerHTML}
+          </div>
+        </body>
+      </html>
+    `)
+
+      printWindow.document.close()
+
+      const interval = setInterval(() => {
+        if (printWindow.document.readyState === 'complete') {
+          clearInterval(interval)
+          printWindow.focus()
+          printWindow.print()
+          printWindow.close()
+        }
+      }, 100)
+    } else {
+      alert('Failed to open print window')
+    }
   }
 
   return (
@@ -52,6 +106,7 @@ export default function BarcodePrint() {
           Add to Print
         </button>
       </div>
+
       <DataTable
         value={products}
         selectionMode="multiple"
@@ -68,6 +123,7 @@ export default function BarcodePrint() {
         <Column field="sku" header="SKU" />
         <Column field="price" header="Price" body={(row) => `₹ ${row.price}`} />
       </DataTable>
+
       <Sidebar
         visible={sidebarVisible}
         onHide={() => setSidebarVisible(false)}
@@ -75,25 +131,39 @@ export default function BarcodePrint() {
         style={{ width: '50vw' }}
         className="p-sidebar-lg"
       >
-       <div className="flex justify-content-around align-items-center mb-3">
-        <h3 className="m-0">Print Preview</h3>
-        <div style={{ flex: 1 }} /> {/* spacer in the middle */}
-        <button className="p-button p-button-success mt-2" onClick={handlePrint}>Print Stickers</button>
-      </div>
+        <div className="flex justify-content-between align-items-center mb-3">
+          <h3 className="m-0">Print Preview</h3>
+          <button className="p-button p-button-success mt-2" onClick={handlePrintBarcodes}>
+            Print Stickers
+          </button>
+        </div>
 
-        <div className="print-area flex flex-column gap-4"> 
+        <div style={{ display: 'none' }}>
+          {selectedProducts.map((p) => (
+            <div key={p.productId}>
+              <Barcode
+                value={p.sku}
+                height={35}
+                width={1}
+                displayValue={false}
+                id={`barcode-svg-${p.productId}`}
+                renderer="svg"
+              />
+            </div>
+          ))}
+        </div>
+        <div ref={printRef}>
           <div className="barcode-grid">
             {selectedProducts.map((p, i) => (
               <div className="barcode-item" key={i}>
-                <strong>{p.productName}</strong>
-                <Barcode value={p.sku} height={40} width={1} displayValue={false} />
-                <div>{p.sku}</div>
-                <div>₹ {p.price.toFixed(2)}</div>
-                <div>{formatPOINV(p.productId)}</div>
+                <p>{p.productName}</p>
+                <Barcode value={p.sku} height={30} width={1} displayValue={false} />
+                <div className="sku">{p.sku}</div>
+                <div className="price">₹ {p.price.toFixed(2)}</div>
+                <div className="invoice">{formatPOINV(p.productId)}</div>
               </div>
             ))}
           </div>
-          
         </div>
       </Sidebar>
     </div>

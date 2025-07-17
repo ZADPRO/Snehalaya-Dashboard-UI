@@ -4,12 +4,12 @@ import POMgmtCreatePurchase from '../..//components/POMgmtCreatePurchase/POCreat
 import POMgmtOverview from '../..//components/POMgmtOverview/POMgmtOverview'
 import POMgmtViewPurchase from '../../components/POMgmtViewPurchase/POMgmtViewPurchase'
 import POGoodsReturned from '../../components/POGoodsReturned/POGoodsReturned'
-// import POGoodsReceived from '../../components/POGoodsReceived/POGoodsReceived'
+import POGoodsReceived from '../../components/POGoodsReceived/POGoodsReceived'
 import {
   Barcode,
   Blocks,
-  // PackageCheck,
-  PackageMinus,
+  PackageCheck,
+  // PackageMinus,
   PackagePlus,
   PackageSearch,
   PackageX,
@@ -53,18 +53,18 @@ const sidebarItems = [
     icon: <PackagePlus />,
     component: <POCreateProducts />
   },
-  // {
-  //   key: 'goodsReceived',
-  //   label: 'Goods Received',
-  //   icon: <PackageCheck />,
-  //   component: <POGoodsReceived />
-  // },
   {
-    key: 'goodsHold',
-    label: 'Goods Hold',
-    icon: <PackageMinus />,
-    component: <POCreateProducts />
+    key: 'goodsReceived',
+    label: 'Goods Received',
+    icon: <PackageCheck />,
+    component: <POGoodsReceived />
   },
+  // {
+  //   key: 'goodsHold',
+  //   label: 'Goods Hold',
+  //   icon: <PackageMinus />,
+  //   component: <POCreateProducts />
+  // },
   {
     key: 'returnedGoods',
     label: 'Goods Returned',
@@ -80,7 +80,7 @@ const sidebarItems = [
 ]
 
 const POMgmt: React.FC = () => {
-  const [activeKey, setActiveKey] = useState('create')
+  const [activeKey, setActiveKey] = useState('createProducts')
 
   return (
     <div className="h-full flex flex-column">
