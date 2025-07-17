@@ -45,7 +45,7 @@ interface SettingsAddNewBranchProps {
  onUpdate: (updatedBranch: Branch) => Promise<void>;
 
   onClose: () => void;
-  existingBranches?: Branch[]; // to check duplicates
+  existingBranches?: Branch[]; 
 }
 
 const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({

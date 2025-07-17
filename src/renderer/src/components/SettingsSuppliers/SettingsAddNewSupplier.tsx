@@ -157,7 +157,7 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onSave, onUpd
   };
 
 const renderInput = (field: keyof Supplier, label: string, type = 'text') => {
-  const fieldId = `supplier-${String(field)}`; // ✅ Declare it here
+  const fieldId = `supplier-${String(field)}`; 
 
   return (
     <div className="flex-1">
