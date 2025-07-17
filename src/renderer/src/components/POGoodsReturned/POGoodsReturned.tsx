@@ -54,7 +54,7 @@ const POGoodsReturned: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [branches, setBranches] = useState<Branch[]>([])
 
-  const [totalPaid, setTotalPaid] = useState<number>(0)
+  const [totalPaid] = useState<number>(0)
 
 
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null)

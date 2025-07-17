@@ -82,6 +82,7 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onSave, onUpd
   const mobileRegex = /^\d{10}$/;
 
   const validateField = (field: keyof Supplier, value: string): string => {
+    
     const trimmed = value.trim();
     switch (field) {
       case 'supplierName':
@@ -124,7 +125,7 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onSave, onUpd
       setErrors((prevErrors) => ({ ...prevErrors, [field]: '' }));
     }
   };
-
+ 
   const handleSubmit = () => {
     const newErrors: { [key: string]: string } = {};
     (Object.keys(formData) as (keyof Supplier)[]).forEach((field) => {
@@ -155,21 +156,26 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onSave, onUpd
     }
   };
 
-  const renderInput = (field: keyof Supplier, label: string, type = 'text') => (
+const renderInput = (field: keyof Supplier, label: string, type = 'text') => {
+  const fieldId = `supplier-${String(field)}`; // ✅ Declare it here
+
+  return (
     <div className="flex-1">
       <FloatLabel className="flex-1 always-float">
         <InputText
-          id={field}
+          id={fieldId}
           type={type}
           value={formData[field] as string}
           className={`w-full ${errors[field] ? 'p-invalid' : ''}`}
           onChange={(e) => handleChange(field, e.target.value)}
         />
-        <label htmlFor={field}>{label}</label>
+        <label htmlFor={fieldId}>{label}</label>
       </FloatLabel>
       {errors[field] && <small style={{ color: 'red' }}>{errors[field]}</small>}
     </div>
   );
+};
+
 
   return (
     <div className="p-4 pb-20 relative">

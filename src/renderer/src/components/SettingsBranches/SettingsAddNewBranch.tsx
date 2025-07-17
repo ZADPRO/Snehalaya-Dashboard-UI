@@ -18,6 +18,7 @@ export interface Branch {
   refLocation: string;
   refMobile: string;
   refEmail: string;
+   refBTId: number;
   isMainBranch: boolean;
   isActive: boolean;
   createdAt: string;
@@ -41,7 +42,8 @@ interface SettingsAddNewBranchProps {
   mode: 'add' | 'edit';
   editData?: Branch | null;
   onSave: (newBranch: Branch) => void;
-  onUpdate: (updatedBranch: Branch) => void;
+ onUpdate: (updatedBranch: Branch) => Promise<void>;
+
   onClose: () => void;
   existingBranches?: Branch[]; // to check duplicates
 }
@@ -129,7 +131,6 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
       return false;
     }
 
-    // Duplicate checks:
     const nameExists = existingBranches.some(
       (b) =>
         b.refBranchName.toLowerCase() === formData.refBranchName.trim().toLowerCase() &&
@@ -150,7 +151,6 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
       return false;
     }
 
-    // New: Duplicate Mobile check
     const mobileExists = existingBranches.some(
       (b) =>
         b.refMobile === formData.refMobile.trim() &&
@@ -183,6 +183,7 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
       isActive: formData.selectedStatus?.isActive ?? true,
       createdAt: editData?.createdAt ?? new Date().toISOString(),
       createdBy: 'Admin',
+      refBTId: editData?.refBTId ?? 1,
       updatedAt: new Date().toISOString(),
       updatedBy: 'Admin',
       isDelete: false
@@ -251,7 +252,7 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
               id="refMobile"
               value={formData.refMobile}
               onChange={(e) => {
-                // Allow digits only
+                
                 const val = e.target.value.replace(/\D/g, '');
                 handleInputChange('refMobile', val);
               }}

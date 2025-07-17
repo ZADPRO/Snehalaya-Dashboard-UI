@@ -174,12 +174,12 @@ const SettingsCategories: React.FC = () => {
 
       if (res.data.status) {
         fetchData();
-        // toast.current?.show({ severity: 'success', summary: 'Updated', detail: res.data.message, life: 2000 });
+        
         setVisibleSidebar(false);
       } else throw new Error(res.data.message);
     } catch (err) {
         console.log(err)
-      // toast.current?.show({ severity: 'error', summary: 'Error', detail: err.message || 'Error updating category', life: 3000 });
+     
     }
   };
 
