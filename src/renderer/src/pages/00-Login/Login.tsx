@@ -14,6 +14,7 @@ import carousel1 from '../../assets/login/carousel1.png'
 import carousel2 from '../../assets/login/carousel2.png'
 import carousel3 from '../../assets/login/carousel3.png'
 import logo from '../../assets/logo/icon.png'
+import baseURL from '../../services/helper'
 
 const images = [carousel1, carousel2, carousel3]
 
@@ -56,8 +57,13 @@ const Login: React.FC = () => {
       Password: password
     }
 
+    console.log('baseURL', baseURL)
+
     try {
-      const response = await axios.post(import.meta.env.VITE_API_URL + '/admin/login', payload)
+      const response = await axios.post(
+        'https://snehalayaa.brightoncloudtech.com/api/v1' + '/admin/login',
+        payload
+      )
 
       const result = response.data
 

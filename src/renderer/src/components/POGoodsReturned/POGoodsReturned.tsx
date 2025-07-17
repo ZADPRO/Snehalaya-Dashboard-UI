@@ -54,7 +54,7 @@ const POGoodsReturned: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [branches, setBranches] = useState<Branch[]>([])
 
-  const [totalPaid, setTotalPaid] = useState<number>(0)
+  const [totalPaid, _setTotalPaid] = useState<number>(0)
 
 
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null)
@@ -204,7 +204,7 @@ const POGoodsReturned: React.FC = () => {
 
     setProductEntries((prev) => [...prev, entry])
 
-   
+
     setSelectedProduct(null)
     setQuantity(1)
     setPrice(0)
@@ -295,7 +295,7 @@ const pendingPayment = total - totalPaid
 
           <Divider layout="vertical" />
 
-         
+
           <div className="flex flex-column gap-3 p-4 border-gray-300" style={{ width: '70%' }}>
             <h4>Preview</h4>
 
@@ -420,13 +420,13 @@ const pendingPayment = total - totalPaid
       </div>
 
       <Divider layout="vertical" />
-  
+
       <div className="creationCard flex flex-column justify-content-between" style={{ width: '20%' }}>
         <div className="buttons p-3 flex flex-column gap-2">
           <p
             className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
             style={{ border: '1px solid #8e5ea8', background: 'none', borderRadius: '6px' }}
-           
+
           >
 
             <FileText size={18} /> Print DebitNote

@@ -7,7 +7,7 @@ import axios from 'axios'
 import { Divider } from 'primereact/divider'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
-import { Download, FileText, Printer } from 'lucide-react'
+import { Download } from 'lucide-react'
 import { generateInvoice } from './InvoicePdf'
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
@@ -55,7 +55,7 @@ const POCreateNewPurchase: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [branches, setBranches] = useState<Branch[]>([])
 
-  const [totalPaid, setTotalPaid] = useState<number>(0)
+  const [totalPaid, _setTotalPaid] = useState<number>(0)
  const toast = useRef<Toast>(null);
 
 
@@ -195,14 +195,14 @@ const handleDownloadInvoice = () => {
   const pdfProducts = productEntries.map((entry) => ({
     poId: entry.product.productId,
     poName: entry.product.productName,
-    // poDescription: entry.product.sku, 
+    // poDescription: entry.product.sku,
     poHSN: entry.product.hsnCode,
     poQuantity: entry.quantity.toString(),
     poPrice: entry.price.toFixed(2),
     poDiscPercent: entry.discount.toFixed(2),
     poDisc: entry.discountPrice.toFixed(2),
     poTotalPrice: entry.totalPrice.toFixed(2),
-    posku: entry.product.sku 
+    posku: entry.product.sku
   }));
 
   generateInvoice(selectedSupplier, selectedBranch, pdfProducts);
@@ -436,7 +436,7 @@ const handleDownloadInvoice = () => {
           {/* <p
             className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
             style={{ border: '1px solid #8e5ea8' }}
-             onClick={handlePrintOrder} 
+             onClick={handlePrintOrder}
           >
             <Printer size={18} /> Print Order
           </p> */}
