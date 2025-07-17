@@ -147,30 +147,9 @@ const SettingsBranches: React.FC = () => {
     }
   };
 
- const handleSave = async (newBra: Branch) => {
-  // ✅ Validate required fields
-  if (
-    !newBra.refBranchName ||
-    !newBra.refBranchCode ||
-    !newBra.refLocation ||
-    !newBra.refMobile ||
-    !newBra.refEmail ||
-    !newBra.refBTId
-  ) {
-    toast.current?.show({
-      severity: 'error',
-      summary: 'Validation Error',
-      detail: 'Please fill in all required fields!',
-      life: 3000,
-    });
-    return;
-  }
-
-  // ✅ Debug: Log data being saved
-  console.log('Saving new branch:', newBra);
-
+const handleSave = async (newBra: Branch) => {
   try {
-    const payload = {
+    const res = await axios.post(`${import.meta.env.VITE_API_URL}/admin/settings/branches`, {
       refBranchName: newBra.refBranchName,
       refBranchCode: newBra.refBranchCode,
       refLocation: newBra.refLocation,
@@ -179,57 +158,24 @@ const SettingsBranches: React.FC = () => {
       isMainBranch: newBra.isMainBranch,
       isActive: newBra.isActive,
       refBTId: newBra.refBTId,
-    };
-
-    const apiUrl = `${import.meta.env.VITE_API_URL}/admin/settings/branches`;
-
-    // ✅ Debug: Log URL and payload
-    console.log('POST to:', apiUrl, 'Payload:', payload);
-
-    const res = await axios.post(apiUrl, payload, {
+    }, {
       headers: {
-        Authorization: sessionStorage.getItem('token') || '',
-      },
+        Authorization: sessionStorage.getItem('token') || ''
+      }
     });
-
-    // ✅ Debug: Log response
-    console.log('Save response:', res.data);
 
     if (res.data.status) {
-      // Success handling
       fetchData();
-      toast.current?.show({
-        severity: 'success',
-        summary: 'Created',
-        detail: res.data.message || 'Branch created successfully!',
-        life: 2000,
-      });
       setVisibleSidebar(false);
-    } else {
-      // Backend returned status = false
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: res.data.message || 'Failed to create branch.',
-        life: 3000,
-      });
-    }
+      // toast.current?.show({ severity: 'success', summary: 'Created', detail: res.data.message, life: 2000 });
+    } else throw new Error(res.data.message);
   } catch (err: any) {
-    console.error('Error saving branch:', err);
-
-    const message =
-      err.response?.data?.message ||
-      err.message ||
-      'Unknown error occurred while saving branch.';
-
-    toast.current?.show({
-      severity: 'error',
-      summary: 'Save Failed',
-      detail: message,
-      life: 3000,
-    });
+  //   toast.current?.show({ severity: 'error', summary: 'Error', detail: err.message || 'Error creating branch', life: 3000 });
+  // }
   }
 };
+
+
 
 
   const handleUpdate = async (updatedBranch: Branch) => {
@@ -247,35 +193,19 @@ const SettingsBranches: React.FC = () => {
 
       if (res.data.status) {
         fetchData();
-        // toast.current?.show({
-        //   severity: 'success',
-        //   summary: 'Updated',
-        //   detail: res.data.message || 'Branch updated successfully!',
-        //   life: 2000
-        // });
+        
         setVisibleSidebar(false);
       } else throw new Error(res.data.message);
     } catch (err: any) {
-      // toast.current?.show({
-      //   severity: 'error',
-      //   summary: 'Error',
-      //   detail: err.message || 'Error updating branch',
-      //   life: 3000
-      // });
+     
     }
   };
 
   return (
     <div className="card">
-      {/* Toast for notifications */}
       <Toast ref={toast} />
-      {/* Confirm Dialog for delete confirmation */}
       <ConfirmDialog />
-      
-      {/* Toolbar */}
       <Toolbar left={leftToolbar} right={rightToolbar} className="mb-4" />
-
-      {/* DataTable for displaying branches */}
       <DataTable
         ref={dtRef}
         value={branches}
@@ -300,7 +230,6 @@ const SettingsBranches: React.FC = () => {
         <Column header="Actions" body={actionBody} />
       </DataTable>
 
-      {/* Sidebar for add/edit */}
       <Sidebar
         visible={visibleSidebar}
         position="right"

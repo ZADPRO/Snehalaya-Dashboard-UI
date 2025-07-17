@@ -1,17 +1,16 @@
-import React, { useRef ,useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { FloatLabel } from 'primereact/floatlabel';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 
-
 interface StatusOption {
   name: string;
   value: boolean;
 }
 
-interface SupplierFormData {
+export interface Supplier {
   supplierName: string;
   supplierCompanyName: string;
   supplierCode: string;
@@ -31,13 +30,14 @@ interface SupplierFormData {
   supplierPaymentTerms: string;
   emergencyContactName: string;
   emergencyContactNumber: string;
+  [key: string]: any;
 }
 
-interface SettingsAddNewSupplierProps {
+interface Props {
   mode: 'add' | 'edit';
-  editData?: SupplierFormData | null;
-  onSave: (newSupplier: SupplierFormData) => void;
-  onUpdate: (updatedSupplier: SupplierFormData) => void;
+  editData?: Supplier | null;
+  onSave: (data: Supplier, onSuccess: () => void, onError: (msg: string) => void) => void;
+  onUpdate: (data: Supplier, onSuccess: () => void, onError: (msg: string) => void) => void;
   onClose: () => void;
 }
 
@@ -46,14 +46,8 @@ const statusOptions: StatusOption[] = [
   { name: 'In Active', value: false },
 ];
 
-const SettingsAddNewSupplier: React.FC<SettingsAddNewSupplierProps> = ({
-  mode,
-  editData,
-  onSave,
-  onUpdate,
-  onClose,
-}) => {
-  const [formData, setFormData] = useState<SupplierFormData>({
+const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onSave, onUpdate, onClose }) => {
+  const [formData, setFormData] = useState<Supplier>({
     supplierName: '',
     supplierCompanyName: '',
     supplierCode: '',
@@ -75,6 +69,7 @@ const SettingsAddNewSupplier: React.FC<SettingsAddNewSupplierProps> = ({
     emergencyContactNumber: '',
   });
 
+  const toast = useRef<Toast>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
@@ -85,122 +80,56 @@ const SettingsAddNewSupplier: React.FC<SettingsAddNewSupplierProps> = ({
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const mobileRegex = /^\d{10}$/;
-const toast = useRef<Toast>(null);
 
-  const validateField = (field: keyof SupplierFormData, value: string): string => {
+  const validateField = (field: keyof Supplier, value: string): string => {
     const trimmed = value.trim();
-
     switch (field) {
       case 'supplierName':
-        if (!trimmed) return 'Supplier Name is required.';
-        break;
       case 'supplierCompanyName':
-        if (!trimmed) return 'Company Name is required.';
-        break;
       case 'supplierCode':
-        if (!trimmed) return 'Supplier Code is required.';
+      case 'supplierDoorNumber':
+      case 'supplierStreet':
+      case 'supplierCity':
+      case 'supplierState':
+      case 'supplierCountry':
+      case 'supplierBankName':
+      case 'supplierBankACNumber':
+      case 'supplierIFSC':
+      case 'supplierGSTNumber':
+      case 'supplierUPI':
+      case 'supplierPaymentTerms':
+      case 'emergencyContactName':
+        if (!trimmed) return `${field.replace(/supplier|emergencyContact/, '').replace(/([A-Z])/g, ' $1')} is required.`;
         break;
       case 'supplierEmail':
         if (!trimmed) return 'Email is required.';
         if (!emailRegex.test(trimmed)) return 'Invalid email format.';
         break;
       case 'supplierContactNumber':
-        if (!trimmed) return 'Contact Number is required.';
-        if (!mobileRegex.test(trimmed)) return 'Contact Number must be 10 digits.';
-        break;
-      case 'supplierDoorNumber':
-        if (!trimmed) return 'Door Number is required.';
-        break;
-      case 'supplierStreet':
-        if (!trimmed) return 'Street is required.';
-        break;
-      case 'supplierCity':
-        if (!trimmed) return 'City is required.';
-        break;
-      case 'supplierState':
-        if (!trimmed) return 'State is required.';
-        break;
-      case 'supplierCountry':
-        if (!trimmed) return 'Country is required.';
-        break;
-      case 'supplierBankName':
-        if (!trimmed) return 'Account Holder Name is required.';
-        break;
-      case 'supplierBankACNumber':
-        if (!trimmed) return 'Account Number is required.';
-        break;
-      case 'supplierIFSC':
-        if (!trimmed) return 'IFSC Code is required.';
-        break;
-      case 'supplierGSTNumber':
-        if (!trimmed) return 'GST Number is required.';
-        break;
-      case 'supplierUPI':
-        if (!trimmed) return 'UPI ID is required.';
-        break;
-      case 'supplierPaymentTerms':
-        if (!trimmed) return 'Payment Terms are required.';
-        break;
-      case 'emergencyContactName':
-        if (!trimmed) return 'Emergency Contact Name is required.';
-        break;
       case 'emergencyContactNumber':
-        if (!trimmed) return 'Emergency Contact Number is required.';
-        if (!mobileRegex.test(trimmed)) return 'Emergency Contact Number must be 10 digits.';
+        if (!trimmed) return 'Number is required.';
+        if (!mobileRegex.test(trimmed)) return 'Must be 10 digits.';
         break;
     }
-
     return '';
   };
 
-  const handleChange = (field: keyof SupplierFormData, value: string | boolean) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+  const handleChange = (field: keyof Supplier, value: string | boolean) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
 
     if (typeof value === 'string') {
       const error = validateField(field, value);
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        [field]: error,
-      }));
+      setErrors((prevErrors) => ({ ...prevErrors, [field]: error }));
     } else if (field === 'supplierIsActive') {
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        [field]: '',
-      }));
+      setErrors((prevErrors) => ({ ...prevErrors, [field]: '' }));
     }
   };
 
-  const isSaveDisabled =
-    Object.values(errors).some((err) => err) ||
-    !formData.supplierName.trim() ||
-    !formData.supplierCompanyName.trim() ||
-    !formData.supplierCode.trim() ||
-    !formData.supplierEmail.trim() ||
-    !formData.supplierContactNumber.trim() ||
-    !formData.supplierDoorNumber.trim() ||
-    !formData.supplierStreet.trim() ||
-    !formData.supplierCity.trim() ||
-    !formData.supplierState.trim() ||
-    !formData.supplierCountry.trim() ||
-    !formData.supplierBankName.trim() ||
-    !formData.supplierBankACNumber.trim() ||
-    !formData.supplierIFSC.trim() ||
-    !formData.supplierGSTNumber.trim() ||
-    !formData.supplierUPI.trim() ||
-    !formData.supplierPaymentTerms.trim() ||
-    !formData.emergencyContactName.trim() ||
-    !formData.emergencyContactNumber.trim();
-
   const handleSubmit = () => {
-    
-    let newErrors: { [key: string]: string } = {};
-    (Object.keys(formData) as (keyof SupplierFormData)[]).forEach((field) => {
-      const val = formData[field];
-      if (typeof val === 'string') {
-        const err = validateField(field, val);
+    const newErrors: { [key: string]: string } = {};
+    (Object.keys(formData) as (keyof Supplier)[]).forEach((field) => {
+      if (typeof formData[field] === 'string') {
+        const err = validateField(field, formData[field] as string);
         if (err) newErrors[field] = err;
       }
     });
@@ -210,15 +139,23 @@ const toast = useRef<Toast>(null);
       return;
     }
 
+    const onSuccess = () => {
+      toast.current?.show({ severity: 'success', summary: 'Success', detail: `${mode === 'edit' ? 'Updated' : 'Saved'} successfully`, life: 2000 });
+      setTimeout(() => onClose(), 1000);
+    };
+
+    const onError = (msg: string) => {
+      toast.current?.show({ severity: 'warn', summary: 'Failed', detail: msg, life: 4000 });
+    };
+
     if (mode === 'add') {
-      onSave(formData);
+      onSave(formData, onSuccess, onError);
     } else {
-      onUpdate(formData);
+      onUpdate(formData, onSuccess, onError);
     }
-    setTimeout(() => onClose(), 500);
   };
 
-  const renderInput = (field: keyof SupplierFormData, label: string, type = 'text') => (
+  const renderInput = (field: keyof Supplier, label: string, type = 'text') => (
     <div className="flex-1">
       <FloatLabel className="flex-1 always-float">
         <InputText
@@ -235,10 +172,8 @@ const toast = useRef<Toast>(null);
   );
 
   return (
-    
     <div className="p-4 pb-20 relative">
-    <Toast ref={toast} position="top-right" />
-
+      <Toast ref={toast} position="top-right" />
       <p className="font-medium text-sm mt-4 mb-2">Basic Details</p>
       <div className="flex gap-4">
         {renderInput('supplierName', 'Supplier Name*')}
@@ -305,7 +240,6 @@ const toast = useRef<Toast>(null);
           icon="pi pi-check"
           className="bg-[#8e5ea8] border-none gap-2"
           onClick={handleSubmit}
-          disabled={isSaveDisabled}
         />
       </div>
     </div>

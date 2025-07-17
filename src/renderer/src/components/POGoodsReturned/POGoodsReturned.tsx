@@ -75,7 +75,7 @@ const POGoodsReturned: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const toast = useRef<Toast>(null)
-<<<<<<< HEAD
+
 const handleGeneratedebit = async () => {
   if (!selectedSupplier || !selectedBranch || productEntries.length === 0) {
     toast.current?.show({
@@ -85,64 +85,12 @@ const handleGeneratedebit = async () => {
       life: 3000
     });
     return;
-=======
-
-  const handleGenerateInvoice = () => {
-    if (!selectedSupplier || !selectedBranch || productEntries.length === 0) {
-      toast.current?.show({
-        severity: 'warn',
-        summary: 'Incomplete Data',
-        detail: 'Please fill all required fields.',
-        life: 3000
-      })
-      return
-    }
 
 
-    const formattedProducts = productEntries.map((entry) => ({
-      poId: entry.product.productId,
-      poName: entry.product.productName,
-      poHSN: entry.product.hsnCode,
-      poQuantity: entry.quantity.toString(),
-      poPrice: entry.price.toFixed(2),
-      poDiscPercent: entry.discount.toString(),
-      poDisc: entry.discountPrice.toFixed(2),
-      poTotalPrice: entry.totalPrice.toFixed(2),
-      sku: entry.product.sku,
-    }))
+  
 
-    try {
-    debitInvoice1({
-  supplier: selectedSupplier!,
-  branch: selectedBranch!,
-  productEntries: formattedProducts,
-  creditedDate: creditedDate?.toLocaleDateString() ?? '',
-  transport,
-  subTotal,
-  discountTotal,
-  tax,
-  total,
-  totalPaid,
-  pendingPayment,
-});
 
-      toast.current?.show({
-        severity: 'success',
-        summary: 'Invoice Generated',
-        detail: 'Debit note has been generated successfully.',
-        life: 3000
-      })
-    } catch (err) {
-      console.error('PDF generation failed:', err)
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Something went wrong while generating the invoice.',
-        life: 3000
-      })
-
-    }
-
+   
   }
 
   const formattedProducts = productEntries.map((entry) => ({
@@ -555,7 +503,7 @@ const handlePrint = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default POGoodsReturned
+export default POGoodsReturned;

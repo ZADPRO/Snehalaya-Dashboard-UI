@@ -1,10 +1,9 @@
-import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
+import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown'; 
 import { FloatLabel } from 'primereact/floatlabel';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import React, { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
 
 interface CategoryStatusOptions {
   name: string;
@@ -115,7 +114,7 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
     return true;
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (isSubmitting || !validateForm()) return;
     setIsSubmitting(true);
 
@@ -131,70 +130,29 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
       profitMargin: parseFloat(formData.profitMargin)
     };
 
-    try {
-      const url = `${import.meta.env.VITE_API_URL}/admin/settings/categories`;
-      const headers = { Authorization: sessionStorage.getItem('token') || '' };
-
-      if (mode === 'add') {
-        const response = await axios.post(url, category, { headers });
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Created',
-          detail: response.data.message || 'Category added successfully!',
-          life: 3000
-        });
-        onSave(response.data);
-      } else {
-        const response = await axios.put(url, category, { headers });
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Updated',
-          detail: response.data.message || 'Category updated successfully!',
-          life: 3000
-        });
-        onUpdate(response.data);
-      }
-
-      setTimeout(() => {
-        setIsSubmitting(false);
-        onClose();
-      }, 1000);
-    } catch (error: any) {
-      setIsSubmitting(false);
-      const msg = error?.response?.data?.message?.toLowerCase();
-
-      if (error.response?.status === 409) {
-        if (msg?.includes('code')) {
-          toast.current?.show({
-            severity: 'warn',
-            summary: 'Duplicate Code',
-            detail: 'Category code already exists. Use a different code.',
-            life: 4000
-          });
-        } else if (msg?.includes('name')) {
-          toast.current?.show({
-            severity: 'warn',
-            summary: 'Duplicate Name',
-            detail: 'Category name already exists. Use a different name.',
-            life: 4000
-          });
-        } else {
-          toast.current?.show({
-            severity: 'warn',
-            summary: 'Duplicate Entry',
-            detail: 'Category already exists.',
-            life: 4000
-          });
-        }
-      } else {
-        toast.current?.show({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to save category.',
-          life: 3000
-        });
-      }
+    // Directly call onSave or onUpdate without axios
+    if (mode === 'add') {
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Created',
+        detail: 'Category added successfully!',
+        life: 3000
+      });
+      onSave(category);
+    } else {
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Updated',
+        detail: 'Category updated successfully!',
+        life: 3000
+      });
+      onUpdate(category);
     }
+
+    setTimeout(() => {
+      setIsSubmitting(false);
+      onClose();
+    }, 1000);
   };
 
   return (

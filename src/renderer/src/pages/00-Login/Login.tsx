@@ -89,16 +89,25 @@ const Login: React.FC = () => {
         setLoading(false)
         setLoginSuccess(false)
       }
-    } catch (error) {
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Login Failed',
-        detail: 'Something went wrong. Please try again.',
-        life: 3000
-      })
-      setLoading(false)
-      setLoginSuccess(false)
-    }
+  } catch (error: unknown) {
+  let errorMessage = 'Something went wrong. Please try again.'
+
+  if (axios.isAxiosError(error)) {
+   
+    errorMessage = error.response?.data?.data?.message || errorMessage
+  }
+
+  toast.current?.show({
+    severity: 'error',
+    summary: 'Login Failed',
+    detail: errorMessage,
+    life: 3000
+  })
+
+  setLoading(false)
+  setLoginSuccess(false)
+}
+
   }
 
   return (

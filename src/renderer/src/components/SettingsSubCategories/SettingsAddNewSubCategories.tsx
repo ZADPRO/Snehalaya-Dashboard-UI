@@ -1,10 +1,9 @@
+import React, { useEffect, useRef, useState } from 'react';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { FloatLabel } from 'primereact/floatlabel';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
-import React, { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
 
 interface SubCategoryStatusOptions {
   name: string;
@@ -55,17 +54,17 @@ const SettingsAddNewSubCategories: React.FC<Props> = ({
   const toast = useRef<Toast>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [formData, setFormData] = useState<SubCategoryFormData>({
-    parentCategory: null,
-    subCategoryName: '',
-    subCategoryCode: '',
-    selectedStatus: { name: 'Active', isActive: true }
-  });
-
   const statusOptions: SubCategoryStatusOptions[] = [
     { name: 'Active', isActive: true },
     { name: 'In Active', isActive: false }
   ];
+
+  const [formData, setFormData] = useState<SubCategoryFormData>({
+    parentCategory: null,
+    subCategoryName: '',
+    subCategoryCode: '',
+    selectedStatus: statusOptions[0]
+  });
 
   useEffect(() => {
     if (mode === 'edit' && editData) {
@@ -122,88 +121,43 @@ const SettingsAddNewSubCategories: React.FC<Props> = ({
     return true;
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (isSubmitting || !validateForm()) return;
+
     setIsSubmitting(true);
 
     const subCategory: SubCategory = {
-      refSubCategoryId: editData?.refSubCategoryId ?? 0,
+      refSubCategoryId: editData?.refSubCategoryId ?? Math.floor(Math.random() * 1000000),
       refCategoryId: formData.parentCategory?.refCategoryId ?? 0,
       subCategoryName: formData.subCategoryName.trim(),
       subCategoryCode: formData.subCategoryCode.trim(),
       isActive: formData.selectedStatus?.isActive ?? true,
       createdAt: editData?.createdAt ?? new Date().toISOString(),
-      createdBy: 'Admin',
+      createdBy: editData?.createdBy ?? 'Admin',
       updatedAt: new Date().toISOString(),
       updatedBy: 'Admin'
     };
 
-    try {
-      const url = `${import.meta.env.VITE_API_URL}/admin/settings/subcategories`;
-      const headers = {
-        Authorization: sessionStorage.getItem('token')
-      };
-
-      if (mode === 'add') {
-        const response = await axios.post(url, subCategory, { headers });
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Success',
-          detail: response.data.message || 'Sub-category added successfully!',
-          life: 3000
-        });
-        onSave(response.data);
-      } else {
-        const response = await axios.put(url, subCategory, { headers });
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Updated',
-          detail: response.data.message || 'Sub-category updated successfully!',
-          life: 3000
-        });
-        onUpdate(response.data);
-      }
-
-      setTimeout(() => {
-        setIsSubmitting(false);
-        onClose();
-      }, 1000);
-    } catch (error: any) {
-      setIsSubmitting(false);
-      const msg = error?.response?.data?.message?.toLowerCase();
-
-      if (error.response?.status === 409) {
-        if (msg?.includes('code')) {
-          toast.current?.show({
-            severity: 'warn',
-            summary: 'Duplicate Code',
-            detail: 'Sub-category code already exists. Use a different code.',
-            life: 4000
-          });
-        } else if (msg?.includes('name')) {
-          toast.current?.show({
-            severity: 'warn',
-            summary: 'Duplicate Name',
-            detail: 'Sub-category name already exists. Use a different name.',
-            life: 4000
-          });
-        } else {
-          toast.current?.show({
-            severity: 'warn',
-            summary: 'Duplicate Entry',
-            detail: 'Sub-category already exists.',
-            life: 4000
-          });
-        }
-      } else {
-        toast.current?.show({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to save sub-category.',
-          life: 3000
-        });
-      }
+    if (mode === 'add') {
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Sub-category added successfully!',
+        life: 3000
+      });
+      onSave(subCategory);
+    } else {
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Updated',
+        detail: 'Sub-category updated successfully!',
+        life: 3000
+      });
+      onUpdate(subCategory);
     }
+
+    setIsSubmitting(false);
+    onClose();
   };
 
   return (
@@ -283,6 +237,7 @@ const SettingsAddNewSubCategories: React.FC<Props> = ({
           icon="pi pi-check"
           className="bg-[#8e5ea8] border-none gap-2"
           onClick={handleSubmit}
+          disabled={isSubmitting}
         />
       </div>
     </div>

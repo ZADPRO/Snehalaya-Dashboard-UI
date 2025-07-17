@@ -217,45 +217,46 @@ const handleDelete = async (id: number, confirmed = false) => {
       if (response.data?.status) {
         fetchSubCategories()
       }
-       
-      
-      
     } catch (error) {
       console.error(error)
-      
-   
     }
   }
 
-  const handleUpdate = async (updatedSubCategory: SubCategory) => {
-    try {
-      const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/admin/settings/subcategories`,
-        {
-          refSubCategoryId: updatedSubCategory.refSubCategoryId,
-          subCategoryName: updatedSubCategory.subCategoryName,
-          subCategoryCode: updatedSubCategory.subCategoryCode,
-          refCategoryId: updatedSubCategory.parentCategoryId || updatedSubCategory.refCategoryId,
-          isActive: updatedSubCategory.isActive
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: sessionStorage.getItem('token')
-          }
+ const handleUpdate = async (updSubCat: SubCategory) => {
+  try {
+    const res = await axios.put(
+      `${import.meta.env.VITE_API_URL}/admin/settings/subcategories`,
+      {
+        refSubCategoryId: updSubCat.refSubCategoryId,
+        subCategoryName: updSubCat.subCategoryName,
+        subCategoryCode: updSubCat.subCategoryCode,
+        refCategoryId: updSubCat.refCategoryId,
+        isActive: updSubCat.isActive
+      },
+      {
+        headers: {
+          Authorization: sessionStorage.getItem('token') || ''
         }
-      )
-
-      if (response.data?.status) {
-        fetchSubCategories()
-       
-        
       }
-    } catch (error) {
-     
-    console.log(error)
+    );
+
+    if (res.data.status) {
+      fetchSubCategories(); // ✅ correct function
+      setVisibleRight(false); // ✅ correct state
+    } else {
+      throw new Error(res.data.message);
     }
+  } catch (err: any) {
+    console.error(err);
+    toast.current?.show({
+      severity: 'error',
+      summary: 'Error',
+      detail: err?.message || 'Update failed',
+      life: 3000
+    });
   }
+};
+
 
   const leftHeader = (
     <div className="flex gap-2 items-center">
