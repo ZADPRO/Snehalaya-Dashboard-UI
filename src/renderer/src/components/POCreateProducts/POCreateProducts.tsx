@@ -54,9 +54,12 @@ const AddProduct: React.FC = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/settings/categories`, {
-        headers: { Authorization: sessionStorage.getItem('token') || '' }
-      })
+      const res = await axios.get(
+        `https://snehalayaa.brightoncloudtech.com/api/v1/admin/settings/categories`,
+        {
+          headers: { Authorization: sessionStorage.getItem('token') || '' }
+        }
+      )
       if (res.data?.status) {
         setCategories(res.data.data)
         localStorage.setItem('categories', JSON.stringify(res.data.data))
