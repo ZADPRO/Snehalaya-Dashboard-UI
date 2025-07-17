@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Dropdown } from 'primereact/dropdown'
-import { Calendar } from 'primereact/calendar'
+// import { Calendar } from 'primereact/calendar'
 import { InputText } from 'primereact/inputtext'
 import { InputNumber } from 'primereact/inputnumber'
 import axios from 'axios'
@@ -10,7 +10,6 @@ import { Column } from 'primereact/column'
 import { FileText, Download } from 'lucide-react'
 import { debitInvoice1 } from '../../components/POGoodsReturned/debitinvoice'
 import { Toast } from 'primereact/toast'
-
 
 interface Supplier {
   supplierId: number
@@ -56,7 +55,6 @@ const POGoodsReturned: React.FC = () => {
 
   const [totalPaid, _setTotalPaid] = useState<number>(0)
 
-
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null)
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null)
 
@@ -86,7 +84,6 @@ const POGoodsReturned: React.FC = () => {
       return
     }
 
-
     const formattedProducts = productEntries.map((entry) => ({
       poId: entry.product.productId,
       poName: entry.product.productName,
@@ -96,23 +93,23 @@ const POGoodsReturned: React.FC = () => {
       poDiscPercent: entry.discount.toString(),
       poDisc: entry.discountPrice.toFixed(2),
       poTotalPrice: entry.totalPrice.toFixed(2),
-      sku: entry.product.sku,
+      sku: entry.product.sku
     }))
 
     try {
-    debitInvoice1({
-  supplier: selectedSupplier!,
-  branch: selectedBranch!,
-  productEntries: formattedProducts,
-  creditedDate: creditedDate?.toLocaleDateString() ?? '',
-  transport,
-  subTotal,
-  discountTotal,
-  tax,
-  total,
-  totalPaid,
-  pendingPayment,
-});
+      debitInvoice1({
+        supplier: selectedSupplier!,
+        branch: selectedBranch!,
+        productEntries: formattedProducts,
+        creditedDate: creditedDate?.toLocaleDateString() ?? '',
+        transport,
+        subTotal,
+        discountTotal,
+        tax,
+        total,
+        totalPaid,
+        pendingPayment
+      })
 
       toast.current?.show({
         severity: 'success',
@@ -128,7 +125,6 @@ const POGoodsReturned: React.FC = () => {
         detail: 'Something went wrong while generating the invoice.',
         life: 3000
       })
-
     }
   }
 
@@ -136,21 +132,31 @@ const POGoodsReturned: React.FC = () => {
     const token = sessionStorage.getItem('token')
 
     axios
-      .get('http://localhost:8080/api/v1/admin/suppliers/read', {
+      .get('https://snehalayaa.brightoncloudtech.com/api/v1/admin/suppliers/read', {
         headers: { Authorization: `${token}` }
       })
       .then((res) => setSuppliers(res.data.data))
       .catch(() => {
-        toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to load suppliers.', life: 3000 })
+        toast.current?.show({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load suppliers.',
+          life: 3000
+        })
       })
 
     axios
-      .get('http://localhost:8080/api/v1/admin/settings/branches', {
+      .get('https://snehalayaa.brightoncloudtech.com/api/v1/admin/settings/branches', {
         headers: { Authorization: `${token}` }
       })
       .then((res) => setBranches(res.data.data))
       .catch(() => {
-        toast.current?.show({ severity: 'error', summary: 'Error', detail: 'Failed to load branches.', life: 3000 })
+        toast.current?.show({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load branches.',
+          life: 3000
+        })
       })
   }, [])
 
@@ -162,17 +168,18 @@ const POGoodsReturned: React.FC = () => {
   }, [creditedDays])
 
   useEffect(() => {
-    const mockProducts: Product[] = [
-      { productId: 1, productName: 'Kanchipuram Silk Saree', hsnCode: '5007', sku: '' },
-      { productId: 2, productName: 'Banarasi Saree', hsnCode: '5007', sku: '' },
-      { productId: 3, productName: 'Chiffon Saree', hsnCode: '5407', sku: '' },
-      { productId: 4, productName: 'Georgette Saree', hsnCode: '5408', sku: '' },
-      { productId: 5, productName: 'Cotton Handloom Saree', hsnCode: '5208', sku: '' },
-      { productId: 6, productName: 'Linen Saree', hsnCode: '5309', sku: '' },
-      { productId: 7, productName: 'Tussar Silk Saree', hsnCode: '5007', sku: '' },
-      { productId: 8, productName: 'Organza Saree', hsnCode: '5407', sku: '' }
-    ]
-    setProductList(mockProducts)
+    const localData = localStorage.getItem('products')
+    if (localData) {
+      const parsedProducts = JSON.parse(localData)
+      const transformed = parsedProducts.map((p: any, index: number) => ({
+        productId: index + 1,
+        productName: p.poName,
+        hsnCode: 'NA',
+        sku: p.dummySKU,
+        discount: parseFloat(p.poDiscPercent) || 0
+      }))
+      setProductList(transformed)
+    }
   }, [])
 
   const handleAddProduct = () => {
@@ -204,7 +211,6 @@ const POGoodsReturned: React.FC = () => {
 
     setProductEntries((prev) => [...prev, entry])
 
-
     setSelectedProduct(null)
     setQuantity(1)
     setPrice(0)
@@ -219,14 +225,15 @@ const POGoodsReturned: React.FC = () => {
     return `SS-${month}-${year}-${serial}`
   }
 
-const subTotal = productEntries.reduce((sum, entry) => sum + entry.price * entry.quantity, 0)
-const discountTotal = productEntries.reduce((sum, entry) => sum + entry.discountPrice * entry.quantity, 0)
-const taxableAmount = subTotal - discountTotal
-const tax = taxableAmount * 0.05
-const total = taxableAmount + tax
-const pendingPayment = total - totalPaid
-
-
+  const subTotal = productEntries.reduce((sum, entry) => sum + entry.price * entry.quantity, 0)
+  const discountTotal = productEntries.reduce(
+    (sum, entry) => sum + entry.discountPrice * entry.quantity,
+    0
+  )
+  const taxableAmount = subTotal - discountTotal
+  const tax = taxableAmount * 0.05
+  const total = taxableAmount + tax
+  const pendingPayment = total - totalPaid
 
   return (
     <div className="purchaseOrderCreationCard flex" style={{ width: '100%', height: '100%' }}>
@@ -234,7 +241,7 @@ const pendingPayment = total - totalPaid
       {/* Left Section - Form */}
       <div className="creationCard" style={{ width: '80%' }}>
         <div className="flex">
-          <div className="flex flex-column gap-3 p-4" style={{ width: '30%' }}>
+          <div className="flex flex-column gap-3 p-1" style={{ width: '30%' }}>
             {/* Float Label Input Fields */}
             <span className="p-float-label always-float">
               <Dropdown
@@ -271,7 +278,7 @@ const pendingPayment = total - totalPaid
               <label htmlFor="creditedDays">Credited Days</label>
             </span>
 
-            <span className="p-float-label always-float">
+            {/* <span className="p-float-label always-float">
               <Calendar
                 id="creditedDate"
                 value={creditedDate}
@@ -280,7 +287,7 @@ const pendingPayment = total - totalPaid
                 dateFormat="dd-mm-yy"
               />
               <label htmlFor="creditedDate">Expected Date</label>
-            </span>
+            </span> */}
 
             <span className="p-float-label always-float">
               <InputText
@@ -295,8 +302,7 @@ const pendingPayment = total - totalPaid
 
           <Divider layout="vertical" />
 
-
-          <div className="flex flex-column gap-3 p-4 border-gray-300" style={{ width: '70%' }}>
+          <div className="flex flex-column gap-3 p-1 border-gray-300" style={{ width: '70%' }}>
             <h4>Preview</h4>
 
             <div className="flex justify-content-between">
@@ -348,7 +354,7 @@ const pendingPayment = total - totalPaid
           </div>
         </div>
 
-        <div className="addProductsPreview p-4 flex flex-column gap-3">
+        <div className="addProductsPreview mt-3 p-1 flex flex-column gap-3">
           <div className="flex gap-3">
             <span className="p-float-label always-float flex-1">
               <Dropdown
@@ -405,7 +411,14 @@ const pendingPayment = total - totalPaid
             </div>
           </div>
 
-          <DataTable value={productEntries} tableStyle={{ minWidth: '50rem' }} stripedRows showGridlines>
+          <Divider />
+
+          <DataTable
+            value={productEntries}
+            tableStyle={{ minWidth: '50rem' }}
+            stripedRows
+            showGridlines
+          >
             <Column header="S.No" body={(_, idx) => idx.rowIndex + 1} />
             <Column header="Product" field="product.productName" />
             <Column header="HSN Code" field="product.hsnCode" />
@@ -421,28 +434,29 @@ const pendingPayment = total - totalPaid
 
       <Divider layout="vertical" />
 
-      <div className="creationCard flex flex-column justify-content-between" style={{ width: '20%' }}>
+      <div
+        className="creationCard flex flex-column justify-content-between"
+        style={{ width: '20%' }}
+      >
         <div className="buttons p-3 flex flex-column gap-2">
           <p
             className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
             style={{ border: '1px solid #8e5ea8', background: 'none', borderRadius: '6px' }}
-
           >
-
             <FileText size={18} /> Print DebitNote
           </p>
 
           <p
             className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
             style={{ border: '1px solid #8e5ea8' }}
-             onClick={handleGenerateInvoice}
+            onClick={handleGenerateInvoice}
           >
             <Download size={18} /> Download
           </p>
         </div>
         <div className="Tax Summary p-3"></div>
         <Divider />
-        <div className="mt-4">
+        <div className="mt-4 p-3">
           <h5 className="mb-3 font-bold">Tax Summary</h5>
           <div className="flex justify-content-between mb-2">
             <span>Tax Type</span>
@@ -471,7 +485,6 @@ const pendingPayment = total - totalPaid
           <div className="flex justify-content-between">
             <strong>Pending Payment</strong>
             <strong>₹{pendingPayment.toFixed(2)}</strong>
-
           </div>
         </div>
       </div>
