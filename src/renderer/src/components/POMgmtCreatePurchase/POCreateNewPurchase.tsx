@@ -7,7 +7,7 @@ import axios from 'axios'
 import { Divider } from 'primereact/divider'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
-import { Download, FileText, Printer } from 'lucide-react'
+import { Download, } from 'lucide-react'
 import { generateInvoice } from './InvoicePdf'
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
@@ -55,7 +55,7 @@ const POCreateNewPurchase: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [branches, setBranches] = useState<Branch[]>([])
 
-  const [totalPaid, setTotalPaid] = useState<number>(0)
+  const [totalPaid, ] = useState<number>(0)
  const toast = useRef<Toast>(null);
 
 

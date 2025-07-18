@@ -41,12 +41,14 @@ interface Props {
   onSave: (newSubCategory: SubCategory) => void;
   onUpdate: (updatedSubCategory: SubCategory) => void;
   onClose: () => void;
+  existingSubCategories: SubCategory[]; 
 }
 
 const SettingsAddNewSubCategories: React.FC<Props> = ({
   mode,
   editData,
   categories,
+   existingSubCategories,
   onSave,
   onUpdate,
   onClose
@@ -90,75 +92,113 @@ const SettingsAddNewSubCategories: React.FC<Props> = ({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const validateForm = () => {
-    if (!formData.parentCategory) {
-      toast.current?.show({
-        severity: 'warn',
-        summary: 'Missing Category',
-        detail: 'Please select a parent category.',
-        life: 3000
-      });
-      return false;
-    }
-    if (!formData.subCategoryName.trim()) {
-      toast.current?.show({
-        severity: 'warn',
-        summary: 'Missing Name',
-        detail: 'Please enter a sub-category name.',
-        life: 3000
-      });
-      return false;
-    }
-    if (!formData.subCategoryCode.trim()) {
-      toast.current?.show({
-        severity: 'warn',
-        summary: 'Missing Code',
-        detail: 'Please enter a sub-category code.',
-        life: 3000
-      });
-      return false;
-    }
-    return true;
-  };
+ const validateForm = () => {
+  if (!formData.parentCategory) {
+    toast.current?.show({
+      severity: 'warn',
+      summary: 'Missing Category',
+      detail: 'Please select a parent category.',
+      life: 3000
+    });
+    return false;
+  }
+  if (!formData.subCategoryName.trim()) {
+    toast.current?.show({
+      severity: 'warn',
+      summary: 'Missing Name',
+      detail: 'Please enter a sub-category name.',
+      life: 3000
+    });
+    return false;
+  }
+  if (!formData.subCategoryCode.trim()) {
+    toast.current?.show({
+      severity: 'warn',
+      summary: 'Missing Code',
+      detail: 'Please enter a sub-category code.',
+      life: 3000
+    });
+    return false;
+  }
+
+  
+  const duplicateName = existingSubCategories.some(
+    (subCat) =>
+      subCat.subCategoryName.toLowerCase() === formData.subCategoryName.trim().toLowerCase() &&
+      (mode === 'add' || subCat.refSubCategoryId !== editData?.refSubCategoryId)
+  );
+  if (duplicateName) {
+    toast.current?.show({
+      severity: 'warn',
+      summary: 'Duplicate Name',
+      detail: 'Sub-category name already exists.',
+      life: 3000
+    });
+    return false;
+  }
+
+  
+  const duplicateCode = existingSubCategories.some(
+    (subCat) =>
+      subCat.subCategoryCode.toLowerCase() === formData.subCategoryCode.trim().toLowerCase() &&
+      (mode === 'add' || subCat.refSubCategoryId !== editData?.refSubCategoryId)
+  );
+  if (duplicateCode) {
+    toast.current?.show({
+      severity: 'warn',
+      summary: 'Duplicate Code',
+      detail: 'Sub-category code already exists.',
+      life: 3000
+    });
+    return false;
+  }
+
+  return true;
+};
+
 
   const handleSubmit = () => {
-    if (isSubmitting || !validateForm()) return;
+  if (isSubmitting || !validateForm()) return;
 
-    setIsSubmitting(true);
+  setIsSubmitting(true);
 
-    const subCategory: SubCategory = {
-      refSubCategoryId: editData?.refSubCategoryId ?? Math.floor(Math.random() * 1000000),
-      refCategoryId: formData.parentCategory?.refCategoryId ?? 0,
-      subCategoryName: formData.subCategoryName.trim(),
-      subCategoryCode: formData.subCategoryCode.trim(),
-      isActive: formData.selectedStatus?.isActive ?? true,
-      createdAt: editData?.createdAt ?? new Date().toISOString(),
-      createdBy: editData?.createdBy ?? 'Admin',
-      updatedAt: new Date().toISOString(),
-      updatedBy: 'Admin'
-    };
-
-    if (mode === 'add') {
-      toast.current?.show({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Sub-category added successfully!',
-        life: 3000
-      });
-      onSave(subCategory);
-    } else {
-      toast.current?.show({
-        severity: 'success',
-        summary: 'Updated',
-        detail: 'Sub-category updated successfully!',
-        life: 3000
-      });
-      onUpdate(subCategory);
-    }
-
-    setIsSubmitting(false);
-    onClose();
+  const subCategory: SubCategory = {
+    refSubCategoryId: editData?.refSubCategoryId ?? Math.floor(Math.random() * 1000000),
+    refCategoryId: formData.parentCategory?.refCategoryId ?? 0,
+    subCategoryName: formData.subCategoryName.trim(),
+    subCategoryCode: formData.subCategoryCode.trim(),
+    isActive: formData.selectedStatus?.isActive ?? true,
+    createdAt: editData?.createdAt ?? new Date().toISOString(),
+    createdBy: editData?.createdBy ?? 'Admin',
+    updatedAt: new Date().toISOString(),
+    updatedBy: 'Admin'
   };
+
+  if (mode === 'add') {
+    toast.current?.show({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Sub-category added successfully!',
+      life: 3000
+    });
+    onSave(subCategory);
+  } else {
+    toast.current?.show({
+      severity: 'success',
+      summary: 'Updated',
+      detail: 'Sub-category updated successfully!',
+      life: 3000
+    });
+    onUpdate(subCategory);
+  }
+
+  setIsSubmitting(false);
+
+  setTimeout(() => {
+    onClose();
+  }, 3000);  // a bit more than toast life
+};
+
 
   return (
     <div className="p-4 pb-20 relative">

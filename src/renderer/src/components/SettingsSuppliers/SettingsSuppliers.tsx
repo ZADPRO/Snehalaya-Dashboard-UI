@@ -9,6 +9,7 @@ import { InputIcon } from 'primereact/inputicon';
 import { Sidebar } from 'primereact/sidebar';
 import { Toast } from 'primereact/toast';
 import axios from 'axios';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import SettingsAddNewSupplier, { Supplier } from './SettingsAddNewSupplier';
 
 const SettingsSuppliers: React.FC = () => {
@@ -119,37 +120,62 @@ const SettingsSuppliers: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    try {
-      const resp = await axios.delete(
-        `${import.meta.env.VITE_API_URL}/admin/suppliers/delete/${id}`,
-        { headers: { Authorization: sessionStorage.getItem('token') || '' } }
-      );
-      if (resp.data.status) {
+ const handleDelete = async (id: number, forceDelete = false) => {
+  try {
+    const url = `${import.meta.env.VITE_API_URL}/admin/suppliers/delete/${id}`;
+    const params = forceDelete ? { forceDelete: true } : {};
+
+    console.log('Deleting supplier:', url, 'with params:', params);
+
+    const response = await axios.delete(url, {
+      headers: { Authorization: sessionStorage.getItem('token') || '' },
+      params,
+    });
+
+    if (response.data?.status) {
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Deleted',
+        detail: response.data.message || 'Supplier deleted successfully.',
+        life: 2000,
+      });
+      setTimeout(() => {
         fetchSuppliers();
-        toast.current?.show({
-          severity: 'success',
-          summary: 'Deleted',
-          detail: resp.data.message || 'Supplier deleted',
-          life: 3000,
-        });
-      } else {
-        toast.current?.show({
-          severity: 'warn',
-          summary: 'Failed',
-          detail: resp.data.message,
-          life: 3000,
-        });
-      }
-    } catch (err: any) {
+      }, 500);
+    }
+  } catch (error: any) {
+    const data = error.response?.data;
+    console.error('Delete error:', error.response); 
+
+    if (error.response?.status === 409 && data?.confirmationNeeded) {
+      confirmDialog({
+        message: `${data.message}\n\nDo you want to delete anyway?`,
+        header: 'Delete Confirmation',
+        acceptLabel: 'Yes, Delete',
+        rejectLabel: 'Cancel',
+        acceptClassName: 'p-button-danger',
+        accept: () => handleDelete(id, true),
+        reject: () => {
+          toast.current?.show({
+            severity: 'info',
+            summary: 'Cancelled',
+            detail: 'Delete cancelled.',
+            life: 2000,
+          });
+        },
+      });
+    } else {
       toast.current?.show({
         severity: 'error',
         summary: 'Error',
-        detail: err.response?.data?.message || 'Delete failed',
+        detail: data?.message || 'Failed to delete supplier.',
         life: 3000,
       });
     }
-  };
+  }
+};
+
+
 
   const exportExcel = () => dtRef.current?.exportCSV();
 
@@ -205,7 +231,7 @@ const SettingsSuppliers: React.FC = () => {
   return (
     <div className="card">
       <Toast ref={toast} />
-
+       <ConfirmDialog />
       <Toolbar className="mb-4" left={rightHeader} right={leftHeader} />
 
       <DataTable
@@ -266,6 +292,7 @@ const SettingsSuppliers: React.FC = () => {
           }}
           onSave={handleSave}
           onUpdate={handleUpdate}
+          existingSuppliers={suppliers}
         />
       </Sidebar>
     </div>

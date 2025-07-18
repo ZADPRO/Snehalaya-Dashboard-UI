@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'; 
+import React, { useEffect, useRef, useState } from 'react';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
 import { FloatLabel } from 'primereact/floatlabel';
 import { InputText } from 'primereact/inputtext';
@@ -18,7 +18,7 @@ export interface Branch {
   refLocation: string;
   refMobile: string;
   refEmail: string;
-   refBTId: number;
+  refBTId: number;
   isMainBranch: boolean;
   isActive: boolean;
   createdAt: string;
@@ -42,10 +42,9 @@ interface SettingsAddNewBranchProps {
   mode: 'add' | 'edit';
   editData?: Branch | null;
   onSave: (newBranch: Branch) => void;
- onUpdate: (updatedBranch: Branch) => Promise<void>;
-
+  onUpdate: (updatedBranch: Branch) => Promise<void>;
   onClose: () => void;
-  existingBranches?: Branch[]; 
+  existingBranches?: Branch[];
 }
 
 const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
@@ -58,6 +57,7 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
 }) => {
   const toast = useRef<Toast>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const statusOptions: BranchStatusOption[] = [
     { name: 'Active', isActive: true },
@@ -92,88 +92,58 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
     field: keyof BranchFormData,
     value: string | boolean | BranchStatusOption | null
   ) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: '' }));
   };
 
   const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const mobileRegex = /^\d{10}$/;
 
-    if (!formData.refBranchName.trim()) {
-      toast.current?.show({ severity: 'warn', summary: 'Missing Branch Name', detail: 'Please enter branch name.', life: 3000 });
-      return false;
-    }
-    if (!formData.refBranchCode.trim()) {
-      toast.current?.show({ severity: 'warn', summary: 'Missing Branch Code', detail: 'Please enter branch code.', life: 3000 });
-      return false;
-    }
-    if (!formData.refLocation.trim()) {
-      toast.current?.show({ severity: 'warn', summary: 'Missing Location', detail: 'Please enter location.', life: 3000 });
-      return false;
-    }
-    if (!formData.refMobile.trim()) {
-      toast.current?.show({ severity: 'warn', summary: 'Missing Mobile', detail: 'Please enter mobile number.', life: 3000 });
-      return false;
-    }
-    if (!mobileRegex.test(formData.refMobile.trim())) {
-      toast.current?.show({ severity: 'warn', summary: 'Invalid Mobile', detail: 'Mobile number must be exactly 10 digits.', life: 3000 });
-      return false;
-    }
-    if (!formData.refEmail.trim()) {
-      toast.current?.show({ severity: 'warn', summary: 'Missing Email', detail: 'Please enter email.', life: 3000 });
-      return false;
-    }
-    if (!emailRegex.test(formData.refEmail.trim())) {
-      toast.current?.show({ severity: 'warn', summary: 'Invalid Email', detail: 'Invalid email format.', life: 3000 });
-      return false;
-    }
+    if (!formData.refBranchName.trim()) newErrors.refBranchName = 'Branch name is required.';
+    if (!formData.refBranchCode.trim()) newErrors.refBranchCode = 'Branch code is required.';
+    if (!formData.refLocation.trim()) newErrors.refLocation = 'Location is required.';
+    if (!formData.refMobile.trim()) newErrors.refMobile = 'Mobile number is required.';
+    else if (!mobileRegex.test(formData.refMobile.trim())) newErrors.refMobile = 'Enter a valid 10-digit mobile number.';
+    if (!formData.refEmail.trim()) newErrors.refEmail = 'Email is required.';
+    else if (!emailRegex.test(formData.refEmail.trim())) newErrors.refEmail = 'Enter a valid email address.';
 
+    // Duplicates
     const nameExists = existingBranches.some(
       (b) =>
         b.refBranchName.toLowerCase() === formData.refBranchName.trim().toLowerCase() &&
         (mode === 'add' || b.refBranchId !== editData?.refBranchId)
     );
-    if (nameExists) {
-      toast.current?.show({ severity: 'warn', summary: 'Duplicate Name', detail: 'Branch name already exists.', life: 4000 });
-      return false;
-    }
+    if (nameExists) newErrors.refBranchName = 'Branch name already exists.';
 
     const codeExists = existingBranches.some(
       (b) =>
         b.refBranchCode.toLowerCase() === formData.refBranchCode.trim().toLowerCase() &&
         (mode === 'add' || b.refBranchId !== editData?.refBranchId)
     );
-    if (codeExists) {
-      toast.current?.show({ severity: 'warn', summary: 'Duplicate Code', detail: 'Branch code already exists.', life: 4000 });
-      return false;
-    }
+    if (codeExists) newErrors.refBranchCode = 'Branch code already exists.';
 
     const mobileExists = existingBranches.some(
       (b) =>
         b.refMobile === formData.refMobile.trim() &&
         (mode === 'add' || b.refBranchId !== editData?.refBranchId)
     );
-    if (mobileExists) {
-      toast.current?.show({ severity: 'warn', summary: 'Duplicate Mobile', detail: 'Mobile number already exists.', life: 4000 });
-      return false;
-    }
+    if (mobileExists) newErrors.refMobile = 'Mobile number already exists.';
 
-    return true;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = () => {
     if (isSubmitting) return;
-
     const isValid = validateForm();
     if (!isValid) return;
 
     setIsSubmitting(true);
 
     const branch: Branch = {
-      refBranchId: editData?.refBranchId ?? Date.now(), // Temporary ID for new items
+      refBranchId: editData?.refBranchId ?? Date.now(),
       refBranchName: formData.refBranchName.trim(),
       refBranchCode: formData.refBranchCode.trim(),
       refLocation: formData.refLocation.trim(),
@@ -215,10 +185,11 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
               id="refBranchName"
               value={formData.refBranchName}
               onChange={(e) => handleInputChange('refBranchName', e.target.value)}
-              className="w-full"
+              className={`w-full ${errors.refBranchName ? 'p-invalid' : ''}`}
             />
             <label htmlFor="refBranchName">Branch Name</label>
           </FloatLabel>
+          {errors.refBranchName && <small className="p-error">{errors.refBranchName}</small>}
         </div>
         <div className="flex-1">
           <FloatLabel className="always-float">
@@ -226,10 +197,11 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
               id="refBranchCode"
               value={formData.refBranchCode}
               onChange={(e) => handleInputChange('refBranchCode', e.target.value)}
-              className="w-full"
+              className={`w-full ${errors.refBranchCode ? 'p-invalid' : ''}`}
             />
             <label htmlFor="refBranchCode">Branch Code</label>
           </FloatLabel>
+          {errors.refBranchCode && <small className="p-error">{errors.refBranchCode}</small>}
         </div>
       </div>
 
@@ -240,10 +212,11 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
               id="refLocation"
               value={formData.refLocation}
               onChange={(e) => handleInputChange('refLocation', e.target.value)}
-              className="w-full"
+              className={`w-full ${errors.refLocation ? 'p-invalid' : ''}`}
             />
             <label htmlFor="refLocation">Location</label>
           </FloatLabel>
+          {errors.refLocation && <small className="p-error">{errors.refLocation}</small>}
         </div>
 
         <div className="flex-1">
@@ -252,15 +225,15 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
               id="refMobile"
               value={formData.refMobile}
               onChange={(e) => {
-                
                 const val = e.target.value.replace(/\D/g, '');
                 handleInputChange('refMobile', val);
               }}
-              className="w-full"
+              className={`w-full ${errors.refMobile ? 'p-invalid' : ''}`}
               maxLength={10}
             />
             <label htmlFor="refMobile">Mobile</label>
           </FloatLabel>
+          {errors.refMobile && <small className="p-error">{errors.refMobile}</small>}
         </div>
       </div>
 
@@ -271,13 +244,14 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
               id="refEmail"
               value={formData.refEmail}
               onChange={(e) => handleInputChange('refEmail', e.target.value)}
-              className="w-full"
+              className={`w-full ${errors.refEmail ? 'p-invalid' : ''}`}
             />
             <label htmlFor="refEmail">Email</label>
           </FloatLabel>
+          {errors.refEmail && <small className="p-error">{errors.refEmail}</small>}
         </div>
 
-        <div className="flex-1 flex items-center gap-3">
+        <div className="flex-1 flex items-center gap-3 mt-2">
           <InputSwitch
             checked={formData.isMainBranch}
             onChange={(e) => handleInputChange('isMainBranch', e.value)}
@@ -297,6 +271,7 @@ const SettingsAddNewBranch: React.FC<SettingsAddNewBranchProps> = ({
             options={statusOptions}
             optionLabel="name"
             placeholder="Select Status"
+            className="w-full"
           />
         </div>
       </div>

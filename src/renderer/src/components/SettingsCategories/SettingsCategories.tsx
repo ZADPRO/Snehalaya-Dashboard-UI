@@ -119,7 +119,7 @@ const SettingsCategories: React.FC = () => {
         confirmDialog({
           message: `${data.message}\n\nDo you want to delete?`,
           header: 'Delete Confirmation',
-          // icon: 'pi pi-exclamation-triangle',
+         
           acceptLabel: 'Yes, Delete',
           rejectLabel: 'Cancel',
           acceptClassName: 'p-button-danger',
@@ -224,6 +224,7 @@ const SettingsCategories: React.FC = () => {
           onClose={() => setVisibleSidebar(false)}
           onSave={handleSave}
           onUpdate={handleUpdate}
+           existingCategories={categories}
         />
       </Sidebar>
     </div>

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react'; 
 import { InputText } from 'primereact/inputtext';
 import { FloatLabel } from 'primereact/floatlabel';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
@@ -36,6 +36,7 @@ export interface Supplier {
 interface Props {
   mode: 'add' | 'edit';
   editData?: Supplier | null;
+  existingSuppliers: Supplier[];  // <--- Added this prop
   onSave: (data: Supplier, onSuccess: () => void, onError: (msg: string) => void) => void;
   onUpdate: (data: Supplier, onSuccess: () => void, onError: (msg: string) => void) => void;
   onClose: () => void;
@@ -46,7 +47,7 @@ const statusOptions: StatusOption[] = [
   { name: 'In Active', value: false },
 ];
 
-const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onSave, onUpdate, onClose }) => {
+const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, existingSuppliers, onSave, onUpdate, onClose }) => {
   const [formData, setFormData] = useState<Supplier>({
     supplierName: '',
     supplierCompanyName: '',
@@ -71,7 +72,7 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onSave, onUpd
 
   const toast = useRef<Toast>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   useEffect(() => {
     if (mode === 'edit' && editData) {
       setFormData(editData);
@@ -82,7 +83,6 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onSave, onUpd
   const mobileRegex = /^\d{10}$/;
 
   const validateField = (field: keyof Supplier, value: string): string => {
-    
     const trimmed = value.trim();
     switch (field) {
       case 'supplierName':
@@ -109,7 +109,7 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onSave, onUpd
       case 'supplierContactNumber':
       case 'emergencyContactNumber':
         if (!trimmed) return 'Number is required.';
-        if (!mobileRegex.test(trimmed)) return 'Must be 10 digits.';
+        if (!mobileRegex.test(trimmed)) return 'Must be exactly 10 digits.';
         break;
     }
     return '';
@@ -125,57 +125,120 @@ const SettingsAddNewSupplier: React.FC<Props> = ({ mode, editData, onSave, onUpd
       setErrors((prevErrors) => ({ ...prevErrors, [field]: '' }));
     }
   };
- 
-  const handleSubmit = () => {
-    const newErrors: { [key: string]: string } = {};
-    (Object.keys(formData) as (keyof Supplier)[]).forEach((field) => {
-      if (typeof formData[field] === 'string') {
-        const err = validateField(field, formData[field] as string);
-        if (err) newErrors[field] = err;
-      }
+
+ const handleSubmit = () => {
+  if (isSubmitting) return;
+
+  const newErrors: { [key: string]: string } = {};
+
+  (Object.keys(formData) as (keyof Supplier)[]).forEach((field) => {
+    if (typeof formData[field] === 'string') {
+      const err = validateField(field, formData[field] as string);
+      if (err) newErrors[field] = err;
+    }
+  });
+
+  const isDuplicate = (key: keyof Supplier, value: string) =>
+    existingSuppliers.some(
+      (s) =>
+        s[key]?.toLowerCase() === value.trim().toLowerCase() &&
+        (mode === 'add' || s.supplierCode !== editData?.supplierCode)
+    );
+
+  if (isDuplicate('supplierName', formData.supplierName)) {
+    newErrors.supplierName = 'Supplier name already exists.';
+  }
+  if (isDuplicate('supplierCode', formData.supplierCode)) {
+    newErrors.supplierCode = 'Supplier code already exists.';
+  }
+  if (
+    existingSuppliers.some(
+      (s) =>
+        s.supplierContactNumber === formData.supplierContactNumber &&
+        (mode === 'add' || s.supplierCode !== editData?.supplierCode)
+    )
+  ) {
+    newErrors.supplierContactNumber = 'Contact number already exists.';
+  }
+
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    toast.current?.show({
+      severity: 'error',
+      summary: 'Validation Error',
+      detail: 'Please fix the errors before submitting.',
+      life: 4000,
     });
+    return;
+  }
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+  setIsSubmitting(true);
 
-    const onSuccess = () => {
-      toast.current?.show({ severity: 'success', summary: 'Success', detail: `${mode === 'edit' ? 'Updated' : 'Saved'} successfully`, life: 2000 });
-      setTimeout(() => onClose(), 1000);
-    };
-
-    const onError = (msg: string) => {
-      toast.current?.show({ severity: 'warn', summary: 'Failed', detail: msg, life: 4000 });
-    };
-
-    if (mode === 'add') {
-      onSave(formData, onSuccess, onError);
-    } else {
-      onUpdate(formData, onSuccess, onError);
-    }
-  };
-
-const renderInput = (field: keyof Supplier, label: string, type = 'text') => {
-  const fieldId = `supplier-${String(field)}`; 
-
-  return (
-    <div className="flex-1">
-      <FloatLabel className="flex-1 always-float">
-        <InputText
-          id={fieldId}
-          type={type}
-          value={formData[field] as string}
-          className={`w-full ${errors[field] ? 'p-invalid' : ''}`}
-          onChange={(e) => handleChange(field, e.target.value)}
-        />
-        <label htmlFor={fieldId}>{label}</label>
-      </FloatLabel>
-      {errors[field] && <small style={{ color: 'red' }}>{errors[field]}</small>}
-    </div>
-  );
+  if (mode === 'add') {
+    onSave(formData, () => {
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Created',
+        detail: 'Supplier added successfully!',
+        life: 3000
+      });
+      setTimeout(() => {
+        setIsSubmitting(false);
+        onClose();
+      }, 3000);
+    }, (msg: string) => {
+      setIsSubmitting(false);
+      toast.current?.show({
+        severity: 'warn',
+        summary: 'Failed',
+        detail: msg,
+        life: 4000
+      });
+    });
+  } else {
+    onUpdate(formData, () => {
+      toast.current?.show({
+        severity: 'success',
+        summary: 'Updated',
+        detail: 'Supplier updated successfully!',
+        life: 3000
+      });
+      setTimeout(() => {
+        setIsSubmitting(false);
+        onClose();
+      }, 3000);
+    }, (msg: string) => {
+      setIsSubmitting(false);
+      toast.current?.show({
+        severity: 'warn',
+        summary: 'Failed',
+        detail: msg,
+        life: 4000
+      });
+    });
+  }
 };
 
+
+  const renderInput = (field: keyof Supplier, label: string, type = 'text') => {
+    const fieldId = `supplier-${String(field)}`;
+
+    return (
+      <div className="flex-1">
+        <FloatLabel className="flex-1 always-float">
+          <InputText
+            id={fieldId}
+            type={type}
+            value={formData[field] as string}
+            className={`w-full ${errors[field] ? 'p-invalid' : ''}`}
+            onChange={(e) => handleChange(field, e.target.value)}
+          />
+          <label htmlFor={fieldId}>{label}</label>
+        </FloatLabel>
+        {errors[field] && <small style={{ color: 'red' }}>{errors[field]}</small>}
+      </div>
+    );
+  };
 
   return (
     <div className="p-4 pb-20 relative">

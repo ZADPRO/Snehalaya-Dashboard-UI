@@ -242,6 +242,7 @@ const handleSave = async (newBra: Branch) => {
           onClose={() => setVisibleSidebar(false)}
           onSave={handleSave}
           onUpdate={handleUpdate}
+           existingBranches={branches}
         />
       </Sidebar>
     </div>

@@ -35,6 +35,7 @@ interface SettingsAddNewCategoriesProps {
   onSave: (newCategory: Category) => void;
   onUpdate: (updatedCategory: Category) => void;
   onClose: () => void;
+    existingCategories: Category[];
 }
 
 const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
@@ -42,7 +43,8 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
   editData,
   onSave,
   onUpdate,
-  onClose
+  onClose,
+  existingCategories
 }) => {
   const toast = useRef<Toast>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -114,46 +116,67 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
     return true;
   };
 
-  const handleSubmit = () => {
-    if (isSubmitting || !validateForm()) return;
-    setIsSubmitting(true);
+ const handleSubmit = () => {
+  if (isSubmitting || !validateForm()) return;
 
-    const category: Category = {
-      refCategoryId: editData?.refCategoryId ?? 0,
-      categoryName: formData.categoryName.trim(),
-      categoryCode: formData.categoryCode.trim(),
-      isActive: formData.selectedStatus?.isActive ?? true,
-      createdAt: editData?.createdAt ?? new Date().toISOString(),
-      createdBy: 'Admin',
-      updatedAt: new Date().toISOString(),
-      updatedBy: 'Admin',
-      profitMargin: parseFloat(formData.profitMargin)
-    };
+  const nameTrimmed = formData.categoryName.trim().toLowerCase();
+  const codeTrimmed = formData.categoryCode.trim().toLowerCase();
 
-    // Directly call onSave or onUpdate without axios
-    if (mode === 'add') {
-      toast.current?.show({
-        severity: 'success',
-        summary: 'Created',
-        detail: 'Category added successfully!',
-        life: 3000
-      });
-      onSave(category);
-    } else {
-      toast.current?.show({
-        severity: 'success',
-        summary: 'Updated',
-        detail: 'Category updated successfully!',
-        life: 3000
-      });
-      onUpdate(category);
-    }
+  const isDuplicate = existingCategories.some((cat) => {
+  const isSameName = cat.categoryName.trim().toLowerCase() === nameTrimmed;
+  const isSameCode = cat.categoryCode.trim().toLowerCase() === codeTrimmed;
+  const isDifferentId = mode === 'edit' ? cat.refCategoryId !== editData?.refCategoryId : true;
+  return (isSameName || isSameCode) && isDifferentId;
+});
 
-    setTimeout(() => {
-      setIsSubmitting(false);
-      onClose();
-    }, 1000);
+
+  if (isDuplicate) {
+    toast.current?.show({
+      severity: 'error',
+      summary: 'Duplicate Entry',
+      detail: 'Category with this name or code already exists.',
+      life: 3000
+    });
+    return;
+  }
+
+  setIsSubmitting(true);
+
+  const category: Category = {
+    refCategoryId: editData?.refCategoryId ?? 0,
+    categoryName: formData.categoryName.trim(),
+    categoryCode: formData.categoryCode.trim(),
+    isActive: formData.selectedStatus?.isActive ?? true,
+    createdAt: editData?.createdAt ?? new Date().toISOString(),
+    createdBy: 'Admin',
+    updatedAt: new Date().toISOString(),
+    updatedBy: 'Admin',
+    profitMargin: parseFloat(formData.profitMargin)
   };
+
+  if (mode === 'add') {
+    toast.current?.show({
+      severity: 'success',
+      summary: 'Created',
+      detail: 'Category added successfully!',
+      life: 3000
+    });
+    onSave(category);
+  } else {
+    toast.current?.show({
+      severity: 'success',
+      summary: 'Updated',
+      detail: 'Category updated successfully!',
+      life: 3000
+    });
+    onUpdate(category);
+  }
+
+  setTimeout(() => {
+    setIsSubmitting(false);
+    onClose();
+  }, 1000);
+};
 
   return (
     <div className="p-4 pb-20 relative">
@@ -225,6 +248,7 @@ const SettingsAddNewCategories: React.FC<SettingsAddNewCategoriesProps> = ({
           className="bg-[#8e5ea8] border-none gap-2"
           onClick={handleSubmit}
           disabled={isSubmitting}
+          
         />
       </div>
     </div>

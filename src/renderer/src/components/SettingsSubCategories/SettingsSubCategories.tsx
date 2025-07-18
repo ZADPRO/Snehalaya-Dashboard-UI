@@ -364,6 +364,7 @@ const handleDelete = async (id: number, confirmed = false) => {
           categories={categories}
           onSave={handleSave}
           onUpdate={handleUpdate}
+          existingSubCategories={subCategories}
           onClose={() => setVisibleRight(false)}
         />
       </Sidebar>

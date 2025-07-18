@@ -59,16 +59,14 @@ interface InvoiceParams {
 
 export const debitInvoice1 = async ({
   supplier,
-  branch,
+  
   productEntries,
-  creditedDate,
-  transport,
+ 
   subTotal,
-  discountTotal,
+ 
   tax,
   total,
-  totalPaid,
-  pendingPayment
+ 
 }: InvoiceParams) => {
   const doc = new jsPDF();
   const base64Logo = await getImageBase64(logo);
