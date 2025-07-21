@@ -72,7 +72,7 @@ const POGoodsReturned: React.FC = () => {
   const [quantity, setQuantity] = useState<number>(1)
   const [price, setPrice] = useState<number>(0)
   const [discount, setDiscount] = useState<number>(0)
-  // const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
 const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
@@ -212,9 +212,9 @@ const handleDownloadDebit = async () => {
       transport: transport,       
       subTotal: subTotal,          
       discountTotal: discountTotal, 
-      tax: tax,                 
-      total: total,             
-      totalPaid: totalPaid,       
+      tax: tax,                    
+      total: total,                
+      totalPaid: totalPaid,        
       pendingPayment: pendingPayment 
     });
 
@@ -243,6 +243,7 @@ const handlePrintDebitNote = async () => {
   }
 
   setIsPrinting(true);
+
   try {
     const pdfProducts = productEntries.map((entry) => ({
       poId: entry.product.productId,
@@ -254,7 +255,8 @@ const handlePrintDebitNote = async () => {
       poDisc: entry.discountPrice.toFixed(2),
       poTotalPrice: entry.totalPrice.toFixed(2),
       sku: entry.product.sku,
-    })); 
+    }));
+
     const doc = await debitInvoice1({
       supplier: selectedSupplier,
       branch: selectedBranch,
@@ -268,8 +270,9 @@ const handlePrintDebitNote = async () => {
       totalPaid: totalPaid,
       pendingPayment: pendingPayment
     });
+
     doc.autoPrint();
-    window.print();  
+    window.print();
   } catch (error) {
     toast.current?.show({
       severity: 'error',

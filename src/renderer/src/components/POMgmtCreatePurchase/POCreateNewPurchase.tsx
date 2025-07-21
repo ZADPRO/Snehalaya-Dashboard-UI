@@ -57,6 +57,8 @@ const POCreateNewPurchase: React.FC = () => {
 
   const [totalPaid, setTotalPaid] = useState<number>(0)
  const toast = useRef<Toast>(null);
+const [isDownloading, setIsDownloading] = useState(false);
+const [isPrinting, setIsPrinting] = useState(false);
 
 
 
@@ -208,7 +210,7 @@ const handleDownloadInvoice = async () => {
     return;
   }
 
-  setLoading(true);
+  setIsDownloading(true);
 
   try {
     const pdfProducts = productEntries.map((entry) => ({
@@ -242,57 +244,75 @@ const handleDownloadInvoice = async () => {
       life: 3000,
     });
   } finally {
-    setLoading(false);
+    setIsDownloading(false);
   }
 };
 
 
-  const handlePrintInvoice = async () => {
-    if (!selectedSupplier || !selectedBranch || productEntries.length === 0) {
-      toast.current?.show({
-        severity: 'warn',
-        summary: 'Missing Info',
-        detail: 'Please select supplier, branch, and add at least one product.',
-        life: 3000,
-      });
-      return;
-    }
+ const handlePrintInvoice = async () => {
+  if (!selectedSupplier || !selectedBranch || productEntries.length === 0) {
+    toast.current?.show({
+      severity: 'warn',
+      summary: 'Missing Info',
+      detail: 'Please select supplier, branch, and add at least one product.',
+      life: 3000,
+    });
+    return;
+  }
 
-    setLoading(true);
+  setIsPrinting(true);
 
-    try {
-      // Prepare the data for the invoice
-      const pdfProducts = productEntries.map((entry) => ({
-        poId: entry.product.productId,
-        poName: entry.product.productName,
-        poHSN: entry.product.hsnCode,
-        poQuantity: entry.quantity.toString(),
-        poPrice: entry.price.toFixed(2),
-        poDiscPercent: entry.discount.toFixed(2),
-        poDisc: entry.discountPrice.toFixed(2),
-        poTotalPrice: entry.totalPrice.toFixed(2),
-        posku: entry.product.sku,
-      }));
+  try {
+    const pdfProducts = productEntries.map((entry) => ({
+      poId: entry.product.productId,
+      poName: entry.product.productName,
+      poHSN: entry.product.hsnCode,
+      poQuantity: entry.quantity.toString(),
+      poPrice: entry.price.toFixed(2),
+      poDiscPercent: entry.discount.toFixed(2),
+      poDisc: entry.discountPrice.toFixed(2),
+      poTotalPrice: entry.totalPrice.toFixed(2),
+      posku: entry.product.sku,
+    }));
 
-      // Generate PDF
-      const doc = await generateInvoice(selectedSupplier, selectedBranch, pdfProducts,creditedDate);
+    const doc = await generateInvoice(
+      selectedSupplier,
+      selectedBranch,
+      pdfProducts,
+      creditedDate
+    );
 
-      // Print the document
-      doc.autoPrint();
-      // doc.open();
-      window.print();
+    doc.autoPrint();
 
-    } catch (error) {
-      toast.current?.show({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Failed to print invoice.',
-        life: 3000,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    const blob = doc.output('blob');
+    const blobUrl = URL.createObjectURL(blob);
+
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = 'none';
+    iframe.src = blobUrl;
+    document.body.appendChild(iframe);
+
+    iframe.onload = () => {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+    };
+  } catch (error) {
+    console.error('Print error:', error);
+    toast.current?.show({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to print invoice.',
+      life: 3000,
+    });
+  } finally {
+    setIsPrinting(false);
+  }
+};
 
 
 

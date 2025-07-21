@@ -1,126 +1,16 @@
-.print-area {
-  padding: 1cm;
-  width: 100%;
-  display: block;
-}
-
 .barcode-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1cm;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
 }
 
 .barcode-item {
-  width: calc(50% - 0.5cm); 
-  border: 1px solid #aaa;
-  padding: 0.5cm;
-  font-size: 12px;
+  border: 1px solid #ccc;
+  padding: 10px;
   text-align: center;
-  box-sizing: border-box;
-  page-break-inside: avoid;
-  break-inside: avoid;
+  font-size: 14px;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
-
-@page {
-  size: A4;
-  margin: 1cm;
-}
-
-@media print {
-  body * {
-    visibility: hidden;
-  }
-
-  .print-area,
-  .print-area * {
-    visibility: visible;
-  }
-
-  .print-area {
-    position: absolute;
-        display: block !important;
-    width: 100% !important;
-    height: auto !important;
-  overflow: visible !important; 
-    top: 0;
-    left: 0;
-    width: 100%;
-  }
- .barcode-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-  .barcode-item {
-    page-break-inside: avoid;
-    break-inside: avoid;
-    margin: 8px;
-     width: 9cm;
-  height: auto;
-  }
-  .barcode-item:nth-child(12n) {
-    page-break-after: always;
-  }
-  html::after {
-    content: "Page " counter(page);
-    position: fixed;
-    bottom: 1cm;
-    right: 1cm;
-    font-size: 10px;
-  }
-}
-
-@page {
-  size: A4;
-  margin: 1cm;
-}
-
-@media print {
-  body * {
-    visibility: hidden;
-  }
-
-  .print-area,
-  .print-area * {
-    visibility: visible;
-  }
-
-  .print-area {
-    position: static !important;
-    display: block !important;
-    overflow: visible !important;
-    width: 100% !important;
-    height: auto !important;
-  }
-
-  .barcode-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
-
-  .barcode-item {
-    width: 9cm;
-    margin: 8px;
-    page-break-inside: avoid;
-    break-inside: avoid;
-  }
-
-  .barcode-item:nth-child(12n) {
-    page-break-after: always;
-  }
-
-  html::after {
-    content: "Page " counter(page);
-    counter-increment: page;
-    position: fixed;
-    bottom: 1cm;
-    right: 1cm;
-    font-size: 10px;
-  }
-}
-
-
-
-
-

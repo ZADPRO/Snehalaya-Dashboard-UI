@@ -1,22 +1,25 @@
-import { useState, useEffect } from 'react'
-import { DataTable } from 'primereact/datatable'
-import { Column } from 'primereact/column'
-import { Sidebar } from 'primereact/sidebar'
-import Barcode from 'react-barcode'
-import './PrintableSelection.css'
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Sidebar } from 'primereact/sidebar';
+import Barcode from 'react-barcode';
+import { Button } from 'primereact/button';
+import './PrintableSelection.css';
 
 interface Product {
-  productId: number
-  productName: string
-  sku: string
-  price: number
+  poId: number;
+  poName: string;
+  poPrice: string;
+  poTotalPrice: string;
+  poHSN: string;
 }
+
 export default function BarcodePrint() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
- 
   const formatPOINV = (id: number) => {
     const now = new Date();
     const dd = String(now.getDate()).padStart(2, '0');
@@ -24,50 +27,102 @@ export default function BarcodePrint() {
     return `POINV-${dd}-${mm}-${1000 + id}`;
   };
 
-
   useEffect(() => {
-    const mock: Product[] = Array.from({ length: 140 }, (_, i) => ({
-      productId: i + 1,
-      productName: `Product ${i + 1}`,
-      sku: `SS-07-25-${(1000 + i).toString().padStart(4, '0')}`,
-      price: Math.floor(Math.random() * 1000 + 100)
-    }))
-    setProducts(mock)
-  }, [])
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/admin/products/read`, {
+          headers: {
+            Authorization: sessionStorage.getItem('token') || ''
+          }
+        });
+        if (response.data.status) {
+          setProducts(response.data.data);
+        } else {
+          console.warn('Failed to load products:', response.data.message);
+        }
+      } catch (err) {
+        console.error('API Error:', err);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const handlePrint = () => {
-    window.print()
-  }
+    const printArea = document.getElementById('print-area');
+    const printWindow = window.open('', '_blank');
+    if (!printWindow || !printArea) return alert('Popup blocked or print area missing');
+
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print Barcodes</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            .barcode-grid {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+              gap: 16px;
+            }
+            .barcode-item {
+              border: 1px solid #ccc;
+              padding: 10px;
+              text-align: center;
+              font-size: 14px;
+              height: 150px;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
+            }
+          </style>
+        </head>
+        <body>
+          ${printArea.innerHTML}
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  };
 
   return (
     <div className="p-4">
-      <h2>Product Barcode Selection</h2>
+     <div className="flex items-center mb-3">
+  <h2 className="text-2xl font-bold text-purple-800 m-0">Product Barcode Selection</h2>
+  <div className="ml-auto">
+    <Button
+      label="Add to Print"
+      className="p-button-sm p-button-primary"
+      onClick={() => setSidebarVisible(true)}
+      disabled={!selectedProducts.length}
+    />
+  </div>
+</div>
 
-      <div className="flex justify-content-end mb-3">
-        <button
-          className="p-button p-button-sm"
-          disabled={!selectedProducts.length}
-          onClick={() => setSidebarVisible(true)}
-        >
-          Add to Print
-        </button>
-      </div>
+
       <DataTable
         value={products}
-        selectionMode="multiple"
         selection={selectedProducts}
         onSelectionChange={(e) => setSelectedProducts(e.value)}
-        dataKey="productId"
+        selectionMode="multiple"
+        dataKey="poId"
         stripedRows
         paginator
-        rows={20}
-        tableStyle={{ minWidth: '50rem' }}
+        rows={10}
+        tableStyle={{ width: '100%' }}
+        className="p-datatable-gridlines"
       >
-        <Column selectionMode="multiple" style={{ width: '3em' }} />
-        <Column field="productName" header="Name" />
-        <Column field="sku" header="SKU" />
-        <Column field="price" header="Price" body={(row) => `₹ ${row.price}`} />
+        <Column selectionMode="multiple" headerStyle={{ width: '3em' }} />
+        <Column field="poName" header="Product Name" />
+        <Column field="poHSN" header="HSN (SKU)" />
+        <Column
+          field="poPrice"
+          header="Price"
+          body={(row) => `₹ ${parseFloat(row.poPrice).toFixed(2)}`}
+        />
       </DataTable>
+
       <Sidebar
         visible={sidebarVisible}
         onHide={() => setSidebarVisible(false)}
@@ -75,27 +130,33 @@ export default function BarcodePrint() {
         style={{ width: '50vw' }}
         className="p-sidebar-lg"
       >
-       <div className="flex justify-content-around align-items-center mb-3">
-        <h3 className="m-0">Print Preview</h3>
-        <div style={{ flex: 1 }} /> {/* spacer in the middle */}
-        <button className="p-button p-button-success mt-2" onClick={handlePrint}>Print Stickers</button>
-      </div>
+      <div className="flex justify-between items-center mb-3">
+  <h3 className="text-lg font-semibold text-purple-800 m-0">Print Preview</h3>
+  <div className="ml-auto">
+    <Button
+      label="Print Stickers"
+      icon="pi pi-print"
+      className="p-button-sm p-button-primary"
+      onClick={handlePrint}
+    />
+  </div>
+</div>
 
-        <div className="print-area flex flex-column gap-4"> 
+
+        <div id="print-area" className="print-area">
           <div className="barcode-grid">
             {selectedProducts.map((p, i) => (
               <div className="barcode-item" key={i}>
-                <strong>{p.productName}</strong>
-                <Barcode value={p.sku} height={40} width={1} displayValue={false} />
-                <div>{p.sku}</div>
-                <div>₹ {p.price.toFixed(2)}</div>
-                <div>{formatPOINV(p.productId)}</div>
+                <strong>{p.poName}</strong>
+                <Barcode value={p.poHSN} height={40} width={1} displayValue={false} />
+                <div>{p.poHSN}</div>
+                <div>₹ {parseFloat(p.poPrice).toFixed(2)}</div>
+                <div>{formatPOINV(p.poId)}</div>
               </div>
             ))}
           </div>
-          
         </div>
       </Sidebar>
     </div>
-  )
+  );
 }
