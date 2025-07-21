@@ -40,7 +40,8 @@
     position: absolute;
         display: block !important;
     width: 100% !important;
-
+    height: auto !important;
+  overflow: visible !important; 
     top: 0;
     left: 0;
     width: 100%;
@@ -69,6 +70,55 @@
   }
 }
 
+@page {
+  size: A4;
+  margin: 1cm;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+
+  .print-area {
+    position: static !important;
+    display: block !important;
+    overflow: visible !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  .barcode-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .barcode-item {
+    width: 9cm;
+    margin: 8px;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .barcode-item:nth-child(12n) {
+    page-break-after: always;
+  }
+
+  html::after {
+    content: "Page " counter(page);
+    counter-increment: page;
+    position: fixed;
+    bottom: 1cm;
+    right: 1cm;
+    font-size: 10px;
+  }
+}
 
 
 

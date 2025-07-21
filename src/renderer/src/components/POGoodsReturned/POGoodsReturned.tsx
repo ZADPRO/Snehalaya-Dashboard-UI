@@ -72,75 +72,13 @@ const POGoodsReturned: React.FC = () => {
   const [quantity, setQuantity] = useState<number>(1)
   const [price, setPrice] = useState<number>(0)
   const [discount, setDiscount] = useState<number>(0)
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
+
+const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
   const toast = useRef<Toast>(null)
 
-const handleGeneratedebit = async () => {
-  if (!selectedSupplier || !selectedBranch || productEntries.length === 0) {
-    toast.current?.show({
-      severity: 'warn',
-      summary: 'Incomplete Data',
-      detail: 'Please fill all required fields.',
-      life: 3000
-    });
-    return;
-
-
   
-
-
-   
-  }
-
-  const formattedProducts = productEntries.map((entry) => ({
-    poId: entry.product.productId,
-    poName: entry.product.productName,
-    poHSN: entry.product.hsnCode,
-    poQuantity: entry.quantity.toString(),
-    poPrice: entry.price.toFixed(2),
-    poDiscPercent: entry.discount.toString(),
-    poDisc: entry.discountPrice.toFixed(2),
-    poTotalPrice: entry.totalPrice.toFixed(2),
-    sku: entry.product.sku
-  }));
-
-  try {
-    setIsLoading(true); 
-
-    await debitInvoice1({
-      supplier: selectedSupplier,
-      branch: selectedBranch,
-      productEntries: formattedProducts,
-      creditedDate: creditedDate?.toLocaleDateString() ?? '',
-      transport,
-      subTotal,
-      discountTotal,
-      tax,
-      total,
-      totalPaid,
-      pendingPayment
-    });
-
-    toast.current?.show({
-      severity: 'success',
-      summary: 'Invoice Generated',
-      detail: 'Debit note has been generated successfully.',
-      life: 3000
-    });
-  } catch (err) {
-    console.error('PDF generation failed:', err);
-    toast.current?.show({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'Something went wrong while generating the invoice.',
-      life: 3000
-    });
-  } finally {
-    setIsLoading(false); 
-  }
-};
-
 
   useEffect(() => {
     const token = sessionStorage.getItem('token')
@@ -235,24 +173,114 @@ const taxableAmount = subTotal - discountTotal
 const tax = taxableAmount * 0.05
 const total = taxableAmount + tax
 const pendingPayment = total - totalPaid
+const [isPrinting, setIsPrinting] = useState<boolean>(false);
 
 const printRef = useRef<HTMLDivElement>(null);
+const handleDownloadDebit = async () => {
+  if (!selectedSupplier || !selectedBranch || productEntries.length === 0) {
+    toast.current?.show({
+      severity: 'warn',
+      summary: 'Missing Information',
+      detail: 'Please select supplier, branch, and add at least one product.',
+      life: 3000,
+    });
+    return;
+  }
 
-const handlePrint = () => {
-  const printContents = printRef.current?.innerHTML;
-  const printWindow = window.open('', '', 'height=600,width=800');
-  if (printWindow && printContents) {
-    printWindow.document.write('<html><head><title>Debit Note</title></head><body>');
-    printWindow.document.write(printContents);
-    printWindow.document.write('</body></html>');
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
+  setIsDownloading(true);
+
+  try {
+    const pdfProducts = productEntries.map((entry) => ({
+      poId: entry.product.productId,
+      poName: entry.product.productName,
+      poHSN: entry.product.hsnCode,
+      poQuantity: entry.quantity.toString(),
+      poPrice: entry.price.toFixed(2),
+      poDiscPercent: entry.discount.toFixed(2),
+      poDisc: entry.discountPrice.toFixed(2),
+      poTotalPrice: entry.totalPrice.toFixed(2),
+      sku: entry.product.sku,
+    }));
+
+    const formattedCreditedDate = creditedDate ? creditedDate.toISOString() : new Date().toISOString();
+
+    const doc = await debitInvoice1({
+      supplier: selectedSupplier,  
+      branch: selectedBranch,      
+      productEntries: pdfProducts, 
+      creditedDate: formattedCreditedDate,  
+      transport: transport,       
+      subTotal: subTotal,          
+      discountTotal: discountTotal, 
+      tax: tax,                 
+      total: total,             
+      totalPaid: totalPaid,       
+      pendingPayment: pendingPayment 
+    });
+
+    doc.save(`DebitNote-${Date.now()}.pdf`);
+  } catch (error) {
+    toast.current?.show({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to generate debit note.',
+      life: 3000,
+    });
+  } finally {
+    setIsDownloading(false);
   }
 };
 
+const handlePrintDebitNote = async () => {
+  if (!selectedSupplier || !selectedBranch || productEntries.length === 0) {
+    toast.current?.show({
+      severity: 'warn',
+      summary: 'Missing Information',
+      detail: 'Please select supplier, branch, and add at least one product.',
+      life: 3000,
+    });
+    return;
+  }
 
+  setIsPrinting(true);
+  try {
+    const pdfProducts = productEntries.map((entry) => ({
+      poId: entry.product.productId,
+      poName: entry.product.productName,
+      poHSN: entry.product.hsnCode,
+      poQuantity: entry.quantity.toString(),
+      poPrice: entry.price.toFixed(2),
+      poDiscPercent: entry.discount.toFixed(2),
+      poDisc: entry.discountPrice.toFixed(2),
+      poTotalPrice: entry.totalPrice.toFixed(2),
+      sku: entry.product.sku,
+    })); 
+    const doc = await debitInvoice1({
+      supplier: selectedSupplier,
+      branch: selectedBranch,
+      productEntries: pdfProducts,
+      creditedDate: creditedDate?.toISOString() || new Date().toISOString(),
+      transport: transport,
+      subTotal: subTotal,
+      discountTotal: discountTotal,
+      tax: tax,
+      total: total,
+      totalPaid: totalPaid,
+      pendingPayment: pendingPayment
+    });
+    doc.autoPrint();
+    window.print();  
+  } catch (error) {
+    toast.current?.show({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to print debit note.',
+      life: 3000,
+    });
+  } finally {
+    setIsPrinting(false);
+  }
+};
 
 
   return (
@@ -453,7 +481,7 @@ const handlePrint = () => {
           <p
             className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
             style={{ border: '1px solid #8e5ea8', background: 'none', borderRadius: '6px' }}
-            onClick={handlePrint}
+            onClick={handlePrintDebitNote}
           >
 
             <FileText size={18} /> Print DebitNote
@@ -462,7 +490,7 @@ const handlePrint = () => {
           <p
             className="iconContents cursor-pointer border-round-md p-2 flex align-items-center gap-2"
             style={{ border: '1px solid #8e5ea8' }}
-             onClick={handleGeneratedebit}
+             onClick={handleDownloadDebit}
           >
             <Download size={18} /> Download
           </p>

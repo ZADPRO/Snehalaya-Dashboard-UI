@@ -7,7 +7,7 @@ import axios from 'axios'
 import { Divider } from 'primereact/divider'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
-import { Download, } from 'lucide-react'
+import { Download, FileText, Printer } from 'lucide-react'
 import { generateInvoice } from './InvoicePdf'
 import { Toast } from 'primereact/toast';
 import { useRef } from 'react';
@@ -55,7 +55,7 @@ const POCreateNewPurchase: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([])
   const [branches, setBranches] = useState<Branch[]>([])
 
-  const [totalPaid, ] = useState<number>(0)
+  const [totalPaid, setTotalPaid] = useState<number>(0)
  const toast = useRef<Toast>(null);
 
 
@@ -233,6 +233,8 @@ const handleDownloadInvoice = async () => {
     // 👇 Save as file (triggers download)
     doc.save(`Invoice-${Date.now()}.pdf`);
   } catch (error) {
+    
+  console.error('Invoice generation error:', error);
     toast.current?.show({
       severity: 'error',
       summary: 'Error',
