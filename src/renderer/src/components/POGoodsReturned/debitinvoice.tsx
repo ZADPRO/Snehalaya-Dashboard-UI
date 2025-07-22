@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import logo from '../../assets/logo/invoice (3).png';
+import logo from '../../assets/logo/invoice (3).png'; 
+
 declare module 'jspdf' {
   interface jsPDF {
     lastAutoTable?: {
@@ -8,7 +9,6 @@ declare module 'jspdf' {
     };
   }
 }
-
 
 interface Supplier {
   supplierId: number;

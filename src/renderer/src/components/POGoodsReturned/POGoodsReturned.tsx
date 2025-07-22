@@ -72,7 +72,7 @@ const POGoodsReturned: React.FC = () => {
   const [quantity, setQuantity] = useState<number>(1)
   const [price, setPrice] = useState<number>(0)
   const [discount, setDiscount] = useState<number>(0)
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
 
 const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
@@ -109,19 +109,37 @@ const [isDownloading, setIsDownloading] = useState<boolean>(false);
     setCreditedDate(newDate)
   }, [creditedDays])
 
-  useEffect(() => {
-    const mockProducts: Product[] = [
-      { productId: 1, productName: 'Kanchipuram Silk Saree', hsnCode: '5007', sku: '' },
-      { productId: 2, productName: 'Banarasi Saree', hsnCode: '5007', sku: '' },
-      { productId: 3, productName: 'Chiffon Saree', hsnCode: '5407', sku: '' },
-      { productId: 4, productName: 'Georgette Saree', hsnCode: '5408', sku: '' },
-      { productId: 5, productName: 'Cotton Handloom Saree', hsnCode: '5208', sku: '' },
-      { productId: 6, productName: 'Linen Saree', hsnCode: '5309', sku: '' },
-      { productId: 7, productName: 'Tussar Silk Saree', hsnCode: '5007', sku: '' },
-      { productId: 8, productName: 'Organza Saree', hsnCode: '5407', sku: '' }
-    ]
-    setProductList(mockProducts)
-  }, [])
+   useEffect(() => {
+    const currentDate = new Date()
+    const newDate = new Date(currentDate)
+    newDate.setDate(currentDate.getDate() + creditedDays)
+    setCreditedDate(newDate)
+  }, [creditedDays])
+ useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const token = sessionStorage.getItem('token');
+        const res = await axios.get('http://localhost:8080/api/v1/admin/products/read', {
+          headers: { Authorization: token || '' },
+        });
+        console.log('Products:', res.data.data);
+       if (res.data.data) {
+  const formattedProducts = res.data.data.map((item: any) => ({
+    productId: item.poId,
+    productName: item.poName,
+    hsnCode: item.poHSN,
+    sku: item.poSKU
+  }));
+  setProductList(formattedProducts);
+}
+
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchProducts();
+  }, []);
+
 
   const handleAddProduct = () => {
     if (!selectedProduct || quantity <= 0 || price <= 0) {
@@ -204,17 +222,18 @@ const handleDownloadDebit = async () => {
 
     const formattedCreditedDate = creditedDate ? creditedDate.toISOString() : new Date().toISOString();
 
+  
     const doc = await debitInvoice1({
       supplier: selectedSupplier,  
-      branch: selectedBranch,      
+      branch: selectedBranch,     
       productEntries: pdfProducts, 
       creditedDate: formattedCreditedDate,  
       transport: transport,       
       subTotal: subTotal,          
       discountTotal: discountTotal, 
       tax: tax,                    
-      total: total,                
-      totalPaid: totalPaid,        
+      total: total,               
+      totalPaid: totalPaid,       
       pendingPayment: pendingPayment 
     });
 
@@ -230,7 +249,6 @@ const handleDownloadDebit = async () => {
     setIsDownloading(false);
   }
 };
-
 const handlePrintDebitNote = async () => {
   if (!selectedSupplier || !selectedBranch || productEntries.length === 0) {
     toast.current?.show({
@@ -257,23 +275,40 @@ const handlePrintDebitNote = async () => {
       sku: entry.product.sku,
     }));
 
+    const formattedCreditedDate = creditedDate?.toISOString() || new Date().toISOString();
+
     const doc = await debitInvoice1({
       supplier: selectedSupplier,
       branch: selectedBranch,
       productEntries: pdfProducts,
-      creditedDate: creditedDate?.toISOString() || new Date().toISOString(),
-      transport: transport,
-      subTotal: subTotal,
-      discountTotal: discountTotal,
-      tax: tax,
-      total: total,
-      totalPaid: totalPaid,
-      pendingPayment: pendingPayment
+      creditedDate: formattedCreditedDate,
+      transport,
+      subTotal,
+      discountTotal,
+      tax,
+      total,
+      totalPaid,
+      pendingPayment,
     });
 
-    doc.autoPrint();
-    window.print();
+    const blob = doc.output('blob');
+    const blobUrl = URL.createObjectURL(blob);
+
+    const newTab = window.open(blobUrl);
+    if (newTab) {
+      newTab.onload = () => {
+        newTab.print();
+      };
+    } else {
+      toast.current?.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Pop-up blocked. Please allow pop-ups for this site to print.',
+        life: 5000,
+      });
+    }
   } catch (error) {
+    console.error("Print Error:", error);
     toast.current?.show({
       severity: 'error',
       summary: 'Error',

@@ -32,15 +32,20 @@ const AddProduct: React.FC = () => {
     poTotalPrice: ''
   })
 
+  const generateHSN = (name: string): string => {
+    if (!name) return ''
+    const prefix = name.trim().substring(0, 4).toUpperCase()
+    const random = Math.floor(1000 + Math.random() * 9000)
+    return `${prefix}${random}`
+  }
+
   const handleChange = (field: keyof ProductPayload, value: string) => {
     const currentValue = product[field]
-
     if (currentValue === value) return
 
     setIsDirty(true)
 
     const numericFields: (keyof ProductPayload)[] = [
-      'poHSN',
       'poQuantity',
       'poPrice',
       'poDiscPercent',
@@ -54,6 +59,10 @@ const AddProduct: React.FC = () => {
 
     setProduct((prev) => {
       const updated = { ...prev, [field]: value }
+
+      if (field === 'poName') {
+        updated.poHSN = generateHSN(value)
+      }
 
       const quantity = parseFloat(updated.poQuantity)
       const price = parseFloat(updated.poPrice)
@@ -148,6 +157,22 @@ const AddProduct: React.FC = () => {
           <label htmlFor="poName">Product Name</label>
         </FloatLabel>
 
+       
+        <FloatLabel className="always-float">
+          <InputText id="poHSN" value={product.poHSN} disabled className="w-full" />
+          <label htmlFor="poHSN">HSN Code </label>
+        </FloatLabel>
+
+        <FloatLabel className="always-float">
+          <InputText
+            id="poQuantity"
+            value={product.poQuantity}
+            onChange={(e) => handleChange('poQuantity', e.target.value)}
+            className="w-full"
+          />
+          <label htmlFor="poQuantity">Quantity</label>
+        </FloatLabel>
+
         <FloatLabel className="always-float">
           <InputText
             id="poPrice"
@@ -194,7 +219,7 @@ const AddProduct: React.FC = () => {
         <Button
           label="Save Product"
           icon="pi pi-check"
-          className=" gap-2"
+          className="gap-2"
           onClick={handleSaveProduct}
           disabled={!isDirty}
         />

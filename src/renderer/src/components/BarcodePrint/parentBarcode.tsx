@@ -51,35 +51,51 @@ export default function BarcodePrint() {
     const printArea = document.getElementById('print-area');
     const printWindow = window.open('', '_blank');
     if (!printWindow || !printArea) return alert('Popup blocked or print area missing');
+printWindow.document.write(`
+  <html>
+    <head>
+      <title>Print Barcodes</title>
+      <style>
+        @media print {
+          body {
+            margin: 0;
+            padding: 0;
+            text-align: center;
+          }
 
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Print Barcodes</title>
-          <style>
-            body { font-family: Arial, sans-serif; padding: 20px; }
-            .barcode-grid {
-              display: grid;
-              grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-              gap: 16px;
-            }
-            .barcode-item {
-              border: 1px solid #ccc;
-              padding: 10px;
-              text-align: center;
-              font-size: 14px;
-              height: 150px;
-              display: flex;
-              flex-direction: column;
-              justify-content: space-between;
-            }
-          </style>
-        </head>
-        <body>
-          ${printArea.innerHTML}
-        </body>
-      </html>
-    `);
+          .barcode-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5mm;
+            padding: 10mm;
+            box-sizing: border-box;
+          }
+
+          .barcode-item {
+            border: 1px solid #000;
+            text-align: center;
+            font-size: 10pt;
+            width: 35mm;
+            height: 50mm;
+            padding: 4mm;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            page-break-inside: avoid;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      ${printArea.innerHTML}
+    </body>
+  </html>
+`);
+
+
     printWindow.document.close();
     printWindow.focus();
     printWindow.print();

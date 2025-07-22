@@ -14,3 +14,24 @@
   flex-direction: column;
   justify-content: space-between;
 }
+.barcode-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.barcode-item {
+  border: 1px solid #ccc;
+  
+  text-align: center;
+  font-size: 14px;
+ 
+  width: 35mm;
+            height: 50mm;
+            padding: 4mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}

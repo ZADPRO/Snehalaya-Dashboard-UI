@@ -36,7 +36,7 @@ interface Product {
   poTotalPrice: string;
 }
 
-// Convert image to base64
+
 const toBase64 = (url: string): Promise<string> => {
   return fetch(url)
     .then((res) => res.blob())
